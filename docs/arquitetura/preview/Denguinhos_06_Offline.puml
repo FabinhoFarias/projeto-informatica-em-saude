@@ -1,0 +1,54 @@
+' GERADO: editar ../1.modeloGlobal.puml e executar ../gerar_previews.py
+@startuml Denguinhos_06_Offline
+    !theme plain
+    skinparam shadowing false
+    hide footbox
+    title 6. Mobile offline — registro local e sincronização idempotente
+    actor "ACE / ACS" as Agent
+    participant "App React Native" as App
+    database "Banco local criptografado\nSQLite / WatermelonDB (a avaliar)" as Local
+    participant "Sync Engine" as Sync
+    participant "API FastAPI" as API
+    database "PostgreSQL\nrotas, visitas e cursor" as DB
+    Agent -> App : consultar rota diária / registrar visita
+    App -> Local : ler rota previamente sincronizada
+    App -> Local : transação: visita UUID + outbox pending
+    Local --> App : confirmação local
+    App --> Agent : registro salvo / pendente de envio
+    note over App,Local
+    Funciona offline para rotas baixadas e registros;
+    alertas novos só chegam quando há conectividade.
+    Pré-carga de rota/área autorizada antes do trabalho de campo.
+    Sem nome/CPF ou dados clínicos identificáveis de pacientes.
+    Referências territoriais devem passar por política de minimização;
+    dado identificável permanece local, conforme RNF-006.
+    end note
+    App -> Sync : conectividade disponível
+    Sync -> Local : ler outbox + último cursor confirmado
+    Sync -> API : POST /v1/sync/push\nBearer; {device_id,operations:[uuid,base_version,payload]}
+    API -> API : validar field:routes, tenant, agente e área atribuída
+    API -> DB : transação; UNIQUE(tenant_id,operation_uuid)\nverificar base_version
+    alt versão válida ou operação já aplicada
+    DB --> API : resultado original / novo ack
+    API --> Sync : ack por operação + versão do servidor
+    Sync -> Local : marcar somente operações aceitas como synced
+    else conflito ou payload inválido
+    API --> Sync : resultado por operação: conflict / rejected\nserver_version + motivo sem dados sensíveis
+    Sync -> Local : preservar registro para correção/revisão
+    end
+    Sync -> API : GET /v1/sync/pull?cursor=...&limit=...\nrotas, alertas e alterações autorizadas
+    API -> DB : ler mudanças ordenadas + tombstones\nlimitadas ao agente/tenant
+    DB --> API : página + next_cursor + has_more
+    API --> Sync : mudanças + cursor
+    Sync -> Local : aplicar página e cursor na mesma transação
+    Sync --> App : atualizar estado de sincronização
+    note over Sync,DB
+    Repetir páginas até has_more=false; retry com backoff em falhas de rede.
+    Cursor expirado exige snapshot novo sem apagar outbox pendente.
+    Visitas usam UUID idempotente; servidor governa rotas/aprovações.
+    Sem sobrescrita silenciosa em conflitos; revisão antes de reaplicar.
+    end note
+    legend bottom
+    RF-012..014; RNF-004, 005, 006, 007
+    endlegend
+    @enduml

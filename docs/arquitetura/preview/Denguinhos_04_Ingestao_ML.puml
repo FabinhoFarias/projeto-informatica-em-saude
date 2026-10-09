@@ -1,0 +1,67 @@
+' GERADO: editar ../1.modeloGlobal.puml e executar ../gerar_previews.py
+@startuml Denguinhos_04_Ingestao_ML
+    !theme plain
+    skinparam shadowing false
+    hide footbox
+    title 4. Fontes → ingestão → ML → resultados publicados
+    participant "Borda local\nplanilhas / conectores municipais" as Edge
+    participant "API FastAPI" as API
+    participant "Scheduler + fila" as Queue
+    participant "Worker de ingestão\nconectores externos" as Ingest
+    participant "Fontes públicas\nAPI / arquivos disponíveis" as Sources
+    database "Dados agregados\nPostgreSQL + PostGIS / storage" as Data
+    participant "Worker ML\nmesmo pipeline de features" as ML
+    collections "Registro de modelos\nartefato + métricas + versões" as Registry
+    database "Previsões + jobs\nPostGIS" as Results
+    participant "Web / Mobile" as Front
+
+    note over Edge,API
+    CSV/XLSX: seleção e mapeamento de colunas local, validação,
+    normalização de bairro/CID e geocodificação local, remoção de PII,
+    agregação por território/semana e supressão de grupos reidentificáveis.
+    Arquivo original não sai da borda; sem upload bruto para anonimizar na nuvem.
+    Cruzamento APS/Vigilância por território/tempo, sem vínculo de pacientes.
+    end note
+    Edge -> API : POST /v1/imports\nagregados + schema_version + checksum\nIdempotency-Key; credencial municipal
+    API -> API : autorizar ingestion:manage\nvalidar schema, tenant e rejeitar payload com PII
+    API -> Results : criar job queued + outbox na mesma transação
+    API --> Edge : 202 {job_id,status_url}
+    API -> Queue : publicar outbox com retry
+    Queue -> Ingest : executar importação / coleta periódica
+    Ingest -> Sources : buscar dados públicos agregados\ntimeout, limites da fonte e backoff
+    Sources --> Ingest : dados + período + proveniência
+    Ingest -> Ingest : validar, deduplicar, harmonizar território/CID\nregistrar lacunas; separar lote inválido sem PII
+    Ingest -> Data : persistir snapshot imutável\ntenant + fonte + período + dataset_version
+    Ingest -> Results : atualizar qualidade e status da importação
+    Ingest -> Queue : agendar features / previsão para snapshot válido
+    Queue -> ML : executar job versionado
+    ML -> Data : ler séries territoriais + clima + população\nAPS, notificações e indicadores vetoriais
+    ML -> ML : nowcasting + features temporais/espaciais\nlacunas sinalizadas; ausência não equivale a zero
+    alt treinamento agendado ou recalibração autorizada
+    ML -> ML : validação temporal sem vazamento\ncalibração, erro por bairro e falsos alarmes
+    ML -> Registry : candidato + métricas + dataset/feature_version
+    note over ML,Registry
+        XGBoost/Prophet e DBSCAN/SaTScan são candidatos, não decisões finais.
+        GeoPandas prepara geometrias; não é modelo preditivo.
+        Aprovação epidemiológica promove a versão; falha mantém a anterior.
+    end note
+    else inferência periódica
+    ML -> Registry : carregar versão aprovada e compatível
+    Registry --> ML : artefato + feature_version + parâmetros
+    ML -> ML : prever horizonte 2..4 semanas\nintervalos, hotspots e recomendações por regras
+    ML -> Results : publicar snapshot atomicamente\nmodel_version + dataset_version + qualidade
+    ML -> API : evento prediction_published\ninvalida cache do tenant / versão
+    end
+    Front -> API : GET /v1/jobs/{job_id}\nou GET /v1/risk
+    API -> Results : consultar resultado no tenant autorizado
+    API --> Front : status ou última previsão válida\ncom updated_at e aviso se desatualizada
+    note over Queue,Results
+    Jobs: queued → running → succeeded | failed.
+    Retries limitados, processamento idempotente e fila de falhas;
+    indisponibilidade da fonte preserva última publicação e sinaliza atraso.
+    Auditoria: request_id/job_id/tenant/versões, sem PII em logs.
+    end note
+    legend bottom
+    RF-001..007, 009, 015..017; RNF-006, 009, 010, 012, 014
+    endlegend
+    @enduml

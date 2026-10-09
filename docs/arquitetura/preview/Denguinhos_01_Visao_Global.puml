@@ -1,0 +1,51 @@
+' GERADO: editar ../1.modeloGlobal.puml e executar ../gerar_previews.py
+@startuml Denguinhos_01_Visao_Global
+    !theme plain
+    left to right direction
+    skinparam componentStyle uml2
+    skinparam packageStyle rectangle
+    skinparam shadowing false
+    title 1. Visão global — responsabilidades e fronteiras
+
+    package "Clientes" {
+    [Web Next.js\nVisão geral, diagnóstico, ingestão,\nsimulação e usuários] as Web
+    [App React Native (proposto)\nRotas, visitas e alertas offline] as Mobile
+    }
+    package "Nuvem — município isolado por tenant_id" {
+    [BFF Next.js\nRoute Handlers: sessão web] as BFF
+    [API FastAPI /v1\nRBAC, validação e regras de negócio] as API
+    [Fila + workers\nIngestão, ML, exportação e simulação] as Workers
+    database "PostgreSQL + PostGIS\nIndicadores, previsões, rotas e jobs" as DB
+    database "Redis\nCache de leitura" as Cache
+    storage "Object storage\nAgregados e modelos versionados" as Storage
+    }
+    [Identidade OIDC\nMFA para administração/gestão] as IdP
+    package "Borda — município / dispositivo" {
+    [Planilhas e bases locais\nPEC, UPA, SINAN/SIM, LIRAa] as Local
+    [Processador local\nNormaliza, geocodifica, agrega\ne remove PII antes de transmitir] as Edge
+    }
+    cloud "Fontes externas\nInfoDengue, DATASUS, clima\nAPI ou arquivo conforme disponibilidade" as Sources
+    Web --> BFF : HTTPS / JSON\ncookie de sessão
+    BFF --> API : HTTPS / REST\nBearer access token
+    Mobile --> API : HTTPS / REST\nBearer + sincronização
+    API --> IdP : valida assinatura, emissor,\naudiência e expiração
+    API --> Cache : leitura por tenant + filtros + versão
+    API --> DB : consultas e transações
+    API --> Workers : job assíncrono
+    Workers --> DB : publica resultados
+    Workers --> Storage : dados/modelos
+    Local --> Edge : leitura local
+    Edge --> API : apenas agregados\nsem PII de pacientes
+    Workers --> Sources : coleta agendada\ncredenciais no servidor
+    note bottom of API
+    Monólito modular inicial: território, diagnóstico, ingestão,
+    simulação, campo e usuários. Workers executam trabalho pesado.
+    REST + OpenAPI como contrato único; sem GraphQL nesta proposta.
+    Tenant derivado da identidade e validado em cada operação;
+    RLS no banco e isolamento também em cache, jobs e storage.
+    end note
+    legend bottom
+    RF-001, 004, 008..017; RNF-002, 004, 006..009
+    Setas indicam chamadas ou envio de dados; respostas ficam nos diagramas de sequência.
+    endlegend
+    @enduml

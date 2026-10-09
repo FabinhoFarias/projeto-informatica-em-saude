@@ -1,0 +1,59 @@
+' GERADO: editar ../1.modeloGlobal.puml e executar ../gerar_previews.py
+@startuml Denguinhos_02_Design_System
+    !theme plain
+    top to bottom direction
+    skinparam componentStyle uml2
+    skinparam packageStyle rectangle
+    skinparam shadowing false
+    title 2. Design system — tokens, contratos e composição
+
+    [Tokens semânticos (alvo)\ncolor, typography, spacing, border, state\nJSON/TypeScript independente de plataforma] as Tokens
+    [Adaptador Web\nCSS variables + Tailwind] as WebAdapter
+    [Adaptador Mobile\nStyleSheet React Native] as MobileAdapter
+    [Primitivos por plataforma\nButton, Input, Select, Text, Status\nlabel, disabled, focus, error] as Primitives
+    [Componentes compartilhados por contrato\nRiskBadge(risk), MetricCard(label,value,detail,trend)\nPanel(title,description,action,children)\nPageHeading(eyebrow,title,description,action)] as UI
+    [Visualizações por plataforma\nMapa(GeoJSON + risco), SérieTemporal(pontos + intervalo)\nTabela(colunas + paginação), FormulárioVisita(validação)] as Views
+    [Composição Web\nDashboardShell + filtros + permissões\n/  /diagnostico  /ingestao  /simulacao  /usuarios] as Pages
+    [Composição Mobile\nRota diária + visita + alertas\nstatus de conexão e sincronização] as Field
+    [Cliente API tipado (alvo)\nDTOs gerados de OpenAPI\nvalidação + mapeamento DTO para view model] as Client
+    Tokens --> WebAdapter
+    Tokens --> MobileAdapter
+    WebAdapter --> Primitives
+    MobileAdapter --> Primitives
+    Primitives --> UI
+    UI --> Views
+    Views --> Pages
+    Views --> Field
+    Client --> Pages : dados / estados
+    Client --> Field : dados / estados
+    note right of Tokens
+    Base visual do protótipo:
+    fundo #FFFFFF; texto #1A1A1A; ação azul.
+    Baixo: #2E7D32 / #E8F5E9
+    Médio: #F57F17 / #FFFDE7
+    Alto: #E65100 / #FFF3E0
+    Crítico: #C62828 / #FFEBEE
+    Fonte Arial/sistema; escala 12/14/16/24/30 px.
+    Alvo: espaçamento 4/8/12/16/20/24/32 px;
+    superfície plana, bordas discretas e sem sombra.
+    Validar contraste dos tokens antes da produção;
+    risco sempre acompanhado de texto/ícone.
+    end note
+    note bottom of Client
+    Estados: loading | success | empty | error | stale.
+    Mobile: offline | pending | syncing | conflict.
+    Mostrar updated_at, qualidade e versão do modelo.
+    UI não calcula risco nem define permissões de segurança.
+    PermissionGate melhora a interface; API autoriza novamente.
+    end note
+    note bottom of Field
+    Compartilhar tokens, tipos e regras de apresentação;
+    componentes DOM e componentes nativos têm implementações distintas.
+    Alvo mobile: toque >= 48 dp, alto contraste e operação com uma mão.
+    end note
+    legend bottom
+    Existente: dashboard-ui.tsx, dashboard-shell.tsx, riskColors e PermissionGate.
+    Proposto: pacote de tokens, adaptadores, cliente API e aplicativo móvel.
+    RF-008, 010, 017; RNF-005, 013
+    endlegend
+    @enduml

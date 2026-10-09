@@ -1,0 +1,50 @@
+' GERADO: editar ../1.modeloGlobal.puml e executar ../gerar_previews.py
+@startuml Denguinhos_03_Consulta_Web_API
+    !theme plain
+    skinparam shadowing false
+    hide footbox
+    title 3. Web → API — consulta de risco e contrato de leitura
+    actor "Gestor / Epidemiologista" as User
+    participant "Browser\nDashboard Next.js" as Web
+    participant "BFF Next.js\n/api/* (proposto)" as BFF
+    participant "FastAPI\n/v1/*" as API
+    participant "Autorização\nJWT + RBAC + tenant" as Auth
+    database "Redis" as Cache
+    database "PostgreSQL / PostGIS" as DB
+    User -> Web : seleciona bairro / semana / horizonte
+    Web -> BFF : GET /api/risk?week=...&horizon=4\ncookie HttpOnly + Secure + SameSite
+    BFF -> API : GET /v1/risk?week=...&horizon=4\nAuthorization: Bearer <token> + X-Request-ID
+    API -> Auth : validar token e dashboard:view\nderivar tenant e escopo territorial
+    alt credencial ou permissão inválida
+    Auth --> API : acesso negado
+    API --> BFF : 401 / 403 + erro estruturado
+    BFF --> Web : mensagem e ação de recuperação
+    else autorizado
+    Auth --> API : contexto autorizado
+    API -> Cache : GET tenant:filtros:prediction_version
+    alt cache válido
+        Cache --> API : snapshot publicado
+    else cache ausente
+        API -> DB : SELECT previsões + geometrias\nRLS tenant; filtros e índices espaciais
+        DB --> API : snapshot consistente
+        API -> Cache : SET snapshot com TTL e versão
+    end
+    API --> BFF : 200 JSON / GeoJSON + ETag
+    BFF --> Web : DTO validado / estado success ou empty
+    Web --> User : mapa, indicadores e atualização dos dados
+    end
+    note over Web,API
+    RiskDTO: neighborhood_id, epidemiological_week, horizon_weeks (2..4),
+    risk_level (Baixo|Médio|Alto|Crítico), probability (0..1), expected_cases,
+    prediction_interval {lower,upper}, model_version, dataset_version,
+    updated_at, quality_flags; mapa em GeoJSON com simplificação/paginação.
+    Erro: {code,message,request_id,details}; 422 para entrada inválida.
+    Server Components podem chamar FastAPI diretamente no servidor.
+    BFF atende chamadas do browser; mutações exigem proteção CSRF.
+    end note
+    note over API,DB
+    Leitura usa previsões previamente publicadas, sem treinar ML na requisição.
+    Meta RNF-001: mapas/painéis <= 3 s em condições normais;
+    verificar com volume real, payload limitado e métricas de latência.
+    end note
+    @enduml

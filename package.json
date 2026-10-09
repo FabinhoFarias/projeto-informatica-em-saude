@@ -6,7 +6,14 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "remove-cache": "node -e \"require('fs').rmSync('.next', { recursive: true, force: true })\"",
+    "git:reset-hard": "git fetch origin && git reset --hard origin/main",
+    "git:pull-keep": "git stash && git pull && git stash pop",
+    "git:config-me": "git config user.name \"Fabinho Farias\" && git config user.email \"fjcff@cin.ufpe.br\"",
+    "git:deploy": "npm run build && git add . && git commit -m",
+    "git:push": "git push -u origin main",
+    "git:push-force": "git push -f origin main"
   },
   "dependencies": {
     "next": "16.4.0",

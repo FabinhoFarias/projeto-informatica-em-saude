@@ -1,0 +1,40 @@
+' GERADO: editar ../1.modeloGlobal.puml e executar ../gerar_previews.py
+@startuml Denguinhos_05_Jobs_API
+    !theme plain
+    skinparam shadowing false
+    hide footbox
+    title 5. API → processamento assíncrono — simulação, exportação e calibração
+    participant "Web via BFF" as Web
+    participant "API FastAPI" as API
+    database "PostgreSQL\njobs + outbox" as DB
+    participant "Fila / dispatcher" as Queue
+    participant "Worker de simulação" as Worker
+    database "Snapshot de risco\n+ capacidade territorial" as Risk
+    Web -> API : POST /v1/simulations + Idempotency-Key\n{resources:{acs,ace,larvicide,tests},horizon_weeks}
+    API -> API : RBAC simulation:view; validar limites/unidades\nfixar tenant, dataset_version e model_version
+    API -> DB : transação: job queued + outbox
+    API --> Web : 202 {job_id,status_url}
+    Queue -> DB : ler outbox pendente
+    Queue -> Worker : job_id + contexto autorizado
+    Worker -> Risk : ler snapshot fixado pelo job
+    Risk --> Worker : previsões + população + capacidade
+    Worker -> Worker : aplicar política de alocação versionada\nconservar totais e respeitar restrições
+    Worker -> DB : resultado + hipóteses + versão da política\nstatus succeeded (ou failed com motivo)
+    loop polling com backoff até estado terminal
+    Web -> API : GET /v1/jobs/{job_id}
+    API -> DB : verificar proprietário/tenant e ler status
+    API --> Web : {status,progress,result,error}
+    end
+    note over Web,Worker
+    Contratos adicionais propostos (REST /v1; OpenAPI é a especificação):
+    GET /diagnosis — diagnosis:view; nível avançado requer diagnosis:advanced.
+    GET /neighborhoods — dashboard:view; cursor, filtros e limite de itens.
+    POST /exports — data:download ou reports:export conforme o produto exportado.
+    GET/POST/PATCH /users — users:manage; restrição ao tenant autorizado.
+    POST /model/calibrations — model:calibrate; cria candidato, não promove automaticamente.
+    POST /routes/{id}/approval — routes:approve; aprovação humana da operação.
+    GET /alerts — aps:alerts (APS/web) ou field:routes (app), com escopo territorial.
+    Simulação não garante redução de casos; publicar hipóteses e incertezas.
+    Exportação/calibração seguem o mesmo ciclo de jobs, com workers próprios.
+    end note
+    @enduml
