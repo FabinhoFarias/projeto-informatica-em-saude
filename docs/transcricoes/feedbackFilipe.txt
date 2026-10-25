@@ -1,0 +1,486 @@
+Aqui está a transcrição detalhada do áudio apresentado no vídeo:
+
+---
+
+**[FALA 1 - Mulher 1]:**
+— Agora que tu vai avisar? Ele não vai falar nada. Você sabe o que é, né? *(Risos)* Mas é massa.
+
+E aí a gente criou um software para facilidade de serviço e para... meu Deus, é fogo! Para a gente trabalhar com esse alerta antecipado de água e viroses. Aí, dentre... a gente pegou a ideia de Recife, mas aí a gente levou para a nossa cidade, né?
+
+**[FALA 2 - Homem 1]:**
+— Mas tem...
+
+**[FALA 1 - Mulher 1]:**
+— O problema de ter essa antecipação de surtos e apoio a decisões. Uma coisa que eu achei interessante, quando eu estava conversando com os meninos, é que quando eu fui atrás lá do... da... Eu acho que ela não é... não trabalha diretamente como epidemiologista, não, acho que ela é mais uma... contratada da prefeitura que colocaram ela na função. Mas... *(Risos)*
+
+**[FALA 2 - Homem 1]:**
+— É, cada um na sua função.
+
+**[FALA 1 - Mulher 1]:**
+— É, cada um na sua função, né? E quando eu fui conversar com ela, ela disse que... esse ano foi o ano que mais teve, comparado ao ano passado, foi o ano que mais teve casos de dengue. Onde a gente tá num... lá na cidade tá tendo um surto, realmente. Inclusive teve casos de óbito.
+
+**[FALA 3 - Mulher 2]:**
+— Nossa!
+
+**[FALA 1 - Mulher 1]:**
+— É, e a gente nem imaginava! Ninguém tem... ninguém tinha o número, mas ela disse que... teve uma quantidade de casos de dengue que lá, pelo menos a SE, que está em alerta, a Secretaria de Saúde, né? Ninguém... ninguém tinha o número, ninguém nem sabe.
+
+Mas aí a gente tem... esses atrasos na notificação do caso, principalmente no... no físico e vetorial. Onde... a gente estava conversando sobre isso, e aí eu perguntei para ela quais são os bairros lá que estavam mais com esse pico de casos de dengue, e ela falou e reportou que era os da zona rural.
+
+E aí, o que é que... quando eu fui propor a proposta para... para ela, do nosso... do nosso software, né, da nossa... do nosso serviço, ela... estava conversando e estava dizendo que... é, basicamente, a solução é dada para a cidade inteira, a mesma solução. E aí a ideia da gente é justamente fazer com que... Como assim?
+
+**[FALA 2 - Homem 1]:**
+— De onde? Ela quer expandir para a cidade inteira, é?
+
+**[FALA 1 - Mulher 1]:**
+— Não, ela não falou isso, não. Do jeito... Calma! Ela disse que quer lançar a proposta lá para a prefeitura, mas assim... quando a gente chegar, com tudo direitinho, tudo pronto, né? Por quê? Porque ela disse que a mesma solução que lá eles ainda estão usando, inclusive ela falou a palavra "fumacinha". Lá... mas lá na... lá na zona rural, né?
+
+E aí, o... o agente de saúde que é responsável por isso, ele estava... parece que estava no momento também, que... o agente de saúde e o agente de endemias que estavam lá, eles estavam conversando, estavam dizendo sobre isso, de que, no momento, não se tem apenas casos, não se teve apenas casos de dengue na zona rural, também se teve no... na cidade, principalmente na Roda de Fogo.
+
+**[FALA 3 - Mulher 2]:**
+— Teve um caso...
+
+**[FALA 1 - Mulher 1]:**
+— É... e aí eles estão usando a mesma solução. E a nossa proposta é ver soluções diferentes para determinados bairros.
+
+**[FALA 2 - Homem 1]:**
+— Tá. A mesma solução que eles usam é o quê? É só a fumaça, por enquanto?
+
+**[FALA 1 - Mulher 1]:**
+— Fumaça e o... fumaça e eu acho que a... *(Vozes sobrepostas)* É... pelas gotinhas, que bota na água.
+
+**[FALA 2 - Homem 1]:**
+— O larvicida, larvicida.
+
+**[FALA 1 - Mulher 1]:**
+— Isso! Mas ela disse que a única solução que eles tomaram para agora foi a... fumaça lá de espalhar ou o veneno que dava lá nas costas, naquelas bombas lá das costas.
+
+**[FALA 2 - Homem 1]:**
+— Fumaça, o bicho tá pegando.
+
+**[FALA 1 - Mulher 1]:**
+— Olha, eu acho que era para tu ser... inclusive, ela deu... até comentei com os meninos, que ela deixou passar para a política para ter essa conversa comigo, porque ela adiou, adiou, adiou, adiou, foi dando um monte de desculpa e esperou passar... acho que para a pré-seleção, não sei o quê. Aí, é... ela esteve me falando isso, que... eles têm a mesma solução para toda a cidade.
+
+Aí eu estava conversando sobre isso, sobre... os locais da cidade, as condições serem diferentes, né, o saneamento básico ser diferente, sobre a região geográfica ali da zona rural ser... pode ser um pouco diferente da cidade, e aí poderia ter soluções diferentes, que é muito do que a gente queria propor. E aí ela achou esse tema muito interessante, mas que... queria ter uma conversa mais assim... mais sólida quando estivesse pronto, né?
+
+Então... basicamente, o nosso sistema é trazer recomendações de acordo com o local e de acordo específico ali com o saneamento básico do local, saber especificamente como é que tá funcionando, também de acordo com a quantidade de... de casos também, eu acho que isso é importante também, a região geográfica, o saneamento básico, a população que mora ali, como é que a população se comporta.
+
+Ela estava até perguntando se... se a... se a plataforma — eu não vou falar plataforma —, se ela cita e se ela traz algo voltado também para a população, e não só de chegar nos agentes de saúde. Foi até... esqueci de citar. Quando eu tinha falado... que eu acho que vai estar aqui, sobre gestão, sobre gestão de endemias e de agentes de saúde, mas ela perguntou até que ponto isso pode chegar na população, porque ela tinha citado que a população já está extremamente desinformada com relação a como lidar e se prevenir para evitar os casos de dengue.
+
+E aí, né, tu trouxe...
+
+**[FALA 4 - Homem 2]:**
+— Então, peraí, peraí, peraí. Ela disse... que a população está desinformada. Essa pessoa era... era a Secretária de Saúde?
+
+**[FALA 1 - Mulher 1]:**
+— Não, ela é responsável... responsável pela Vigilância Epidemiológica.
+
+**[FALA 4 - Homem 2]:**
+— Isso. Ela é... uma funcionária que é responsável por um... epidemiologista do local.
+
+**[FALA 1 - Mulher 1]:**
+— Ela tá responsável por como lidar lá com essa epidemia do local, com o surto de dengue.
+
+**[FALA 4 - Homem 2]:**
+— O que quer dizer que ela estava dizendo que ela não estava fazendo o trabalho dela *(Risos)*.
+
+**[FALA 1 - Mulher 1]:**
+— É, basicamente isso. Se o pessoal tá desinformado...
+
+**[FALA 3 - Mulher 2]:**
+— Informalmente ela falou isso, nem ela mesma percebeu o que ela estava dizendo.
+
+**[FALA 1 - Mulher 1]:**
+— Que eu até citei sobre... que a... que a nossa solução, ela tem um ponto muito importante com o agente de saúde, né, que... a gente vai mostrar direitinho o que tem a função ali a partir do agente de saúde e como a gente pode lidar. Aí ela falou, e conversou com a gente sobre isso, que realmente a população e o agente de saúde da região... são habituados a realmente lidar com os casos de dengue da cidade.
+
+Que ela falou que só dois lá, se eu não me engano é meu pai... e outro que... é o que é o único que está indo lá com a fumaça mexer lá com os casos de dengue da zona rural. Aí ela tá falando, tá dizendo que... eh, tá um pouco atrasado no momento, mas que eles estão querendo dar palestra, etc., para dar essa formação melhor para os agentes de saúde.
+
+**[FALA 4 - Homem 2]:**
+— Para os agentes.
+
+**[FALA 1 - Mulher 1]:**
+— Isso, para os agentes de saúde. Eh, disse que... estava conversando que... eh, ela estava até citando que eu acho que, se eu não me engano, o SINAN tá... não tá abrindo para a cidade faz uns dois meses. É.
+
+**[FALA 3 - Mulher 2]:**
+— E por isso...
+
+**[FALA 1 - Mulher 1]:**
+— E ela me inclusive me mostrou, no celular dela, ela abriu o sistema, tentou colocar, porque ela disse que... se não resolvesse, se eu não me engano, até... não sei se era até essa sexta, acho que era até essa sexta, que é amanhã, eles iam perder... eh, mais de 20 amostras de... de de sorologia, de não sei o quê lá, de exames mesmo do pessoal que estava com o caso de dengue, que eles... ela não estava conseguindo enviar para o sistema do SINAN. Aí eles iam perder essa... *(Risos)* essas amostras que estavam lá.
+
+**[FALA 3 - Mulher 2]:**
+— É o interior, né?
+
+**[FALA 1 - Mulher 1]:**
+— É, é o interior. Eles iam perder essas amostras, tá?
+
+**[FALA 4 - Homem 2]:**
+— Vão passar o número do meu prefeito, já que... *(Risos)* Tu é doido?
+
+**[FALA 1 - Mulher 1]:**
+— Eu realmente não sabia que estava nesse... tá subterrâneo, tá!
+
+**[FALA 3 - Mulher 2]:**
+— É real, né? Mas eu... eu juro para você que eu fiquei assim, ó: poxa, é... é realmente um retrato do que a Ranni está dizendo, de que realmente a população não está informada, porque a gente não tem noção de que realmente isso está acontecendo. Os óbitos, tudo.
+
+**[FALA 4 - Homem 2]:**
+— Isso é com a dengue, imagina com a assistência... assistência... saúde da mulher, gestação.
+
+**[FALA 3 - Mulher 2]:**
+— A grande é essa. Babado.
+
+**[FALA 1 - Mulher 1]:**
+— Aí... tudo que a gente conversa sobre isso, e eu estava justamente citando esses... esses três... três tópicos, né? Que aí trouxe mais novidades da região no momento, mas acho que é de realmente iniciar lá na nossa cidade, né? Então...
+
+**[FALA 3 - Mulher 2]:**
+— Tá, de fato tá precisando mais do que aqui. *(Risos)* Pode continuar, fique à vontade.
+
+**[FALA 1 - Mulher 1]:**
+— E aí, a gente... quando eu estava conversando com ela, eu citei esses três pontos, né, como é que seria, no caso, as três seções principais, que realmente são ali os que regem, os que tomam conta de fato do inicial, que é o gestor municipal, que... a solução... qual a proposta para a solução? Que é... ver essa exigência de simulação de recursos e etc., como é que seria os dados que iam passar para ele dentro da plataforma.
+
+A nossa querida funcionária que eu tive a conversa, que aí... ia mostrar para ela direitinho a exposição analítica e etc., como é que... como é que está dentro do... com o bairro, como é que está a situação dentro do bairro, como é que está... eh, os sinais, etc., que vai ser passada ali de acordo com o local.
+
+E os ACS e o ACE, né, onde eles teriam ali o sinal de acordo com o seu cadastro direitinho para dar ali no apoio do... dentro do campo onde eles teriam as informações, eh, qual a solução plausível para de acordo com o seu bairro, né? Porque, como a gente sabe, cada bairro tem o seu... mais de um, acredita a gente, de de saúde, né? Normalmente o mínimo é um. Mas cada um tem o seu, e aí, de acordo com o seu bairro, dentro ali da sua UBS, tá aquela situação plausível, direitinho, para cada local adequado.
+
+Espero que ainda não esteja muito... mas tudo bem.
+
+E aí... a integração e a oportunidade de dados onde a gente tem... eh, o e-SUS, onde ele trabalha com as notificações de febres na atenção primária; tem o SINAN, com as notificações que ela disse que não estava funcionando, inclusive, que trabalha com as notificações históricas dos casos de arboviroses. Ah, inclusive, eu atentei para o de dengue, mas a ideia também é implementar para as outras... as demais arboviroses, como Zika e Chikungunya.
+
+Tá, e o InfoDengue, né, que a gente trabalha com as... eh, estimativas principais de clima, de precipitação e etc., como funciona. Então, a gente teria basicamente município, bairro, e aí a gente trabalha com a semana, o agravo, a fonte, a versão, tudo de acordo com... com o seu bairro, de acordo com aquilo que realmente fosse precisar ali dentro do... de cada bairro, de acordo com... com a região geográfica, o local, a população e etc. dos seus bairros.
+
+**[FALA 3 - Mulher 2]:**
+— OK, essa parte é minha. Eh, entrando na parte do rigor ético, eh, a gente vai falar agora sobre como funcionaria isso dentro do nosso sistema.
+
+Basicamente, ele integra prontuários eletrônicos de UBSs e UPAs ao sistema, a bases nacionais de notificações, como já foi citado aqui, o SINAN e o DataSUS. E aí, eh, tem toda uma questão que gira em torno da... dos dados sensíveis, né, da proteção de dados sensíveis previstos no artigo 5º da LGPD, como a gente já viu.
+
+E aí... eh, juridicamente falando, o nosso sistema, ele meio que estaria amparado já pelas próprias políticas públicas que de... de de utilização de dados sensíveis, né? Na própria lei já é previsto isso, no artigo 11, onde tratamento de dados sensíveis, eh, que são indispensáveis à tutela da saúde, eles podem ser utilizados sem consentimento, eh, individual de cada paciente, né?
+
+E, eh, além disso, procedimentos que são, eh, realizados em instituições de pesquisa, tais quais universidades, eh, a Fiocruz, até, por exemplo, eh, são realizados no que a gente poderia dizer num ambiente controlado. Então, eh, esses dados sensíveis também podem ser utilizados em um ambiente assim, justamente por não oferecer risco. Eles estão em um ambiente controlado onde a... a ética dos pacientes não seria comprometida.
+
+Eh... deixa eu ver se eu estou esquecendo mais... Ah! Além disso, a LGPD também prevê a não venda dos dados. Não pode ser utilizado para fins comerciais. E a gente também se enquadra nisso porque não é utilizado para isso. É só um sistema de notificações, não há ainda fins comerciais.
+
+**[FALA 4 - Homem 2]:**
+— No caso de instituição de pesquisa, vocês teriam que ser registrados como, eh, instituição de pesquisa para usar esse argumento.
+
+**[FALA 3 - Mulher 2]:**
+— Hum...
+
+**[FALA 5 - Homem 3]:**
+— É, como a gente tá no contexto de disciplina, a gente não pode chegar e justificar...
+
+**[FALA 4 - Homem 2]:**
+— Na disciplina sim, mas num ambiente real de produção, não. Certo? Então, teria que utilizar os outros dois na prática, não necessariamente o terceiro.
+
+**[FALA 3 - Mulher 2]:**
+— Não necessariamente o terceiro. Sim.
+
+Tá, aí falando agora sobre a questão da privacidade do dos dados, né, da do do transporte dos dados da UBS para a nuvem... eh, basicamente, o... passaria por um processamento de borda — eu esqueci agora o termo em inglês —, mas...
+
+**[FALA 5 - Homem 3]:**
+— O quê?
+
+**[FALA 3 - Mulher 2]:**
+— *Edge*. É porque antes tem um negócio do do *Edge*. Aí é *Privacy by* alguma coisa...
+
+**[FALA 4 - Homem 2]:**
+— *Privacy by Design*.
+
+**[FALA 3 - Mulher 2]:**
+— Isso, *Privacy by Design*. E aí os dados, eles são completamente desidentificados antes que cheguem à nuvem. Ou seja, eh, os dados armazenados, eles basicamente só trazem as informações necessárias às validações, eh, futuras do processo da pesquisa.
+
+E aí, eh, falando sobre proteção de infraestrutura, a gente teria relatório de impacto de proteção de dados, criptografia de ponta a ponta e autenticação de dois fatores e controle baseado em papéis, que basicamente, eh, só faria chegar até o... ao agente de saúde, ao gestor público, os dados que de fato forem necessários para que eles desenvolvam suas funções. Ou seja, mais uma vez, não comprometendo a privacidade e não violando os dados sensíveis dos pacientes.
+
+E aí, eh, falando, por fim, da... da última parte ética, eh, como evitar erros de calibração? O nosso sistema, ele meio que é classificado como, eh, Classe 2, que é... Isso, Classe 2, que é risco médio.
+
+E então erros de calibração poderiam fazer com que os gestores me desinassem insumos, eh, de uma forma incorreta, caso haja o erro de calibração. Então, a gente visa contornar isso com um ciclo de revalidação contínua. Ou seja, validação epidemiológica e supervisão humana.
+
+Em resumo: a IA, ela vai orientar e antecipar — o nosso sistema, ele vai orientar e antecipar —, mas a decisão final, ela fica na mão dos gestores e dos gestores públicos de saúde e dos agentes. Ou seja...
+
+**[FALA 4 - Homem 2]:**
+— Vocês já sabem a resposta para o que ele me perguntou antes de vocês chegarem. E ele já sabe o que é que vem. Por que vocês vão desidentificar os dados para poder processar os dados, se o processo de vigilância em saúde exige que o dado seja identificado? Eu tenho que saber quem é a pessoa para poder ter a notificação e depois investigar o caso.
+
+Vou pegar o exemplo do município de vocês. Vocês disseram que no município de vocês pessoas morreram de dengue. Então, o processo de análise desse dado começou como? O médico fez a notificação do caso — notificação —, depois teve uma investigação. São dois momentos temporais distintos, certo?
+
+Mas são os dados são identificados. Vocês estão com a tutela do dado em nome da Secretaria de Saúde, por que de desidentificar?
+
+**[FALA 3 - Mulher 2]:**
+— É uma boa informação...
+
+**[FALA 4 - Homem 2]:**
+— Mas você vai expor em que momento? É para responder. O que é que você vai dizer?
+
+**[FALA 5 - Homem 3]:**
+— Eh, desidentificar porque a gente não quer apontar qual paciente, sei lá, tá doente, qual paciente morreu naquele tempo. A gente só quer pegar o dado para processar e fazer previsões, a gente não quer... não quer identificar nada, assim.
+
+**[FALA 3 - Mulher 2]:**
+— É, a ideia é essa. Para ter a privacidade do paciente, ou que tá em uma situação de óbito, por respeito ao... ao processo da família e... por isso. Porque a gente só precisa dos dados para fazer uma previsão, uma antecipação.
+
+**[FALA 5 - Homem 3]:**
+— Também porque a classificação do nosso sistema é no SAMD.
+
+**[FALA 3 - Mulher 2]:**
+— É... no quê?
+
+**[FALA 5 - Homem 3]:**
+— SaMD.
+
+**[FALA 3 - Mulher 2]:**
+— Isso, a decisão final ela fica na mão dos gestores e dos agentes, acontecendo um ciclo de supervisão humana sempre para evitar os possíveis erros de calibração.
+
+Pronto.
+
+**[FALA 5 - Homem 3]:**
+— Pronto. Aqui a gente já entra um pouco no que a gente pensou da da interface. Tá... aqui tá um pouco mais alto nível do que o que tá lá, se eu não me engano.
+
+Aí o que vai acontecer? A gente vai, como eu estava discutindo com o senhor, a gente... depois da reunião... da reunião, isso aqui não vai ficar tão adequado, mas viria o setor que a secretaria faz a separação...
+
+**[FALA 4 - Homem 2]:**
+— Os distritos.
+
+**[FALA 5 - Homem 3]:**
+— Isso. E nas porcentagens, no caso de porcentagens, seria a probabilidade de de incidência dado o... o valor que o pessoal vai aceitar, no caso de prever daqui a quatro semanas, duas semanas...
+
+**[FALA 4 - Homem 2]:**
+— Posso responder a ela?
+
+**[FALA 5 - Homem 3]:**
+— Pode, por favor.
+
+**[FALA 4 - Homem 2]:**
+— Porque eu eu expliquei a você, mas ela tá voando. Um município, ele é subdividido em distritos, certo, de saúde? Só que um distrito de saúde não é necessariamente a mesma divisão territorial de um bairro, às vezes ele bota um bairro no meio.
+
+E aí a gente tem essa divisão de distritos justamente para facilitar a própria divisão dos agentes de saúde com as áreas de atuação de acordo com critérios sociodemográficos, clima, epidemiológico, distribuição até de renda da população, todas essas variáveis, tamanho do bairro, a extensão territorial que leva, às vezes não faz sentido...
+
+**[FALA 3 - Mulher 2]:**
+— Entendi. Se você parar para pensar, por exemplo, um bairro do tamanho de Jaboatão, como aquele dali tem, e outro como aquele ali nos...
+
+**[FALA 4 - Homem 2]:**
+— Por trás da principal.
+
+**[FALA 3 - Mulher 2]:**
+— Por trás da principal, já fica um tamanho bem distinto.
+
+**[FALA 4 - Homem 2]:**
+— É.
+
+**[FALA 5 - Homem 3]:**
+— Então ele pode englobar num num mais baixo, né, no setor?
+
+Aí, só voltando, aqui seria a probabilidade de de de surto da daquela endemia, de estar num superpatamar, do que você vai acertar, sei lá, quer saber daqui a uma semana, duas semanas. Como tem no próprio InfoDengue, isso aí também não seria novidade.
+
+Eh, aqui, tipo, a gente... isso aqui seria uma visão mais de de *card*. E aqui a gente também tem, né, na na prova de interface, uma uma proposta de tabela, onde, sei lá, tu poderia ordenar com a probabilidade de ocupação...
+
+**[FALA 4 - Homem 2]:**
+— Uhum.
+
+**[FALA 5 - Homem 3]:**
+— Bairro...
+
+Ah, e aqui seria mais a parte de *dashboard* que a pessoa gestora vai vai ver esse que a gente vai mostrar.
+
+E, basicamente, as entregas que a gente tem na M1 foi o que eu estava lhe mostrando, sobre a documentação de requisitos, que eu também tenho alguns protótipos de de em UML sobre o que a gente vai usar, diagrama de fluxo, de API, quais rotas que a gente pretende usar.
+
+Nessa parte a gente não focou tanto em fornecer uma interface, dado que a gente ainda tá esperando também a mulher decidir o que ela quer da da vida, né *(risos)*. E baseado no que a gente pensa que ela quer.
+
+**[FALA 3 - Mulher 2]:**
+— Que é a parte mais complicada.
+
+**[FALA 5 - Homem 3]:**
+— Que é a parte mais complicada, a gente tá atirando no escuro. Aí... aí a gente decidiu focar no que a gente sabe que realmente é a certeza que vai ter, que é basicamente seleção de modelo para fazer *cluster*, a gente também tem que pegar dado, vai olhar...
+
+**[FALA 4 - Homem 2]:**
+— Nessa parte de modelos, aí eu tenho algumas sugestões para vocês de coisas que eu venho estudando muito recentemente por conta de outros projetos.
+
+Eh, depende dos das abordagens de aprendizado que vocês vão utilizar, mas o universo de dados que vocês vão ter é são pequenos, se considerar apenas o município que vocês estão olhando, que é o município de vocês. Não tem uma quantidade gigante de dados sobre dengue.
+
+Então pode ser que algoritmos mais clássicos de de análise para que são utilizados na epidemiologia digital, como ARIMA, é uma é um algoritmo clássico... Eh, ele não é de aprendizado, tá, é estatística mais mais antiga. Eh, ele permite você fazer esse *forecast*, como vocês estão propondo fazer, com um universo de dados menor.
+
+Tá?
+
+Eh, e explorar também os métodos mais... eh... não diria... mais fáceis de explicar, como os... bota um XGBoost, CatBoost...
+
+**[FALA 5 - Homem 3]:**
+— Uma aprendizagem baseada em árvore.
+
+**[FALA 4 - Homem 2]:**
+— Em *ensemble*. Fazem um *stacking ensemble* com SHAP. Para poder explicar para o usuário final o que é que vocês estão entregando. Para não ficar o o indicador sendo gerado ali para uma área determinada, sei lá...
+
+Eh, o bairro, aí você, sei lá, você gera um mapa e bota um gráfico daquele de... ou de de coloração, ou aquelas bolhas, né, que o pessoal...
+
+**[FALA 5 - Homem 3]:**
+— Tá, aquele de previsão do tempo.
+
+**[FALA 4 - Homem 2]:**
+— Tipo de previsão do tempo, tá? E aí quando você bota aquilo, você dá uma noção de dimensão do quanto tá o problema dentro daquela área. Isso é bom para ele ver. Só que como é que você explica como é que você chegou naquele valor ali para o usuário final?
+
+Você não vai ter esse nível de interação com ele para explicar como entregou aquele indicador, aquele resultado. Então se ele clicar ali, ele vai ter que ter a explicação: essa bola tá desse tamanho por isso, isso, isso e isso.
+
+**[FALA 5 - Homem 3]:**
+— Tá. Eh, modelos de imagem de satélite baseados em regressão...
+
+A literatura já diz um pouquinho que é isso, agora eu também pensei em fazer algum outro tipo de ontologia, por quê? Porque com essa regra de negócio pode, sei lá, pegar uma base de documentos históricos de, sei lá, de como foi tratado e como pode ser tratado, sei lá...
+
+**[FALA 4 - Homem 2]:**
+— Sim, para poder indicar, ser propositivo. Isso é a melhor solução, na minha perspectiva.
+
+**[FALA 5 - Homem 3]:**
+— Pronto, a gente pensou em fazer isso também.
+
+E a gente vai agora... Tem mais alguma coisa?
+
+**[FALA 3 - Mulher 2]:**
+— Tem não.
+
+**[FALA 5 - Homem 3]:**
+— Aí pronto, o desenvolvimento Marco 2, que a gente estava conversando, a gente realmente só queria validar se... ô, a gente pode seguir por esse caminho? Já que pode, que tem isso preventivamente...
+
+**[FALA 4 - Homem 2]:**
+— Sim.
+
+**[FALA 5 - Homem 3]:**
+— Eh, a gente pretende fazer a modelagem, primeiro tentar fazer a modelagem da API que, assim, pelo que eu vi, é o maior trabalho que a gente pode ter.
+
+Pegar o dado. Depois que a gente pegar o dado, a gente vai poder brincar um pouco mais, porque interface a gente, sei lá, a gente extrai o design system, a interface...
+
+**[FALA 4 - Homem 2]:**
+— Da mesma forma como eu sugeri para o grupo do do David, da Rafaela e da Mariana, vocês também podem entregar o serviço como inteligência. Não apenas como...
+
+**[FALA 5 - Homem 3]:**
+— Não se preocupe.
+
+**[FALA 4 - Homem 2]:**
+— É entregar, vender o fato de que você sabe analisar o cenário melhor do que eles, entendeu?
+
+Se você já tem a inteligência, se você já treinou, você já construiu o conhecimento de como fazer esse tipo de tarefa, e você tem como demonstrar que você consegue entregar esse tipo de tarefa.
+
+Então é uma forma diferente de vender serviço. Você não tá... é como se você estivesse vendendo uma consultoria. Entendeu? Nesse caso, o município de você só precisa exatamente de uma consultoria.
+
+**[FALA 5 - Homem 3]:**
+— Ah, entendi. Você diz assim: nunca me chame de inteligência... *(risos)* Então... então a gente... então a gente, no caso, no meu ponto de vista, é o seguinte: a a a consultoria, assim, de certa forma, é uma consultoria, só que a a de infra...
+
+**[FALA 4 - Homem 2]:**
+— Uhum.
+
+**[FALA 5 - Homem 3]:**
+— A tecnológica, a de infra, a de dev, a de inteligência e a de treinamento, então, basicamente, são essas quatro frentes de...
+
+**[FALA 4 - Homem 2]:**
+— É, quatro frentes de atuação, é. Não é só o software. Porque vender só o software, o pessoal se passar seis meses estudando como a gente tá fazendo, pode ser que chegue também, entendeu?
+
+**[FALA 5 - Homem 3]:**
+— Aí... eita, deu um nó aqui, eu não sei por quê...
+
+**[FALA 4 - Homem 2]:**
+— Não, é porque você bateu no USB-C, aí em vez de ele dar o curto, ele apaga a tela e desce de novo.
+
+**[FALA 5 - Homem 3]:**
+— Deixa eu carregar o projeto aqui rapidinho. Eh, eu fiz um... você pode acessar esse... não sei se você vai ter paciência de digitar um endereço desse, né *(risos)*?
+
+**[FALA 4 - Homem 2]:**
+— Não, não. *(Risos)*
+
+**[FALA 5 - Homem 3]:**
+— Mas já tá... a gente pensou, assim... você tá falando na interface. Forneci um com um contexto que a gente conversou, que a gente até conversou, com o modelo que a gente conseguiu rodar em imagem.
+
+Aí foi como a gente tinha conversado com o senhor, aqui na minha tela seria a Prefeitura em questão, Prefeitura de Recife. Aí aqui seria o cadastro da pessoa também, enfim, o que interessa. Aqui os bairros e as probabilidades.
+
+Aí aqui esse "ver detalhes e recomendações", no caso, não ficou muito bem definido por conta do mapeamento de *features* em tempo que não deu para fazer.
+
+**[FALA 4 - Homem 2]:**
+— É justamente onde vai entrar a questão da explicação.
+
+**[FALA 5 - Homem 3]:**
+— Eh, aí deixa eu só ver... aqui tem algum lugar que perfila a pessoa... É. Aí tem mais coisas. Aqui, gestão de usuários. A gente, por exemplo, com essa... com esse mapeamento daquele setor geográfico, a gente pode apontar: tá, sei lá, o pai dela trabalha naquela região, ele é responsável por aquela região.
+
+Então, assim que o gestor decidir alguma coisa, ele vai ter essa informação...
+
+**[FALA 4 - Homem 2]:**
+— Ele já vai receber para fazer a tarefa lá. Mas é justamente nesse ponto que vem aquele meu questionamento da desidentificação dos dados. Por quê?
+
+Na hora em que você botar o pai dela para fazer a atuação, você vai ter que indicar para o pai dela quais são as pessoas que ele vai ter que atuar prioritariamente, porque são as pessoas que estão com maior vulnerabilidade. Perto do endereço... Perto do endereço, perto do nome da pessoa, entendeu?
+
+**[FALA 3 - Mulher 2]:**
+— Perto do endereço...
+
+**[FALA 4 - Homem 2]:**
+— Então existe esse componente... Vocês... vocês começaram com uma abordagem de desidentificar para relatar. Mas só o relato...
+
+**[FALA 3 - Mulher 2]:**
+— É...
+
+**[FALA 4 - Homem 2]:**
+— Não vai fazer verão. Por quê? Porque só o relato o InfoDengue já dá.
+
+**[FALA 3 - Mulher 2]:**
+— Já dá.
+
+**[FALA 4 - Homem 2]:**
+— Vocês têm que ter uma abordagem rastreada, entendeu? Para vocês sim, para vocês sim, o gestor, ele pode ver o dado da pessoa da mesma forma como vocês veem. Ele tá sobre a mesma tutela.
+
+Inclusive, quem vai assinar o termo lá para liberar o acesso ao *dataset* para vocês é o Secretário de Saúde, é o dele que vai entrar na roda, entendeu? Pronto, então ele tem a mesma tutela que vocês têm como gestores da plataforma.
+
+A diferença é: você como gestor da plataforma ou você como utilizador profissional gestor do município, você como programador não tem que ter acesso aos dados, para você, você vê a hashtag, um pessoal aleatório lá.
+
+O gestor, o ACS e o Secretário de Saúde, o profissional de saúde, quem for dar a réde, tiver dentro da secretaria, vai ter que ver o dado completo. Por quê? Porque vocês estão entregando uma parte do serviço. A outra parte que eles têm mais dor é no rastreamento, é identificar onde é que tá o caso, a notificação, fazer a avaliação, porque aí você vai ter um dado que ninguém tem.
+
+Todo mundo vai ter o mesmo *dataset* que você tem, que é aquele que tá disponibilizado no OpenDataSUS, mas não vai ter a transição de um estado para o outro, que é o estado da notificação para o estado da investigação, porque aí ele vai ter um nível de atualização dos dados que ninguém vai ter. Só quem vai ter é quem gerencia o *dataset* do município.
+
+**[FALA 5 - Homem 3]:**
+— Tá.
+
+*(Suspiro)*
+
+**[FALA 3 - Mulher 2]:**
+— É uma informação mais detalhada também, né?
+
+**[FALA 4 - Homem 2]:**
+— É. Tá entendendo? Você fecha o ciclo da vigilância e entrega uma solução completa para ele, de TI, de vigilância com inteligência, porque você tá entregando coisas muito mais avançadas do que ele teria que sentar na cadeira para fazer, porque ele paga uma pessoa numa cadeira para pegar um *dataset* no Excel e fazer esse cálculo que você faz.
+
+Pode ir lá na Secretaria Estadual de Saúde, tem uma sala do tamanho deste departamento aqui, com um monte de gente, um do lado do outro enfileirado, fazendo exatamente isso o dia inteiro, 24 horas por dia, 365 dias no ano.
+
+**[FALA 5 - Homem 3]:**
+— Tá.
+
+**[FALA 4 - Homem 2]:**
+— Fazendo Excel e relatório.
+
+**[FALA 5 - Homem 3]:**
+— Aí, pronto, só para fechar essa parte de interface... O que a gente pensa para fazer, por exemplo, entregar a solução para para o agente municipal? Ele poderia fazer também um acesso de interface que não seria bem como esse...
+
+**[FALA 4 - Homem 2]:**
+— Sim.
+
+**[FALA 5 - Homem 3]:**
+— Seria outra coisa. E como o agente durante a visita, ele tem a necessidade de ir, sei lá, vou para atrás do cemitério, não pega internet, como é que eu vou fazer? Aí, tipo, já manda tudo para ele antes dele sair, e ele coleta e vai processando lá, salva no *cache* e depois manda.
+
+**[FALA 4 - Homem 2]:**
+— É assim que funciona o aplicativo do e-SUS Território com o ACS na visita, no *tabletzinho* no município que tem.
+
+**[FALA 5 - Homem 3]:**
+— Ah, entendi. Pronto, aí a gente teria também todo o trabalho de treinamento para saber... para a gente não, para a pessoa gestora que realmente vai tomar a decisão, que manda, a gente se achegar e dizer assim: "Aconselho que faça isso, faça isso".
+
+**[FALA 4 - Homem 2]:**
+— Vocês desenvolvendo essa plataforma com inteligência para dengue, depois dá para fazer para as outras de... de arbovirose. Qualquer outra doença de notificação. Qualquer outra doença de notificação, porque o mecanismo de análise vai ser bastante parecido.
+
+**[FALA 5 - Homem 3]:**
+— Pronto, é um caminho interessante. Daqui não não tem muito mais para entregar, é só mostrar por conta de que a gente não...
+
+**[FALA 4 - Homem 2]:**
+— Sim. Tem bastante aprimoramento para vocês fazerem, mas é um caminho bem legal. É o... talvez em termos de de solução, parece ser o menos complexo, mas eu acho que o de vocês vai ser o mais difícil de resolver. Sério, sério!
+
+Porque envolve saber mais coisas da rotina do que, por exemplo, o delas, que é focado só na fase do...
+
+**[FALA 3 - Mulher 2]:**
+— É muito viés, né, para o negócio...
+
+**[FALA 4 - Homem 2]:**
+— É, é muito viés. Tem que ser o ciclo inteiro, no caso de vocês. Se vocês repararem, lá no site da Secretaria de Saúde, o único projeto que tem o nome IA lá é o de vocês, que eles queriam que resolvessem com IA, mas não é só IA que resolve.
+
+Aí por isso que eu digo: não adianta entregar só o serviço, tem que entregar a inteligência. No caso do Recife, eles já têm o Conecta Saúde, então ele não iria querer usar necessariamente a solução de vocês para mostrar para o usuário final, entendeu?
+
+Por isso que tem que entregar a API para ele poder carregar, jogar os dados no site como ele quiser. Hoje em dia, a solução não é só um software, tem que ser um pacote completo.
+
+**[FALA 3 - Mulher 2]:**
+— Eu tinha falado para ele dos sistemas de requisitos, ele tava falando sobre isso. Um sistema não é só um software hoje em dia. Tem muito viés para você entregar...
+
+**[FALA 4 - Homem 2]:**
+— Toda uma discussão até... aquela discussão que eu levantei com vocês de aplicativo... *(Áudio encerrado)*

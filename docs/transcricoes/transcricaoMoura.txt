@@ -1,0 +1,383 @@
+￼
+É amigo padrinho o senhor autoriza a reprodução desse áudio em algum outro lugar.
+
+Sim.
+
+É o seguinte eu tô trabalhando no software que a ideia dele é o seguinte. Senhor conhece o Sinam Sim.
+
+Conhece o Inoden eu ouvi falar.
+
+Infodengue é um sistema que ele trabalha basicamente dizendo eram basicamente probabilidades de ocorrência de doença naquele dia.
+
+Por exemplo se precisar nem fo dengue hoje colocar na gotenga ele vai dar na de hoje.
+
+Os casos não exatamente mas ele consegue medir.
+
+Aí vê qual é a ideia eu tô trabalhando numa numa IA pra poder prever daqui a um mês ou dois meses qual a probabilidade de ter um surto de dengue na gotaenga essa é o principal foco só que não adianta nada eu entregar alguma coisa assim ah tá um número aqui sei lá 80 por cento.
+
+Como é que a gente vai agir sobre esse número Aí quem trabalha mais diretamente fazendo o combate são vocês agente de Ademir se não me engano né.
+
+Eu quero saber basicamente se o senhor hoje durante o seu trabalho de visita campal ou até mesmo lá na na agência o senhor tem algum tipo de programa que vocês mexem pra fazer registro.
+
+Sei lá o senhor vai na casa de senhor vai na minha casa fazer alguma vistoria o senhor marca isso em algum lugar se é só planilha se tem algum trabalho chato que o senhor faz que o senhor acha que daria pra ser automatizado.
+
+Por quê qual a ideia?
+
+O sistema vai dar daqui a um mês vai ter tantas por cento de chance aí responsável por vocês vai estar direcionando vocês com base nos casos que foram notificados no passado e que estão sendo notificados agora pra vocês olha a probabilidade é essa vocês vão ter que em tal e tal e tal canto é exatamente lá pra tentar mitigar os focos de dengue.
+
+Aí é o seguinte o que que o senhor acha do seu trabalho que daria pra ser automatizado.
+
+Hoje assim eu acredito que o mais até um dia desse tinha um programa do governo do Estado que era o Evisita.
+
+Isso foi o mais avançado que a gente chegou até agora na questão tecnológica na questão de trabalho com a D. Esse programa era cadastrado todos os imóveis de cada agente aqui na cidade da gente tem 12 áreas Uma média de uma média de 1000 imóveis em cada área.
+
+Tem de 800 tem de de 900 tem de 1100 então assim vai mas é uma média de 1000 imóveis por a gente agente de deir né aí o que acontece aí tem esse programa que era pra a gente trabalhar e colocar nele e já deixar a casa pronta exemplo não tinha necessidade de levar aquele papel Anotado a planilha pra digitar por um digitador né aí o que acontece hoje esse esse aplicativo não tá ativo mais aí continua-se na folhinha voltou pra folha do na verdade fazia os dois na época paralelo porque o e visita era pro estado. E a folha ficava como tipo uma.
+
+É tipo um Um backup né ficava tipo né ficava as folhas como garantia e servia pro município e como garantia do funcionário estar trabalhava como se fosse a folha de ponto dele não é desse tipo.
+
+E outro caso que você falou aí no meio da pergunta foi a questão de como é que a gente via a probabilidade de casos.
+
+Pra isso tem o Lira. Chamado de Lira levantamento de índice rápido se eu não me engano o nome é esse.
+
+Aí o que acontece a gente faz esse esse processo a cada dois meses a cada começo de ciclo né um ciclo que a gente passa o que é um ciclo é quando a gente passa naquela área da gente.
+
+A gente passa seis vezes por ano a cada dois meses o agente de saúde de edemias ele passa na em cada em cada casa né entendeu aí antes de cada começo de cada ciclo a primeira semana do ciclo na verdade é para o levantamento de índ o que é o levantamento de índice.
+
+Ele o programa sorteia o quarteirão sorteia aleatoriamente pelo programa e o agente vai lá e faz 50 por cento desses imóveis porque ele vai entrar uma casa outra não casa sim casa não casa sim casa não Entendeu então se naquele quarteirão tem 40 casa ou a gente vai entrar em 20 casas naquela.
+
+Analisando e inspecionando cada reservatório de água onde a gente vai aonde se localiza as lava as pulpa possíveis né mosquito também entendeu leva pro laboratório analisa se é positivo ou negativo Isso aqui graças a Deus a gente consegue fazer aqui em Lago tenga mesmo acho que é uma das das cidades da Greia aqui da segunda gere que consegue fazer no próprio município da Lagoa Tenga né que é João Zilda do que faz que é o laboratorista daqui entendeu aí a gente consegue fazer isso aí levantamentos e índices do município é onde a gente prevê possível avanço do de casos de de surto ou não né.
+
+Mas no meu caso essa previsão é baseado em visita ou ela é baseado em algoritmo em visitas.
+
+Baseado em visita você realmente tem que ir tem que ir.
+
+E fazer as 50 por cento de cada casa de cada de cada quarteirão.
+
+Entendi.
+
+Aí fora fora isso vocês endurando assim é porque eu tô descobrindo ainda como é o trabalho de vocês porque Uma das frentes do sistema é a gente construir realmente essa que vai dizer daqui até a gente quer se adiantar vocês realmente vão a cada ciclo sei lá janeiro março maio julho vamos dizer assim cada meioímpa né.
+
+Não sei.
+
+A gente quer a hora que você quiser Tá daqui a dois meses daqui a um ou seja todo dia a ideia é o seguinte programar por exemplo todo dia de 8h00 da manhã a gente vai meter um alerta de 11h00 a gente vai meter um alerta de 2h00 da tarde a gente vai meter um alerta um exemplo.
+
+Pra as de vocês não necessariamente ter que ir só naquele dia a cada dois meses pra ter que fazer a metade da visita não vocês já vão se adiantar.
+
+Essa é uma das frentes e o trabalho de vocês eu não essa é uma pelo que eu entendi vocês a cada dois meses vão nas na metade das casas. Fora isso vocês fazem mais alguma coisa por exemplo vocês quando vão na casa que que vocês fazem vocês registram realmente ah Moura mora nessa casa em Itaú e nesse na casa de Moura tem teve vice e isso é assim que vocês fazem como é que vocês marcam?
+
+O trabalho de hoje da gente ainda é rua casa rua e número de casa então como é que você tem que fazer o registro da casa em si.
+
+Não é casa e número entre residência comércio outros que é garagem tal terreno baldio que assim às vezes parece até uma besteira mas na maioria dos terrenos tem lixo e lixo acumula é ver um plástico uma bolsa de pipoca com o resto da com a chuva fica ali parado um monte de tempo né E ponto estratégico que é ponto estratégico ponto estratégico é onde se acumula muito itens que acumulam água tipo borracharia que tem muito pneu aqueles cabas que junta lixo que que pega lixo, né né plástico essas coisas como é a reciclagem né aí nesse local a gente passa a cada 15 dias fazendo inspeção Esse local né os PE a cada 15 dias fazendo inspeção. Isso?
+
+Aí a cada 15 dias a cada dois meses a gente passa tratando total aí é outro tipo é o perifocal no caso é o tratamento perifocal nas casas que a gente passa normal com o inseticida ele é um tratamento focal né que é dal lei e perifocal é o o perímetro periffocal tudo entendeu naquele exemplo naquela garagem toda naquele vê um muro aberto a borraha realmente é um muro aberto né aí tá ali a gente faz aquele vendendo todo ali entendeu Isso a cada dois meses. No caso perifocal nos Ps é 65 por ano. Antes era 12 mas de uns dois anos pra cá tá sendo seis.
+
+No caso tem de 20 a 52 semanas no caso né era metade era metade 52 semanas o ano tem a gente passava 26 semanas que é uma semana sem outra não a gente ia lá.
+
+E dessas 26 aí fazia 13 13 Perieriffal né 13 inspeção e 13 tratamento periffocal mas hoje é só seis tratamento no caso é um tratamento a cada dois meses.
+
+Mas no caso quando vocês vão quando vocês vão pra pra casa em si da pessoa vocês não vão com nenhuma planilha de registro de nada olha na casa do Moura eu fiz isso isso e isso.
+
+Tem não tem normal.
+
+O específico da gente é o seguinte a gente tem uma planilha.
+
+O planeta da gente é essa é o que acontece o que acontece a gente vai com o quarteirão evidente o quarteirão que a gente trabalha pro quarteirão o quarteirão o lado do quarteirão 1234 lá de vez tem o quarteirão com mais lado o nome da rua daquele lado do quarteirão o número da casa beleza aí vem se a casa é residência é o tipo do imóvel se é residência que nem eu falei residência é outro terreno baldio ou comércio né o pé não entra aqui o PE é específico é um tratamento específico.
+
+Hoje no nosso município a gente tem 14 temos 14 PE aqui em Lagoa de Itaega.
+
+Aí vamos lá.
+
+A gente vai entrar na casa a gente identifica os depósitos então vamos identificar os depósitos não é isso vai analisando aí a um caixa d'água a um é o que tá no alto.
+
+Caixa d'água a dois é tudo que tá no chão e não se move.
+
+Forma, tanque.
+
+Tonel ou do lugar mas você tirou o tonel cheio.
+
+É assim?
+
+Tonel beleza.
+
+B é tudo que acumula água mas é móvel um balde.
+
+Tem um balde, um caneco ou alguma coisa desse tipo isso é tudo B. C é.
+
+Pro eu entendi essa classificação aí eu consigo dear eu consigo ver depois o que é aí esse essa nessa coluna aqui esse aqui é o quê.
+
+Aqui é Aqui é coleta de amostra esse caso aqui aqui a gente não usa mais entendeu ainda existe nesse negócio mas aqui a gente faz no lira a gente só coleta amostra o que eu disse a gente faz inspeção e coleta amostra no lira pra ver a questão doido. Água dentro daquele local.
+
+É o tubinho que bota álcool dentro que é pra conservar a arva pra o laboratório analisar.
+
+Aqui faz né?
+
+É.
+
+Tá bom.
+
+Cada agente colhe né bota identifica com a casa tal número tal, né a cidade da reta é dividida em quatro extrato.
+
+A Cidade da reta é dividida em quatro extrato no lira.
+
+É porque cada cada evento desse Cent Fire é uma planilha diferente. Isso aqui que é das antiga eu acredito que ainda tem cidade que trabalha ainda trabalha desse estilo pegando larvas durante o tratamento aí é por isso que aindaiste isso aqui.
+
+Aí aqui vem o lavicida aí vem o tipo e é quem trabalha pro grama né lavicida pro grama aí tem dois tipos aqui porque aqui é a um e a dois é tratado aqui que é pra cima e esses inferiores aqui o BCD1 é pneu D2 é lixo e é é cacimba esse tipo de coisa entendeu é é elemento da natureza tipo cacimba lá que normalmente não trata.
+
+Éimboimba né que é cacimbão esse tipo de coisa Beleza.
+
+Mas isso aqui normalmente não trata por quê porque tem os próprios animais que eles sabiam aquelas coisas como arlava. Interesse mais e talvez tenha algum lugar que não não acontecesse aí aqui é muito muito raro tratar muito raro mesmo.
+
+Aí beleza e aqui que eu te falei aqui no lado do do tratamento é o tratamento em quantidade maior acima de 1000 l e na segunda etapa tratamento com menos de 1 l.
+
+Entendi aí basicamente isso aqui vocês fazem a cada dois tipo vocês passam sei lá vamos supor três folha dessa aí vocês passam a cada dois meses você preenche um negócio desse inteiro.
+
+Não a gente por dia a gente faz uma média de 25 a 35 imóveis aí cada registro desse aqui.
+
+Aqui tem 25 mo se eu não me engano desse.
+
+Isso é por dia.
+
+Por dia.
+
+A a gere o SUS não é a vigilância de no caso né ele pede pra fazer uma média de 25 mas aqui tem a gente que faz 25 de boa tranquilo mas tem a gente que não consegue fazer 25 senão ele não dá conta da área dele.
+
+Mas lembrando de que nesses quando for uma contada a mais tem barraca não tem nada tem garagem não tem nada entendeu e aí aproveita e adianta uma coisinha.
+
+Agora quando pega-se casas mesmo residências é 25 imóveis por dia.
+
+Se por exemplo vamos supor vocês trabalham com algum tipo de tablet ou é só na planilha na planilha hoje é só planilha.
+
+Só isso é papel.
+
+É e no final o coordenador soma a semana da pessoa os cinco dias trabalhado e passa hoje no caso pra mim né que eu sou digitador agora não no momento eu tô como digitador.
+
+Aí o senhor soltar pra digitar isso aqui digitar isso e os outros programas os outros sete programas sete programas ao todo.
+
+Não é só dengue. Quer trabalhar com estossomose lhmaniose Chagas né aqui é o que mais é esses quatro que a gente trabalha hoje né agora aqui tem uns na dengue tem o Lira tem o O Ces temos o cabo tem uns quatro programas só na dengue.
+
+Quatro programas só na.
+
+Mas esses programas eles se complementam por exemplo um programa é só por É só pra dados só dados todos eles é sóado.
+
+O que gera alguma coisa antes É o Ces no caso que é na questão de insumo que a gente pedir insumo aí é antes durante e depois né.
+
+Ces é o sistema de informação o sistema do governo que a gente fala o pedido do inseticida.
+
+Aí é o que é antes depois porque a gente fala o pedido do inseticida o inseticida vem a gente dá a entrada nele e depois quandoseticida é usado a gente dá saída.
+
+De todos esses quais são o que vocês mais usam o Ces eu acredito que vocês usam não por exemplo você não usa todo dia o mais que usa é o XPente CD que a gente usa semanamente.
+
+É pra quê.
+
+Esse é pra digitar o comando da dengue todos os trabalhados tratado ou inspecionado sim.
+
+Aí você precisa passar isso pra esse sistema.
+
+Todo sistema isso aí toda semana.
+
+É semanal isso aí.
+
+Entendi entendi.
+
+Aí realmente por exemplo lá nesse sistema se o senhor tem uma planilha vamos supor o senhor trabalha no Excel aqui aí o senhor não quer trabalhar direto nesse sistema o senhor trabalha direto no É isso aqui praticamente.
+
+É a soma disso tudo que eu chego lá e boto.
+
+É a soma disso aí.
+
+Tem outra né que é a do coordenador que vem tudinho mas é mais ou menos baseado nisso aqui.
+
+A soma daqui ele bota na dele lá entendeu os personado deixa eu ver aqui se eu vou olhando já é ruim e aí ver é pior ainda.
+
+Aqui vem a quantidade e tal de tantos comércios tantos terrenos maldidos tantas residências tantos imóveis tratados focal que é o tratamento mesmo tantos inspecionado na verdade aquele todo que é ele que a gente entra foi um imóvel inspecionado.
+
+A gente entrou nele né foi inspecionado entendeu aí os fechados que no outro dia o cabo ele recupera e vem como recuperado e assim vai o tipo dos imóveis do tipo do do o tipo do depósito né que vem aqui aí quantos quarteirões concluiu ele essa semana trabalhou em três quarteirões mas não terminou um concluiu dois entendeu muita falta concluir esse tipo de coisa.
+
+Aqui é um X. E aqui é um número.
+
+Não aqui é número também aqui exemplo eu entrei numa casa tem uma caixa d'água tem um tanque e dois balde 12 + um entendeu aí vai.
+
+Aí você matar de tudo.atório.
+
+Tudo aqui quantos tinha aí aqui vem né BBBB 10B. Ah esse aqui é semanal.
+
+Esse é diário.
+
+Esse é diário.
+
+Tem um parecido com esse que eu falei o do coordenador.
+
+Eu posso desenrolar pra tudo pra tu ver.
+
+E onde a gente pega tudo daqui soma as oito do iPhone que a gente trabalha semanalmente aí ele soma tudinho e bota na naquele dele que é o que ele passa pra mim aí aquele dele é justamente o espelho do meu programa é o espelho total do meu programa.
+
+O programa que eu trabalho do sepende.
+
+Tá naquele computador lá atrás.
+
+Não, tudo bem.
+
+Mas não tem tem não.
+
+Deixa eu.
+
+É o seguinte.
+
+É porque eu sou trabalho hoje mais interno eu acredito né.
+
+Pra o agente de campo, por exemplo o senhor já trabalhou muito dentro em campo eu acredito né.
+
+Por um agente de campo o senhor acha que pelo menos essa planilha aqui sendo automatizada sei lá você tem no seu celular aí vamos supor eu consigo o cadastro de todas as casas da município.
+
+Aí o senhor vai lá em tal setor vai estar tal casa aí você coloca tal casa eu tive tanto negócio desse tanto negócio desse aqui aí você vai preenchendo digital.
+
+Eu só acredito que você já facilitaria seu trabalho.
+
+Com certeza.
+
+Tá, beleza.
+
+Aí no caso o agente deias em si ele é uma profissão mais campal né?
+
+É.
+
+Realmente vocês por exemplo assim eu acho que acredito que trocando isso aqui já pra um digital você conseguiria terminar o trabalho de você mais rápido ou não vê só não tem como ser mais rápido essa questão aí eu acredito que não.
+
+A vistoria em si não mas falando o cadastro.
+
+O cadastro o cadastro só ia assim tipo ser tudo online né eles iam ser responsável pela própria produção deles.
+
+Não ia passar não ia pronto ia eliminar duas coisas não ia precisar de do coordenador tá somando esse trabalho e nem ia precisar do gerador de botar esse seu sistema na verdade já é só um sistema direto é isso que você fala pronto aí já ia botar o sistema dele lá direto.
+
+Tá bom.
+
+Aí eu tentaria eu tentaria pra vocês automatizar isso aqui aí por exemplo uma das possibilidades.
+
+Eu direciono a Moura vai ter uma dessa com o setor dele Aí Moura vai Moro não é setor um aí vai dar só as casas de Moura independente.
+
+Aí Moura vai fazer tudo lá aí no caso isso aqui já já estaria automatizado o gestor sei lá vamos supor o Guilherme não sei se ele ele mesmo.
+
+Aí Guilherme vai ver tudo que o senhor tá fazendo. Aí isso aí com base nesses dados a gente vai poder tipo alimentar nosso modelo e dizer e por exemplo dizer assim olha o M registrou esse aqui ó eu passei pra minha a e aí assim olha é provável que você faça isso aqui não tô ligado. 
+
+￼
+
+
+O senhor acharia interessante que no seu sistema, no seu setor, não vai ter as casas todas as suas casas que o senhor é responsável por aquelas casas o senhor acharia interessante que. Fosse fazer o mapeamento das casas da com as pessoas dentro daquelas casas via car único o senhor acharia isso interessante.
+
+Por exemplo o senhor ver na minha casa sei lá número quatro vou monar da Silva aí tem eu meu avô e minha avó.
+
+Aí vai dizer é Fábio Cecília e Regina só se seria interessante.
+
+Isso ajudaria em quê.
+
+Isso ajudaria pra gente ver a quantidade o mapeamento de pessoas exato que tem em cada casa .
+
+Né Porque pode ser acontecer de que aqueles não estejam cadastrados.
+
+Aí você pra não interferir na família você vai ser direto mediante o cade quando você botar você perto de qualquer um que tivesse na casa. Exemplo eu cheguei e tava acessível qual seu tal aí aparecia lá a família aí nesse a gente só confirmaria e confirmaria que aquelas três pessoas moravam na casa.
+
+O senhor acha que isso vai ajudar em que na questão realmente do seu combate A dengue por exemplo porque o Spa é muito é um sistema grande na verdade que eu eu tô fazendo xema grande só que pra reduzir o escopo tipo começa com a dengue e depois vai o resto sei lá malária um exemplo.
+
+Aí que o senhor acha que esse tipo de informação seria útil no seu trabalho de combate a epidemias no caso.
+
+Não acredito que facilitaria até pra localizar é pra localização de possíveis possíveis possíveis casos de dengue né para se identificar mesmo de onde surgiu aquele aquela pessoa foi infectada Onde é que ele conviveive mais ele mora na rua tal.
+
+E ali já tá um no sistema que é tá no sistema de todos né tanto que nem eu falei tanto vindo a agregação do C um que já vai pro SUS e tal.
+
+Quando chegar fulano de tal ele mora em rua Rua Manel José da Silva número quatro como você falou.
+
+Entendeu eu acho que ajudaria muito adiantaria muito o processo de de intervenção pelo pelo pelo agente pela questão de bloqueios né que quando tem em casa a gente sai com aquela bomba fazendo aquela fumaça Pra eliminar os possíveis mosquitos que ainda resta.
+
+Isso ajudaria muito.
+
+Adiantava né no caso que hoje é um prazo de 15 dias eu acredito que isso aí adiantava muito pra 23 dias.
+
+Entendi se ele fazer outra pergunta Esse dado é outro sistema de agente de saúde no caso né não é isso.
+
+É o dado da gente a gente só usa que nem eu disse só usa territorial é quarteirão rua e número de imóvel tipo de imóvel e número da casa no caso né número do imóvel.
+
+Entendi aí o senhor gostaria de por exemplo quando vamos supor Dado a campanha o senhor saber por exemplo a recorrência de casos daquela casa daquela família por exemplo amoura ou é amora tu já tem um alerta de que naquela casa ali naquela família tem o histórico de ter alguma merda.
+
+Aí tu vai lá direto é isso que tu tá querendo dizer isso apontar direto né?
+
+Pronto.
+
+Isso Pronto.
+
+O senhor sabe dizer de onde por exemplo se tem algum sistema que ele já manda toda a relação de território do município pronto .
+
+Por exemplo D Lagoenga eu tenho algum sistema que já tem cadastrado todos esses dados de uma vez só cada agente eu acho que no na atenção básica tem isso aí.
+
+Atenção básica é onde todos os agentes de saúde do município com eles mensalmente eles botam sua produção lá.
+
+Eu esqueci da outra pergunta que eu ia fazer.
+
+Esqueci qual foi a última pergunta que eu fiz também me lembro rapidinho.
+
+Sobre a data da atenção básica.
+
+Pô velho me deu um branco agora me deu um branco legal.
+
+Hum velho qual foi cara Aonde é que tem os dados das casa.
+
+Tipo das casas assim eu quero cada eu quero saber dada a Lagotaenga quais são todos os imóveis de Lagotaenga e lá na na rede de saúde o agente de saúde consegue saber quem é as pessoas que moram naquela casa né os agros de saúde agentes o agente de epidemias ele tem um todo territorial agora a gente só tem a quantitativa de imóveis.
+
+Eu disse só de casos aí nisso o que acontece a gente pode exemplo hoje esse mês a gente passou É que a gente a gente passa a cada dois meses.
+
+Esse mês a gente passou na na casa aqui do lado mesmo essa casa do lado a casa número 10 a casa tá vazia Né aí quando fosse pra semana passado tem um morador.
+
+Entendeu aí a gente a única coisa que a gente pode dizer é atualizando a cada doisense.
+
+Entendeu a gente não pode dizer todo mês a gente só atualiza a cada um mês.
+
+Mas isso é política do município ou isso é política nacional não isso é política nacional a gente só passa a cada dois meses então a gente só vai poder atualizar a cada dois meses.
+
+Entendi.
+
+Aí nesse caso a gente bota fechada vazia tem aquela coisa de fechada por morador ter saído pra trabalhar ou ter saído de casa naquele momento que a gente passou ou essa a gente pode voltar no dia pra recuperar que nem eu falei tem aí no no negócio do no panfleto aí.
+
+Lembrei.
+
+Nesse sistema que o senhor trabalha o senhor é digitador né.
+
+Nesse sistema que você trabalha digitando o senhor por exemplo tem como saber O senhor tem como me entregar um Excel de hoje é 24 dia 24 eu quero saber eu quero retirar os dados desse sistema inteiro do de 10 anos o senhor tem como sabe-se tem como fazer isso.
+
+Eu não sei te dizer de verdade ali eu não tô de eu nunca parei pra olhar isso agora eu acredito que nos últimos quatro anos tem.
+
+Isso eu sei dizer que esse dia eu tive que ter que voltar ao meu caso aí e teve nos últimos quatro anos eu achei agora eu não sincero contigo eu não olhei se tinha anos anteriores.
+
+É verdade.
+
+Tá bom.
+
+Mais quatro anos já suficiente.
+
+E outra eu tenho que olhar os quatro anos.
+
+Beleia.
+
+No caso foi 2023 que eu voltei no caso da quatro ou o Aí é dois meses janeiro março fevereiro janeiro fevereiro março.
+
+Janeiro março maio julho setembro de novembro é onde a gente fala o levantamento de índice. Em fevereiro vocês fazem o que o mês todo a gente trabalha o mês todo.
+
+Janeiro inteiro.
+
+Trabalho janeiro e fevereiro inteiro.
+
+O levantamento de índices é aquele que você foi a pergunta que você falou da gente qual é como a gente faz pra prever a questão do.
+
+E o tratamento é diário uma média de 25 a 85 imóveis diário.
+
+Entendi é da 1000 dá 100 por 25 dá quatro então só demora em média 40 dias pra cobrir a casa inteira.
+
+É uma média mas vem feriado vem imprensado o imprensado acaba com a gente.
+
+Não mas tudo bem se botar mais empecilho o dia aumenta.
+
+Aí tá tudo bem então cobre esse caso.
+
+Pronto. Brigado padrinho eu acho que isso aqui é o suficiente então qualquer coisa eu vou entrar em contato.
+
+Bom beleza qualquer coisa a gente vê aí direitinho e organiza a fila. 
+
+
