@@ -1,0 +1,118 @@
+@startchen Denguinhos_DER_01_acesso_territorio
+left to right direction
+' Entidades em retângulos; relacionamentos em losangos; cardinalidades min–máx.
+' Cada cardinalidade indica a participação da entidade ligada naquele relacionamento.
+' Atributos e restrições de implementação: dicionario_entidades.md e README.md.
+entity "Município (geografia)" as Mun {
+}
+entity "Usuario" as Usr {
+}
+entity "Vinculo usuario" as Mem {
+}
+entity "Papel" as Role {
+}
+entity "Concessao papel" as Grant {
+}
+entity "Permissao" as Perm {
+}
+entity "Papel permissao" as RP {
+}
+entity "Territorio" as Ter {
+}
+entity "Territorio versao" as TV {
+}
+entity "Vinculo territorial" as Link {
+}
+entity "Imovel" as Im {
+}
+entity "Imovel versao" as IV {
+}
+entity "Imovel territorio" as IT {
+}
+entity "Cliente / prefeitura" as Client {
+}
+entity "Unidade organizacional [ref]" as Unit {
+}
+relationship "Autoriza participação" as R01 {
+}
+R01 -(0,N)- Client
+R01 -(1,1)- Mem
+relationship "Possui participação" as R02 {
+}
+R02 -(0,N)- Usr
+R02 -(1,1)- Mem
+relationship "Recebe concessão" as R03 {
+}
+R03 -(0,N)- Mem
+R03 -(1,1)- Grant
+relationship "Define concessão" as R04 {
+}
+R04 -(0,N)- Role
+R04 -(1,1)- Grant
+relationship "Delimita escopo" as R05 {
+}
+R05 -(0,N)- Ter
+R05 -(0,1)- Grant
+relationship "Inclui permissão" as R06 {
+}
+R06 -(0,N)- Role
+R06 -(1,1)- RP
+relationship "Compõe papel" as R07 {
+}
+R07 -(0,N)- Perm
+R07 -(1,1)- RP
+relationship "Organiza" as R08 {
+}
+R08 -(0,N)- Mun
+R08 -(1,1)- Ter
+relationship "Possui versão" as R09 {
+}
+R09 -(1,N)- Ter
+R09 -(1,1)- TV
+relationship "Vincula como origem" as R10 {
+}
+R10 -(0,N)- TV
+R10 -(1,1)- Link
+relationship "Vincula como destino" as R11 {
+}
+R11 -(0,N)- TV
+R11 -(1,1)- Link
+relationship "Localiza versão do imóvel" as R12 {
+}
+R12 -(0,N)- Mun
+R12 -(1,1)- IV
+relationship "Possui versão" as R13 {
+}
+R13 -(1,N)- Im
+R13 -(1,1)- IV
+relationship "Possui referência" as R14 {
+}
+R14 -(0,N)- IV
+R14 -(1,1)- IT
+relationship "Localiza imóvel" as R15 {
+}
+R15 -(0,N)- TV
+R15 -(1,1)- IT
+
+' Regras preservadas:
+' Papéis são relações de acesso, não tabelas de ACE/gestor separadas.
+' Bairro e distrito podem se sobrepor: vínculos N:N com tipo e vigência.
+' Número/endereço e sequência de percurso não identificam o imóvel.
+' Catálogos e versões históricas não são sobrescritos silenciosamente.
+relationship "É dono do território" as R16 {
+}
+R16 -(0,N)- Client
+R16 -(1,1)- Ter
+relationship "É dono do cadastro" as R17 {
+}
+R17 -(0,N)- Client
+R17 -(1,1)- Im
+relationship "Restringe concessão" as R18 {
+}
+R18 -(0,N)- Unit
+R18 -(0,1)- Grant
+relationship "Organiza unidades" as R19 {
+}
+R19 -(0,N)- Client
+R19 -(1,1)- Unit
+@endchen

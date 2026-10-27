@@ -1,0 +1,135 @@
+@startchen Denguinhos_DER_04_gestao_documentos_ocorrencias
+left to right direction
+' Entidades em retângulos; relacionamentos em losangos; cardinalidades min–máx.
+' Cada cardinalidade indica a participação da entidade ligada naquele relacionamento.
+' Atributos e restrições de implementação: dicionario_entidades.md e README.md.
+entity "Visita revisao [ref]" as Rev {
+}
+entity "Vinculo usuario [ref]" as Mem {
+}
+entity "Previsao territorial [ref]" as Pred {
+}
+entity "Consolidacao" as Con {
+}
+entity "Item consolidacao" as Item {
+}
+entity "Indicador consolidado" as CI {
+}
+entity "Evento conferencia" as Conf {
+}
+entity "Documento emitido" as Doc {
+}
+entity "Envio documento" as Send {
+}
+entity "Decisao gerencial" as Dec {
+}
+entity "Ocorrencia" as Occ {
+}
+entity "Tarefa" as Task {
+}
+entity "Evento tarefa" as TE {
+}
+entity "Encaminhamento ocorrencia" as Route {
+}
+entity "Evento tratativa" as Reply {
+}
+entity "Anexo" as Media {
+}
+entity "Unidade organizacional [ref]" as Unit {
+}
+relationship "Inclui item" as R01 {
+}
+R01 -(0,N)- Con
+R01 -(1,1)- Item
+relationship "Fundamenta item" as R02 {
+}
+R02 -(0,N)- Rev
+R02 -(1,1)- Item
+relationship "Produz indicador" as R03 {
+}
+R03 -(0,N)- Con
+R03 -(1,1)- CI
+relationship "Recebe conferência" as R04 {
+}
+R04 -(0,N)- Con
+R04 -(1,1)- Conf
+relationship "Realiza conferência" as R05 {
+}
+R05 -(0,N)- Mem
+R05 -(1,1)- Conf
+relationship "Fundamenta documento" as R06 {
+}
+R06 -(0,N)- Con
+R06 -(1,1)- Doc
+relationship "Possui envio" as R07 {
+}
+R07 -(0,N)- Doc
+R07 -(1,1)- Send
+relationship "Subsidia decisão" as R08 {
+}
+R08 -(0,N)- Con
+R08 -(0,1)- Dec
+relationship "Subsidia decisão" as R09 {
+}
+R09 -(0,N)- Pred
+R09 -(0,1)- Dec
+relationship "Registra decisão" as R10 {
+}
+R10 -(0,N)- Mem
+R10 -(1,1)- Dec
+relationship "Origina ocorrência" as R11 {
+}
+R11 -(0,N)- Rev
+R11 -(0,1)- Occ
+relationship "Orienta tarefa" as R12 {
+}
+R12 -(0,N)- Dec
+R12 -(0,1)- Task
+relationship "Motiva tarefa" as R13 {
+}
+R13 -(0,N)- Occ
+R13 -(0,1)- Task
+relationship "Possui evento" as R14 {
+}
+R14 -(0,N)- Task
+R14 -(1,1)- TE
+relationship "Recebe encaminhamento" as R15 {
+}
+R15 -(0,N)- Occ
+R15 -(1,1)- Route
+relationship "Possui resposta" as R16 {
+}
+R16 -(0,N)- Route
+R16 -(1,1)- Reply
+relationship "Documenta visita" as R17 {
+}
+R17 -(0,N)- Rev
+R17 -(0,1)- Media
+relationship "Documenta ocorrência" as R18 {
+}
+R18 -(0,N)- Occ
+R18 -(0,1)- Media
+relationship "Possui anotação" as R19 {
+}
+R19 -(0,N)- Media
+R19 -(0,1)- Media
+' Autorrelacionamento: Media como origem (0,N) e destino (0,1).
+
+' Regras preservadas:
+' Uma única revisão de cada visita por consolidação (PK consolidação+visita).
+' Snapshot aprovado e itens são imutáveis; retificação = versão nova.
+' Indicadores são derivados e reconstruíveis dos itens/regras; não são nova produção.
+' Um documento não prova assinatura, envio, aceite externo ou execução.
+' Anexo: CHECK exatamente uma origem (visita ou ocorrência); anotação mantém original.
+' Ocorrência pública pode existir sem imóvel; não é recipiente A1..E nem PE automaticamente.
+' Setor destinatário e atribuição são referências aos cadastros operacionais.
+' Fotos de ações específicas podem usar tabela de vínculo tipada no refinamento físico.
+relationship "É responsável por" as R20 {
+}
+R20 -(0,N)- Unit
+R20 -(1,1)- Con
+relationship "É responsável por" as R21 {
+}
+R21 -(0,N)- Unit
+R21 -(1,1)- Occ
+@endchen

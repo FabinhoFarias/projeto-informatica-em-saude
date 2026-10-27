@@ -8,24 +8,24 @@
     participant "Browser\nDashboard Next.js" as Web
     participant "BFF Next.js\n/api/* (proposto)" as BFF
     participant "FastAPI\n/v1/*" as API
-    participant "Autorização\nJWT + RBAC + tenant" as Auth
+    participant "Autorização\nJWT + RBAC + cliente/unidade" as Auth
     database "Redis" as Cache
     database "PostgreSQL / PostGIS" as DB
     User -> Web : seleciona bairro / semana / horizonte
     Web -> BFF : GET /api/risk?week=...&horizon=4\ncookie HttpOnly + Secure + SameSite
     BFF -> API : GET /v1/risk?week=...&horizon=4\nAuthorization: Bearer <token> + X-Request-ID
-    API -> Auth : validar token e dashboard:view\nderivar tenant e escopo territorial
+    API -> Auth : validar token e dashboard:view\nderivar cliente/unidade e escopo territorial
     alt credencial ou permissão inválida
     Auth --> API : acesso negado
     API --> BFF : 401 / 403 + erro estruturado
     BFF --> Web : mensagem e ação de recuperação
     else autorizado
     Auth --> API : contexto autorizado
-    API -> Cache : GET tenant:filtros:prediction_version
+    API -> Cache : GET cliente:unidade:permissoes:filtros:prediction_version
     alt cache válido
         Cache --> API : snapshot publicado
     else cache ausente
-        API -> DB : SELECT previsões + geometrias\nRLS tenant; filtros e índices espaciais
+        API -> DB : SELECT previsões + geometrias\nRLS cliente/unidade; filtros e índices espaciais
         DB --> API : snapshot consistente
         API -> Cache : SET snapshot com TTL e versão
     end

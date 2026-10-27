@@ -1,0 +1,118 @@
+@startchen Denguinhos_DER_03_depositos_tratamento_laboratorio
+left to right direction
+' Entidades em retângulos; relacionamentos em losangos; cardinalidades min–máx.
+' Cada cardinalidade indica a participação da entidade ligada naquele relacionamento.
+' Atributos e restrições de implementação: dicionario_entidades.md e README.md.
+entity "Visita revisao [ref]" as Rev {
+}
+entity "Categoria deposito versao" as Cat {
+}
+entity "Observacao deposito" as Obs {
+}
+entity "Acao controle" as Act {
+}
+entity "Alvo controle" as Target {
+}
+entity "Produto versao" as Prod {
+}
+entity "Carga produto" as Load {
+}
+entity "Aplicacao produto" as App {
+}
+entity "Amostra" as Sam {
+}
+entity "Recipiente coleta" as Tube {
+}
+entity "Amostra recipiente" as ST {
+}
+entity "Movimento amostra" as Move {
+}
+entity "Resultado analise" as Res {
+}
+entity "Contagem especime" as Spec {
+}
+entity "Unidade organizacional [ref]" as Unit {
+}
+relationship "Registra depósito" as R01 {
+}
+R01 -(0,N)- Rev
+R01 -(1,1)- Obs
+relationship "Classifica depósito" as R02 {
+}
+R02 -(0,N)- Cat
+R02 -(1,1)- Obs
+relationship "Registra ação" as R03 {
+}
+R03 -(0,N)- Rev
+R03 -(1,1)- Act
+relationship "Possui alvo" as R04 {
+}
+R04 -(0,N)- Act
+R04 -(1,1)- Target
+relationship "Identifica alvo" as R05 {
+}
+R05 -(0,N)- Obs
+R05 -(0,1)- Target
+relationship "Utiliza aplicação" as R06 {
+}
+R06 -(0,N)- Act
+R06 -(1,1)- App
+relationship "Identifica produto aplicado" as R07 {
+}
+R07 -(0,N)- Prod
+R07 -(1,1)- App
+relationship "Compõe carga" as R08 {
+}
+R08 -(0,N)- Prod
+R08 -(1,1)- Load
+relationship "Abastece aplicação" as R09 {
+}
+R09 -(0,N)- Load
+R09 -(0,1)- App
+relationship "Origina amostra" as R10 {
+}
+R10 -(0,N)- Rev
+R10 -(1,1)- Sam
+relationship "Localiza coleta" as R11 {
+}
+R11 -(0,N)- Obs
+R11 -(0,1)- Sam
+relationship "Possui associação" as R12 {
+}
+R12 -(0,N)- Sam
+R12 -(1,1)- ST
+relationship "Compõe associação" as R13 {
+}
+R13 -(0,N)- Tube
+R13 -(1,1)- ST
+relationship "Possui movimento" as R14 {
+}
+R14 -(0,N)- Sam
+R14 -(1,1)- Move
+relationship "Recebe análise" as R15 {
+}
+R15 -(0,N)- Sam
+R15 -(1,1)- Res
+relationship "É corrigido por" as R16 {
+}
+R16 -(0,N)- Res
+R16 -(0,1)- Res
+' Autorrelacionamento: Res como origem (0,N) e destino (0,1).
+relationship "Identifica espécimes" as R17 {
+}
+R17 -(0,N)- Res
+R17 -(1,1)- Spec
+
+' Regras preservadas:
+' Observação individual não exige cadastro permanente de cada balde.
+' Modo quantitativo agrupa categoria/indicador; validar vínculo suficiente dos alvos.
+' Eliminados/tratados derivam das ações, sem repetir como novo recipiente.
+' Uma carga pode atender várias visitas; não repetir preparo/volume em cada aplicação.
+' Produto, calda, volume do depósito e carga são medidas diferentes.
+' Amostra, tubito e espécime não são equivalentes; relação amostra-recipiente a homologar.
+' Positividade visual e conclusão laboratorial têm método e origem distintos.
+relationship "É responsável por" as R18 {
+}
+R18 -(0,N)- Unit
+R18 -(1,1)- Load
+@endchen

@@ -7,42 +7,44 @@
     skinparam shadowing false
     title 1. Visão global — responsabilidades e fronteiras
 
-    package "Clientes" {
+    package "Aplicações de apresentação" {
     [Web Next.js\nVisão geral, diagnóstico, ingestão,\nsimulação e usuários] as Web
     [App React Native (proposto)\nRotas, visitas e alertas offline] as Mobile
     }
-    package "Nuvem — município isolado por tenant_id" {
+    package "Nuvem — clientes/prefeituras e unidades isoladas" {
     [BFF Next.js\nRoute Handlers: sessão web] as BFF
     [API FastAPI /v1\nRBAC, validação e regras de negócio] as API
     [Fila + workers\nIngestão, ML, exportação e simulação] as Workers
-    database "PostgreSQL + PostGIS\nIndicadores, previsões, rotas e jobs" as DB
+    database "PostgreSQL + PostGIS\nClientes, unidades, permissões\nOperação, previsões, rotas e jobs" as DB
     database "Redis\nCache de leitura" as Cache
     storage "Object storage\nAgregados e modelos versionados" as Storage
     }
     [Identidade OIDC\nMFA para administração/gestão] as IdP
     package "Borda — município / dispositivo" {
     [Planilhas e bases locais\nPEC, UPA, SINAN/SIM, LIRAa] as Local
-    [Processador local\nNormaliza, geocodifica, agrega\ne remove PII antes de transmitir] as Edge
+    [Processador local\nValida e normaliza por contrato\nTransforma conforme finalidade] as Edge
     }
     cloud "Fontes externas\nInfoDengue, DATASUS, clima\nAPI ou arquivo conforme disponibilidade" as Sources
     Web --> BFF : HTTPS / JSON\ncookie de sessão
     BFF --> API : HTTPS / REST\nBearer access token
     Mobile --> API : HTTPS / REST\nBearer + sincronização
     API --> IdP : valida assinatura, emissor,\naudiência e expiração
-    API --> Cache : leitura por tenant + filtros + versão
+    API --> Cache : leitura por cliente + unidade + permissões + filtros + versão
     API --> DB : consultas e transações
     API --> Workers : job assíncrono
     Workers --> DB : publica resultados
     Workers --> Storage : dados/modelos
     Local --> Edge : leitura local
-    Edge --> API : apenas agregados\nsem PII de pacientes
+    Edge --> API : dados operacionais autorizados\ncliente_id + unidade_id
     Workers --> Sources : coleta agendada\ncredenciais no servidor
     note bottom of API
     Monólito modular inicial: território, diagnóstico, ingestão,
     simulação, campo e usuários. Workers executam trabalho pesado.
     REST + OpenAPI como contrato único; sem GraphQL nesta proposta.
-    Tenant derivado da identidade e validado em cada operação;
-    RLS no banco e isolamento também em cache, jobs e storage.
+    Cliente e unidade derivados da identidade e das concessões válidas;
+    RLS e FKs por cliente; acesso por unidade/finalidade.
+    Isolamento também em cache, jobs, storage e sincronização.
+    Prefeitura é cliente; secretaria/departamento/setor é unidade organizacional.
     end note
     legend bottom
     RF-001, 004, 008..017; RNF-002, 004, 006..009

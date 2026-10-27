@@ -3,8 +3,8 @@
     ' Base: docs/documento_de_requisitos.md, DESIGN.md e protótipo em app/, components/, lib/.
     ' Status: arquitetura ALVO. Apenas dashboard Next.js, dados demonstrativos e RBAC
     ' de interface estão implementados. API, mobile, conectores e ML são propostos.
-    ' O documento de requisitos contém uma seção duplicada; foram considerados os
-    ' RF-001..017 e RNF-001..014 completos. Tecnologias de ML dependem de avaliação.
+    ' Referência atual: documento de requisitos v2.2, RNF-002 e RF-041.
+    ' Tenant = cliente/prefeitura; secretaria = unidade; município = geografia.
 
     @startuml Denguinhos_01_Visao_Global
     !theme plain
@@ -14,42 +14,44 @@
     skinparam shadowing false
     title 1. Visão global — responsabilidades e fronteiras
 
-    package "Clientes" {
+    package "Aplicações de apresentação" {
     [Web Next.js\nVisão geral, diagnóstico, ingestão,\nsimulação e usuários] as Web
     [App React Native (proposto)\nRotas, visitas e alertas offline] as Mobile
     }
-    package "Nuvem — município isolado por tenant_id" {
+    package "Nuvem — clientes/prefeituras e unidades isoladas" {
     [BFF Next.js\nRoute Handlers: sessão web] as BFF
     [API FastAPI /v1\nRBAC, validação e regras de negócio] as API
     [Fila + workers\nIngestão, ML, exportação e simulação] as Workers
-    database "PostgreSQL + PostGIS\nIndicadores, previsões, rotas e jobs" as DB
+    database "PostgreSQL + PostGIS\nClientes, unidades, permissões\nOperação, previsões, rotas e jobs" as DB
     database "Redis\nCache de leitura" as Cache
     storage "Object storage\nAgregados e modelos versionados" as Storage
     }
     [Identidade OIDC\nMFA para administração/gestão] as IdP
     package "Borda — município / dispositivo" {
     [Planilhas e bases locais\nPEC, UPA, SINAN/SIM, LIRAa] as Local
-    [Processador local\nNormaliza, geocodifica, agrega\ne remove PII antes de transmitir] as Edge
+    [Processador local\nValida e normaliza por contrato\nTransforma conforme finalidade] as Edge
     }
     cloud "Fontes externas\nInfoDengue, DATASUS, clima\nAPI ou arquivo conforme disponibilidade" as Sources
     Web --> BFF : HTTPS / JSON\ncookie de sessão
     BFF --> API : HTTPS / REST\nBearer access token
     Mobile --> API : HTTPS / REST\nBearer + sincronização
     API --> IdP : valida assinatura, emissor,\naudiência e expiração
-    API --> Cache : leitura por tenant + filtros + versão
+    API --> Cache : leitura por cliente + unidade + permissões + filtros + versão
     API --> DB : consultas e transações
     API --> Workers : job assíncrono
     Workers --> DB : publica resultados
     Workers --> Storage : dados/modelos
     Local --> Edge : leitura local
-    Edge --> API : apenas agregados\nsem PII de pacientes
+    Edge --> API : dados operacionais autorizados\ncliente_id + unidade_id
     Workers --> Sources : coleta agendada\ncredenciais no servidor
     note bottom of API
     Monólito modular inicial: território, diagnóstico, ingestão,
     simulação, campo e usuários. Workers executam trabalho pesado.
     REST + OpenAPI como contrato único; sem GraphQL nesta proposta.
-    Tenant derivado da identidade e validado em cada operação;
-    RLS no banco e isolamento também em cache, jobs e storage.
+    Cliente e unidade derivados da identidade e das concessões válidas;
+    RLS e FKs por cliente; acesso por unidade/finalidade.
+    Isolamento também em cache, jobs, storage e sincronização.
+    Prefeitura é cliente; secretaria/departamento/setor é unidade organizacional.
     end note
     legend bottom
     RF-001, 004, 008..017; RNF-002, 004, 006..009
@@ -125,24 +127,24 @@
     participant "Browser\nDashboard Next.js" as Web
     participant "BFF Next.js\n/api/* (proposto)" as BFF
     participant "FastAPI\n/v1/*" as API
-    participant "Autorização\nJWT + RBAC + tenant" as Auth
+    participant "Autorização\nJWT + RBAC + cliente/unidade" as Auth
     database "Redis" as Cache
     database "PostgreSQL / PostGIS" as DB
     User -> Web : seleciona bairro / semana / horizonte
     Web -> BFF : GET /api/risk?week=...&horizon=4\ncookie HttpOnly + Secure + SameSite
     BFF -> API : GET /v1/risk?week=...&horizon=4\nAuthorization: Bearer <token> + X-Request-ID
-    API -> Auth : validar token e dashboard:view\nderivar tenant e escopo territorial
+    API -> Auth : validar token e dashboard:view\nderivar cliente/unidade e escopo territorial
     alt credencial ou permissão inválida
     Auth --> API : acesso negado
     API --> BFF : 401 / 403 + erro estruturado
     BFF --> Web : mensagem e ação de recuperação
     else autorizado
     Auth --> API : contexto autorizado
-    API -> Cache : GET tenant:filtros:prediction_version
+    API -> Cache : GET cliente:unidade:permissoes:filtros:prediction_version
     alt cache válido
         Cache --> API : snapshot publicado
     else cache ausente
-        API -> DB : SELECT previsões + geometrias\nRLS tenant; filtros e índices espaciais
+        API -> DB : SELECT previsões + geometrias\nRLS cliente/unidade; filtros e índices espaciais
         DB --> API : snapshot consistente
         API -> Cache : SET snapshot com TTL e versão
     end
@@ -184,13 +186,16 @@
 
     note over Edge,API
     CSV/XLSX: seleção e mapeamento de colunas local, validação,
-    normalização de bairro/CID e geocodificação local, remoção de PII,
-    agregação por território/semana e supressão de grupos reidentificáveis.
-    Arquivo original não sai da borda; sem upload bruto para anonimizar na nuvem.
-    Cruzamento APS/Vigilância por território/tempo, sem vínculo de pacientes.
+    normalização de bairro/CID e validação de campos por finalidade,
+    ingestão operacional identificada somente quando autorizada.
+    Dataset analítico usa transformação/agregação e avaliação de reidentificação.
+    Arquivo autorizado pode entrar no ambiente protegido local ou hospedado.
+    Cliente/prefeitura e unidade responsável acompanham todo o processamento.
+    Vínculo operacional de moradores requer contrato, finalidade e permissão.
+    Compartilhamento entre secretarias não é implícito; município não é tenant.
     end note
-    Edge -> API : POST /v1/imports\nagregados + schema_version + checksum\nIdempotency-Key; credencial municipal
-    API -> API : autorizar ingestion:manage\nvalidar schema, tenant e rejeitar payload com PII
+    Edge -> API : POST /v1/imports\npayload autorizado + schema_version + checksum\nIdempotency-Key; credencial municipal
+    API -> API : autorizar ingestion:manage\nvalidar schema, cliente/unidade e campos autorizados
     API -> Results : criar job queued + outbox na mesma transação
     API --> Edge : 202 {job_id,status_url}
     API -> Queue : publicar outbox com retry
@@ -198,7 +203,7 @@
     Ingest -> Sources : buscar dados públicos agregados\ntimeout, limites da fonte e backoff
     Sources --> Ingest : dados + período + proveniência
     Ingest -> Ingest : validar, deduplicar, harmonizar território/CID\nregistrar lacunas; separar lote inválido sem PII
-    Ingest -> Data : persistir snapshot imutável\ntenant + fonte + período + dataset_version
+    Ingest -> Data : persistir snapshot imutável\ncliente + unidade + fonte + período + dataset_version
     Ingest -> Results : atualizar qualidade e status da importação
     Ingest -> Queue : agendar features / previsão para snapshot válido
     Queue -> ML : executar job versionado
@@ -224,6 +229,7 @@
     API --> Front : status ou última previsão válida\ncom updated_at e aviso se desatualizada
     note over Queue,Results
     Jobs: queued → running → succeeded | failed.
+    Job e credencial vinculados a cliente/unidade; revalidar autorização ao executar.
     Retries limitados, processamento idempotente e fila de falhas;
     indisponibilidade da fonte preserva última publicação e sinaliza atraso.
     Auditoria: request_id/job_id/tenant/versões, sem PII em logs.
@@ -245,7 +251,7 @@
     participant "Worker de simulação" as Worker
     database "Snapshot de risco\n+ capacidade territorial" as Risk
     Web -> API : POST /v1/simulations + Idempotency-Key\n{resources:{acs,ace,larvicide,tests},horizon_weeks}
-    API -> API : RBAC simulation:view; validar limites/unidades\nfixar tenant, dataset_version e model_version
+    API -> API : RBAC simulation:view; validar limites/unidades\nfixar cliente/unidade, dataset_version e model_version
     API -> DB : transação: job queued + outbox
     API --> Web : 202 {job_id,status_url}
     Queue -> DB : ler outbox pendente
@@ -293,15 +299,16 @@
     Funciona offline para rotas baixadas e registros;
     alertas novos só chegam quando há conectividade.
     Pré-carga de rota/área autorizada antes do trabalho de campo.
-    Sem nome/CPF ou dados clínicos identificáveis de pacientes.
+    Identificação operacional apenas por contrato/finalidade autorizados.
     Referências territoriais devem passar por política de minimização;
-    dado identificável permanece local, conforme RNF-006.
+    dados identificados podem existir na operação protegida (RNF-006).
+    Troca de cliente/unidade não mistura filas, cache ou permissões.
     end note
     App -> Sync : conectividade disponível
     Sync -> Local : ler outbox + último cursor confirmado
     Sync -> API : POST /v1/sync/push\nBearer; {device_id,operations:[uuid,base_version,payload]}
-    API -> API : validar field:routes, tenant, agente e área atribuída
-    API -> DB : transação; UNIQUE(tenant_id,operation_uuid)\nverificar base_version
+    API -> API : validar field:routes, cliente/unidade, agente e área atribuída
+    API -> DB : transação; UNIQUE(cliente_id,operation_uuid)\nverificar base_version
     alt versão válida ou operação já aplicada
     DB --> API : resultado original / novo ack
     API --> Sync : ack por operação + versão do servidor

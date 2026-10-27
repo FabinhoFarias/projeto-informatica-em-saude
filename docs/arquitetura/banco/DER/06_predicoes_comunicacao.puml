@@ -1,0 +1,120 @@
+@startchen Denguinhos_DER_06_predicoes_comunicacao
+left to right direction
+' Entidades em retângulos; relacionamentos em losangos; cardinalidades min–máx.
+' Cada cardinalidade indica a participação da entidade ligada naquele relacionamento.
+' Atributos e restrições de implementação: dicionario_entidades.md e README.md.
+entity "Vinculo usuario [ref]" as Mem {
+}
+entity "Territorio [ref]" as Ter {
+}
+entity "Previsao territorial [ref]" as Pred {
+}
+entity "Decisao gerencial [ref]" as Dec {
+}
+entity "Politica visibilidade" as Policy {
+}
+entity "Publico autorizado" as Audience {
+}
+entity "Agenda predicao" as Agenda {
+}
+entity "Horario agenda" as Time {
+}
+entity "Destinatario agenda" as Recipient {
+}
+entity "Entrega predicao" as Delivery {
+}
+entity "Comunicacao equipe" as Comm {
+}
+entity "Destinatario comunicacao" as CR {
+}
+entity "Unidade organizacional [ref]" as Unit {
+}
+relationship "Define política" as R01 {
+}
+R01 -(0,N)- Mem
+R01 -(1,1)- Policy
+relationship "Delimita política" as R02 {
+}
+R02 -(0,N)- Ter
+R02 -(0,1)- Policy
+relationship "Autoriza público" as R03 {
+}
+R03 -(0,N)- Policy
+R03 -(1,1)- Audience
+relationship "Integra público" as R04 {
+}
+R04 -(0,N)- Mem
+R04 -(1,1)- Audience
+relationship "Configura agenda" as R05 {
+}
+R05 -(0,N)- Mem
+R05 -(1,1)- Agenda
+relationship "Rege agenda" as R06 {
+}
+R06 -(0,N)- Policy
+R06 -(1,1)- Agenda
+relationship "Delimita agenda" as R07 {
+}
+R07 -(0,N)- Ter
+R07 -(0,1)- Agenda
+relationship "Programa horário" as R08 {
+}
+R08 -(1,N)- Agenda
+R08 -(1,1)- Time
+relationship "Possui destinatário" as R09 {
+}
+R09 -(0,N)- Agenda
+R09 -(1,1)- Recipient
+relationship "Recebe programação" as R10 {
+}
+R10 -(0,N)- Mem
+R10 -(1,1)- Recipient
+relationship "Gera entrega" as R11 {
+}
+R11 -(0,N)- Time
+R11 -(1,1)- Delivery
+relationship "Recebe entrega" as R12 {
+}
+R12 -(0,N)- Mem
+R12 -(1,1)- Delivery
+relationship "Rege entrega" as R13 {
+}
+R13 -(0,N)- Policy
+R13 -(1,1)- Delivery
+relationship "Fundamenta entrega" as R14 {
+}
+R14 -(0,N)- Pred
+R14 -(0,1)- Delivery
+relationship "Orienta comunicação" as R15 {
+}
+R15 -(0,N)- Dec
+R15 -(1,1)- Comm
+relationship "Contextualiza comunicação" as R16 {
+}
+R16 -(0,N)- Delivery
+R16 -(0,1)- Comm
+relationship "Possui destinatário" as R17 {
+}
+R17 -(0,N)- Comm
+R17 -(1,1)- CR
+relationship "Recebe comunicação" as R18 {
+}
+R18 -(0,N)- Mem
+R18 -(1,1)- CR
+
+' Regras preservadas:
+' UNIQUE(horario_agenda_id, prevista_para, destinatario_id) na entrega.
+' Agenda ativa requer horário/destinatário autorizados; validar mudanças de fuso.
+' Entrega pode existir sem previsão válida: registrar ausência/atraso, nunca valor inventado.
+' Disponibilizada, lida e comunicada são eventos diferentes.
+' Revalidar permissão ao gerar/consultar/enviar: histórico não concede acesso atual.
+' Orientação à equipe não libera previsão restrita nem comprova visita executada.
+relationship "É responsável por" as R19 {
+}
+R19 -(0,N)- Unit
+R19 -(1,1)- Policy
+relationship "É responsável por" as R20 {
+}
+R20 -(0,N)- Unit
+R20 -(1,1)- Agenda
+@endchen

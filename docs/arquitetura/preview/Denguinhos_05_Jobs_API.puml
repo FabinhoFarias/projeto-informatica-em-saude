@@ -11,7 +11,7 @@
     participant "Worker de simulação" as Worker
     database "Snapshot de risco\n+ capacidade territorial" as Risk
     Web -> API : POST /v1/simulations + Idempotency-Key\n{resources:{acs,ace,larvicide,tests},horizon_weeks}
-    API -> API : RBAC simulation:view; validar limites/unidades\nfixar tenant, dataset_version e model_version
+    API -> API : RBAC simulation:view; validar limites/unidades\nfixar cliente/unidade, dataset_version e model_version
     API -> DB : transação: job queued + outbox
     API --> Web : 202 {job_id,status_url}
     Queue -> DB : ler outbox pendente

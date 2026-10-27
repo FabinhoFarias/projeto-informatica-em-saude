@@ -17,13 +17,16 @@
 
     note over Edge,API
     CSV/XLSX: seleção e mapeamento de colunas local, validação,
-    normalização de bairro/CID e geocodificação local, remoção de PII,
-    agregação por território/semana e supressão de grupos reidentificáveis.
-    Arquivo original não sai da borda; sem upload bruto para anonimizar na nuvem.
-    Cruzamento APS/Vigilância por território/tempo, sem vínculo de pacientes.
+    normalização de bairro/CID e validação de campos por finalidade,
+    ingestão operacional identificada somente quando autorizada.
+    Dataset analítico usa transformação/agregação e avaliação de reidentificação.
+    Arquivo autorizado pode entrar no ambiente protegido local ou hospedado.
+    Cliente/prefeitura e unidade responsável acompanham todo o processamento.
+    Vínculo operacional de moradores requer contrato, finalidade e permissão.
+    Compartilhamento entre secretarias não é implícito; município não é tenant.
     end note
-    Edge -> API : POST /v1/imports\nagregados + schema_version + checksum\nIdempotency-Key; credencial municipal
-    API -> API : autorizar ingestion:manage\nvalidar schema, tenant e rejeitar payload com PII
+    Edge -> API : POST /v1/imports\npayload autorizado + schema_version + checksum\nIdempotency-Key; credencial municipal
+    API -> API : autorizar ingestion:manage\nvalidar schema, cliente/unidade e campos autorizados
     API -> Results : criar job queued + outbox na mesma transação
     API --> Edge : 202 {job_id,status_url}
     API -> Queue : publicar outbox com retry
@@ -31,7 +34,7 @@
     Ingest -> Sources : buscar dados públicos agregados\ntimeout, limites da fonte e backoff
     Sources --> Ingest : dados + período + proveniência
     Ingest -> Ingest : validar, deduplicar, harmonizar território/CID\nregistrar lacunas; separar lote inválido sem PII
-    Ingest -> Data : persistir snapshot imutável\ntenant + fonte + período + dataset_version
+    Ingest -> Data : persistir snapshot imutável\ncliente + unidade + fonte + período + dataset_version
     Ingest -> Results : atualizar qualidade e status da importação
     Ingest -> Queue : agendar features / previsão para snapshot válido
     Queue -> ML : executar job versionado
@@ -57,6 +60,7 @@
     API --> Front : status ou última previsão válida\ncom updated_at e aviso se desatualizada
     note over Queue,Results
     Jobs: queued → running → succeeded | failed.
+    Job e credencial vinculados a cliente/unidade; revalidar autorização ao executar.
     Retries limitados, processamento idempotente e fila de falhas;
     indisponibilidade da fonte preserva última publicação e sinaliza atraso.
     Auditoria: request_id/job_id/tenant/versões, sem PII em logs.

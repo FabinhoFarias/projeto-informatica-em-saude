@@ -1,0 +1,97 @@
+@startchen Denguinhos_DER_07_clientes_organizacao
+left to right direction
+' Tenant = cliente_id; município é geografia, secretaria é unidade organizacional.
+entity "Cliente" as Client {
+}
+entity "Município (geografia)" as City {
+}
+entity "Prefeitura" as Pref {
+}
+entity "Unidade organizacional" as Unit {
+}
+entity "Vínculo usuário [ref]" as Mem {
+}
+entity "Lotação" as Lot {
+}
+entity "Concessão papel [ref]" as Grant {
+}
+entity "Módulo" as Module {
+}
+entity "Módulo do cliente" as CM {
+}
+entity "Módulo da unidade" as UM {
+}
+entity "Configuração versão" as Config {
+}
+entity "Compartilhamento autorizado" as Share {
+}
+relationship "Especializa cliente" as R01 {
+}
+R01 -(0,1)- Client
+R01 -(1,1)- Pref
+relationship "Identifica município" as R02 {
+}
+R02 -(0,N)- City
+R02 -(1,1)- Pref
+relationship "Organiza unidades" as R03 {
+}
+R03 -(0,N)- Client
+R03 -(1,1)- Unit
+relationship "Subordina unidade" as R04 {
+}
+R04 -(0,N)- Unit
+R04 -(0,1)- Unit
+relationship "Vincula usuário" as R05 {
+}
+R05 -(0,N)- Client
+R05 -(1,1)- Mem
+relationship "Possui lotação" as R06 {
+}
+R06 -(0,N)- Mem
+R06 -(1,1)- Lot
+relationship "Recebe lotação" as R07 {
+}
+R07 -(0,N)- Unit
+R07 -(1,1)- Lot
+relationship "Delimita concessão" as R08 {
+}
+R08 -(0,N)- Unit
+R08 -(0,1)- Grant
+relationship "Habilita módulo" as R09 {
+}
+R09 -(0,N)- Client
+R09 -(1,1)- CM
+relationship "Identifica módulo" as R10 {
+}
+R10 -(0,N)- Module
+R10 -(1,1)- CM
+relationship "Permite habilitar" as R11 {
+}
+R11 -(0,N)- CM
+R11 -(1,1)- UM
+relationship "Habilita na unidade" as R12 {
+}
+R12 -(0,N)- Unit
+R12 -(1,1)- UM
+relationship "Possui configuração" as R13 {
+}
+R13 -(0,N)- Client
+R13 -(1,1)- Config
+relationship "Especializa configuração" as R14 {
+}
+R14 -(0,N)- Unit
+R14 -(0,1)- Config
+relationship "Compartilha como origem" as R15 {
+}
+R15 -(0,N)- Unit
+R15 -(1,1)- Share
+relationship "Recebe compartilhamento" as R16 {
+}
+R16 -(0,N)- Unit
+R16 -(1,1)- Share
+' Prefeitura é especialização do cliente; cliente do tipo prefeitura exige um registro Prefeitura.
+' Unidade tem tipo SECRETARIA, DEPARTAMENTO, SETOR ou outro tipo autorizado.
+' Unidades da mesma prefeitura não compartilham automaticamente dados sensíveis.
+' Subordinação não autoriza acesso herdado por padrão; proibir ciclos e pais de outro cliente.
+' Compartilhamento exige origem e destino do mesmo cliente, finalidade, campos, aprovador e vigência.
+@endchen

@@ -1,0 +1,133 @@
+@startchen Denguinhos_DER_02_planejamento_visitas
+left to right direction
+' Entidades em retângulos; relacionamentos em losangos; cardinalidades min–máx.
+' Cada cardinalidade indica a participação da entidade ligada naquele relacionamento.
+' Atributos e restrições de implementação: dicionario_entidades.md e README.md.
+entity "Imovel [ref]" as Im {
+}
+entity "Imovel versao [ref]" as IV {
+}
+entity "Vinculo usuario [ref]" as Mem {
+}
+entity "Territorio [ref]" as Ter {
+}
+entity "Modalidade versao" as Mod {
+}
+entity "Ciclo" as Cycle {
+}
+entity "Planejamento" as Plan {
+}
+entity "Atribuicao" as Assign {
+}
+entity "Item planejamento" as PI {
+}
+entity "Jornada" as Day {
+}
+entity "Visita" as Visit {
+}
+entity "Visita revisao" as Rev {
+}
+entity "Pendencia campo" as Pend {
+}
+entity "Operacao sync" as Sync {
+}
+entity "Unidade organizacional [ref]" as Unit {
+}
+relationship "Organiza" as R01 {
+}
+R01 -(0,N)- Cycle
+R01 -(0,1)- Plan
+relationship "Define atividade" as R02 {
+}
+R02 -(0,N)- Mod
+R02 -(1,1)- Plan
+relationship "Delimita" as R03 {
+}
+R03 -(0,N)- Ter
+R03 -(1,1)- Plan
+relationship "Possui atribuição" as R04 {
+}
+R04 -(0,N)- Plan
+R04 -(1,1)- Assign
+relationship "Assume atribuição" as R05 {
+}
+R05 -(0,N)- Mem
+R05 -(1,1)- Assign
+relationship "Seleciona" as R06 {
+}
+R06 -(0,N)- Plan
+R06 -(1,1)- PI
+relationship "É selecionado" as R07 {
+}
+R07 -(0,N)- Im
+R07 -(1,1)- PI
+relationship "Executa jornada" as R08 {
+}
+R08 -(0,N)- Mem
+R08 -(1,1)- Day
+relationship "Recebe tentativa" as R09 {
+}
+R09 -(0,N)- Im
+R09 -(1,1)- Visit
+relationship "Origina retorno" as R10 {
+}
+R10 -(0,N)- Visit
+R10 -(0,1)- Visit
+' Autorrelacionamento: Visit como origem (0,N) e destino (0,1).
+relationship "Possui revisão" as R11 {
+}
+R11 -(1,N)- Visit
+R11 -(1,1)- Rev
+relationship "Contextualiza" as R12 {
+}
+R12 -(0,N)- IV
+R12 -(1,1)- Rev
+relationship "Agrupa" as R13 {
+}
+R13 -(0,N)- Day
+R13 -(1,1)- Rev
+relationship "Fundamenta" as R14 {
+}
+R14 -(0,N)- PI
+R14 -(0,1)- Rev
+relationship "Classifica" as R15 {
+}
+R15 -(0,N)- Mod
+R15 -(1,1)- Rev
+relationship "Registra autoria" as R16 {
+}
+R16 -(0,N)- Mem
+R16 -(1,1)- Rev
+relationship "Gera pendência" as R17 {
+}
+R17 -(0,N)- Visit
+R17 -(1,1)- Pend
+relationship "Resolve pendência" as R18 {
+}
+R18 -(0,N)- Visit
+R18 -(0,1)- Pend
+relationship "Recebe operação" as R19 {
+}
+R19 -(0,N)- Visit
+R19 -(1,1)- Sync
+relationship "Envia operação" as R20 {
+}
+R20 -(0,N)- Mem
+R20 -(1,1)- Sync
+
+' Regras preservadas:
+' Tentativa nova = visita nova. Reenvio = mesmo UUID/operação.
+' UNIQUE(cliente_id, operation_uuid). Não usar imóvel+data como UNIQUE.
+' UNIQUE(cliente_id, visita_id, revisao); revisões são imutáveis.
+' Cada revisão de visita referencia o contexto histórico, não o endereço atual.
+' Conteúdo, recepção técnica e conferência são estados independentes.
+' Fila local do aparelho também existe; dados ainda não enviados não estão no servidor.
+relationship "É responsável por" as R21 {
+}
+R21 -(0,N)- Unit
+R21 -(1,1)- Plan
+relationship "É responsável por" as R22 {
+}
+R22 -(0,N)- Unit
+R22 -(1,1)- Day
+@endchen

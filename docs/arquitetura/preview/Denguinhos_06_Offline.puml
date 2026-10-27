@@ -19,15 +19,16 @@
     Funciona offline para rotas baixadas e registros;
     alertas novos só chegam quando há conectividade.
     Pré-carga de rota/área autorizada antes do trabalho de campo.
-    Sem nome/CPF ou dados clínicos identificáveis de pacientes.
+    Identificação operacional apenas por contrato/finalidade autorizados.
     Referências territoriais devem passar por política de minimização;
-    dado identificável permanece local, conforme RNF-006.
+    dados identificados podem existir na operação protegida (RNF-006).
+    Troca de cliente/unidade não mistura filas, cache ou permissões.
     end note
     App -> Sync : conectividade disponível
     Sync -> Local : ler outbox + último cursor confirmado
     Sync -> API : POST /v1/sync/push\nBearer; {device_id,operations:[uuid,base_version,payload]}
-    API -> API : validar field:routes, tenant, agente e área atribuída
-    API -> DB : transação; UNIQUE(tenant_id,operation_uuid)\nverificar base_version
+    API -> API : validar field:routes, cliente/unidade, agente e área atribuída
+    API -> DB : transação; UNIQUE(cliente_id,operation_uuid)\nverificar base_version
     alt versão válida ou operação já aplicada
     DB --> API : resultado original / novo ack
     API --> Sync : ack por operação + versão do servidor

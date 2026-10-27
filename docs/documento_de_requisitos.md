@@ -1,12 +1,14 @@
 # Documento de Requisitos de Software — Plataforma Denguinhos
 
-**Versão:** 2.1 — acompanhamento de implementação por requisito
+**Versão:** 2.2 — múltiplas prefeituras, unidades organizacionais e isolamento de dados
 
-**Data:** 26 de outubro de 2026
+**Data:** 27 de outubro de 2026
 
 **Estado:** backlog funcional consolidado; capacidades planejadas com ativação por fase e validações municipais explícitas, sem declaração de implementação ou homologação.
 
 **Fontes:** [transcrição de Moura](transcricoes/transcricaoMoura.txt), requisitos anteriores e esclarecimentos do solicitante sobre consolidação, impressão, assinatura, sistema territorial atual e consulta de moradores da Atenção Básica (26/10/2026).
+
+**Decisão multiclientes (27/10/2026):** tenant = cliente/prefeitura; secretarias são unidades organizacionais; município é referência geográfica. RNF-002 e RF-041 definem isolamento e administração. Os diagramas e o dicionário do banco seguem essa separação.
 
 **Fonte única:** requisitos, campos, fluxos, entidades, regras, evidências, demonstrativos, critérios de aceite e backlog estão centralizados neste arquivo. Os arquivos anteriores de análise/especificação são apenas redirecionamentos. Fotos, entrevistas e publicações externas são fontes de evidência, não definições concorrentes de requisitos.
 
@@ -28,15 +30,15 @@ Os IDs existentes foram preservados. Requisitos novos usam IDs posteriores aos j
 <!-- requirements-progress:start -->
 ![Progresso dos requisitos implementados: 0%](https://geps.dev/progress/0)
 
-**Progresso de implementação:** 0% (0 de 63 requisitos com status Implementado).
+**Progresso de implementação:** 0% (0 de 64 requisitos com status Implementado).
 
 | Status | Quantidade |
 | :--- | ---: |
 | ✅ Implementado | 0 |
 | 🏗 Parcial | 11 |
-| ⏳ Futuro | 49 |
+| ⏳ Futuro | 50 |
 | 🔎 A verificar | 3 |
-| **Total** | **63** |
+| **Total** | **64** |
 <!-- requirements-progress:end -->
 
 ## Como consultar este documento
@@ -77,7 +79,7 @@ Coordenação, digitação e laboratório devem ter permissões próprias; não 
 
 ### 2.1 Regra de acesso e composição dos módulos
 
-O acesso combina papel, município, território atribuído e finalidade da tarefa. A mesma pessoa pode acumular papéis autorizados; isso não elimina autoria nem validações de aprovação. A interface mostra ações permitidas e os serviços validam novamente a autorização. Os papéis descritos são a referência funcional; não pressupõem que todos já existam no protótipo.
+O acesso combina cliente/prefeitura, unidade organizacional, papel, território atribuído, módulo habilitado, finalidade e vigência. Secretaria de Saúde é uma unidade da prefeitura; outra secretaria não herda acesso aos dados de saúde. Município/geografia não é a chave do cliente. A mesma pessoa pode acumular papéis autorizados; isso não elimina autoria nem validações de aprovação. A interface mostra ações permitidas e os serviços validam novamente a autorização. Os papéis descritos são a referência funcional; não pressupõem que todos já existam no protótipo.
 
 A consulta de moradores pela Atenção Básica é consumida pelo ACE (RF-032); ingestão e vinculação pertencem ao módulo compartilhado de integrações. ACS/APS não herda permissões do ACE e seu fluxo assistencial não é ampliado por esta reorganização. Coordenação e digitador trabalham sobre a mesma produção; laboratório registra resultados relacionados às amostras, sem duplicar a visita.
 
@@ -342,7 +344,7 @@ confirmar titularidade e disponibilidade antes da implantação. Suportar isolam
 
 | Campo do papel / código | Significado operacional | Entidade de origem | Tipo de dado | Regra de preenchimento | Regra de consolidação | Fonte ou pendência |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| C-01 Município | Município da produção | Município/atribuição | Código + nome | H/O, derivado da sessão/área | Agrupar sem misturar tenants | DOC/ACE; IMG-P |
+| C-01 Município | Referência geográfica da produção, distinta da prefeitura/cliente | Município/território | Código IBGE/local + nome | H/O conforme leiaute; não define credencial/tenant | Agrupamento geográfico dentro do cliente/unidade autorizados | DOC/ACE; IMG-P |
 | C-02 Código e nome da localidade | Divisão reconhecida pelo serviço | Localidade | Código + texto | H; C se usado no leiaute | Agrupar pelo código vigente no registro | PED; vínculo territorial a validar |
 | C-03 Zona urbana/rural | Classificação territorial | Território | Enum versionado | H/C; desconhecida explícita | Separar zona conforme regra do destino | PED; COMP destaca zona rural; IMG-P |
 | C-04 Área/setor | Atribuição territorial do trabalho | Área/atribuição | Referência | H/O; não presumir área=setor=distrito | Agrupar pelo contexto da atividade | ACE/DOC; equivalência local pendente |
@@ -398,6 +400,8 @@ confirmar titularidade e disponibilidade antes da implantação. Suportar isolam
 | C-54 Assinaturas do agente, supervisor e laboratório | Responsabilização documental | Aprovação/documento | Referência de responsável/assinatura | C; I1 tem agente e supervisor, I2 tem laboratorista e assinatura | Não criar confirmação automática ao emitir | I1/I2; validade/fluxo de assinatura municipal pendente |
 | C-55 Categoria da localidade | Classificação territorial impressa separadamente de tipo sede/outros | Localidade/catálogo | Código/texto | H/C; significado e catálogo ainda não confirmados | Agrupar apenas se regra do destino exigir | I1; não fundir com C-03/C-38 |
 | C-56 Número de quarteirão no rodapé diário | Referência territorial no fechamento do papel | Jornada/fechamento/território | Código ou lista a confirmar | H/C; definir se identifica quarteirão da folha, quantidade ou encerramento | Não converter em total de concluídos sem regra | I1; rótulo visível, semântica pendente |
+| C-57 Cliente/prefeitura | Proprietário organizacional dos dados | Cliente/perfil prefeitura | UUID + referência institucional | Herdado do contexto autorizado, obrigatório; não confiar no payload | Isolar todos os dados e documentos por cliente | RF-041/RNF-002; campo digital, não inferido do papel |
+| C-58 Unidade responsável | Secretaria/departamento/setor que opera o registro | Unidade organizacional/lotação | UUID + tipo/nome | Herdado da atribuição, com autorização; manter unidade histórica | Consolidar/compartilhar somente no escopo aprovado | RF-041/RNF-008; não confundir com município/localidade |
 
 #### Catálogo de depósitos
 
@@ -1006,21 +1010,44 @@ O ambiente operacional autorizado do Denguinhos pode receber, armazenar e relaci
 
 **Qualidade e restrições deste módulo:**
 
+### RF-041 — Gestão de clientes/prefeituras, unidades organizacionais e módulos
+
+**Status:** ⏳ **Futuro**
+
+**Evidência e lacunas:** Não foram identificados cadastro persistido de clientes, hierarquia de secretarias, lotações ou habilitação de módulos por cliente/unidade; o município demonstrativo não entrega esse fluxo.
+
+- Manter cliente com identidade estável, nome, tipo, situação e fuso; prefeitura tem perfil institucional e município geográfico relacionado. Secretaria não é cliente implícito nem sinônimo de prefeitura; é unidade do cliente.
+- Cadastrar unidades com tipo (secretaria, departamento, setor ou outro autorizado), código, nome, unidade superior e vigência. Permitir secretaria de saúde e de outras áreas sem alterar a estrutura central do banco; impedir pai de outro cliente e ciclos hierárquicos.
+- Manter participação do usuário no cliente, uma ou mais lotações e concessões de papéis/permissões por unidade/território/finalidade, com vigência. Administração da plataforma gerencia provisionamento, sem acesso automático ao conteúdo operacional ou clínico dos clientes.
+- Habilitar módulos para o cliente e para unidades autorizadas; configuração de unidade só se aplica ao seu escopo. Desabilitar módulo impede novas operações pertinentes sem apagar histórico ou documentos emitidos.
+- Dados compartilhados no cliente (por exemplo, identidade de imóvel) e dados de uma secretaria (por exemplo, atendimento/visita) têm classificação e políticas explícitas. Compartilhar um cadastro não compartilha todos os registros associados a ele.
+- Autorizar compartilhamento entre unidades do mesmo cliente com recurso/escopo, finalidade, campos, responsável, vigência e revogação. Encaminhamento a órgão externo segue contrato próprio de RF-038; não simular troca de tenant ou acesso irrestrito entre clientes.
+- Registrar alterações e desativações com autoria e motivo; reestruturação organizacional preserva unidade responsável histórica, lotações e documentos. Código local é único no escopo apropriado do cliente, sem usar nome da secretaria como chave.
+- **Aceite:** configurar prefeitura A com Saúde e Educação e prefeitura B com Saúde; ativar módulos distintos, lotar o mesmo usuário em contextos autorizados e comprovar que o cliente/unidade ativos delimitam o acesso. Revogar compartilhamento bloqueia novas consultas/envios sem apagar a trilha histórica.
+
 ### RNF-008 — Controle de Acesso de Usuários
 
 **Status:** 🏗 **Parcial**
 
 **Evidência e lacunas:** [lib/rbac.ts](../lib/rbac.ts). Papéis e permissões controlam navegação e componentes em conjunto com PermissionGate; o papel é selecionável na demonstração, sem autenticação real, MFA ou autorização na API.
 
-O sistema deve adotar controle de acesso baseado em papéis (RBAC - *Role-Based Access Control*) com autenticação multifator (MFA) para perfis administrativos e de gestão.
+O sistema deve adotar controle de acesso baseado em papéis (RBAC - *Role-Based Access Control*) com autenticação multifator (MFA) para perfis administrativos e de gestão. Concessões vinculam cliente/prefeitura, unidade organizacional, módulo, território/finalidade e vigência; lotação e hierarquia não autorizam acesso por si só. Administração técnica da plataforma não concede acesso automático aos dados de cada cliente. O contexto ativo deve ser revalidado no servidor e nas integrações, conforme RF-041/RNF-002.
 
 ### RNF-002 — Arquitetura Multitenant / SaaS
 
 **Status:** ⏳ **Futuro**
 
-**Evidência e lacunas:** lib/dashboard-data.ts fixa um município demonstrativo; não há isolamento por tenant em API, banco ou armazenamento.
+**Evidência e lacunas:** lib/dashboard-data.ts fixa um município demonstrativo; não há cadastro de clientes/prefeituras e unidades nem isolamento por cliente/unidade em API, banco ou armazenamento.
 
-A arquitetura deve suportar múltiplos municípios de forma isolada e escalável na nuvem, permitindo a adição de novas cidades sem reestruturação do código-fonte.
+A arquitetura deve suportar múltiplos clientes/prefeituras isolados e escaláveis. O tenant é identificado por `cliente_id`; a prefeitura é a organização cliente, e secretaria de saúde, educação, assistência social, departamentos e setores são unidades organizacionais vinculadas a ela. Município é referência geográfica (por exemplo, código IBGE) e não deve ser usado como identidade de autenticação/contrato ou única chave de isolamento.
+
+- Cada cliente pode possuir múltiplas secretarias e demais unidades, com hierarquia, vigência, usuários, módulos e configurações próprios. A estrutura organizacional não deve presumir que todo cliente ou unidade seja uma secretaria de saúde.
+- Dados operacionais têm `cliente_id` obrigatório e unidade responsável quando pertinente. FKs compostas, RLS e autorização dos serviços devem impedir referência e leitura/escrita entre clientes; selecionar outro `cliente_id` no payload não concede acesso.
+- Dentro do mesmo cliente, lotação ou papel não concede acesso automático a todas as secretarias. Acesso depende de unidade, papel, território, módulo, finalidade e vigência; compartilhamento entre unidades é explícito, limitado e auditado.
+- Contexto de cliente/unidade deve acompanhar consultas, sincronização, cache, jobs, storage, arquivos, integrações, exportações, datasets, modelos e notificações. Mesmos códigos locais em prefeituras distintas não colidem.
+- A identidade de login pode ser global; participação, lotações e concessões são próprias de cada cliente. O mesmo profissional pode atuar em várias prefeituras/unidades sem misturar dados ou permissões, inclusive no dispositivo offline.
+- A habilitação de novas áreas reutiliza o núcleo de clientes/unidades e acesso; seus processos específicos dependem de requisitos próprios. Não converter todo formulário de saúde em formulário genérico nem liberar dados clínicos a outros setores por compartilharem a prefeitura.
+- **Aceite:** cadastrar duas prefeituras com secretarias distintas, usuários e códigos territoriais iguais; comprovar isolamento em FK/consulta/API/cache/job/arquivo/exportação/offline. No mesmo cliente, negar acesso de uma secretaria à outra até existir concessão/compartilhamento compatível. Município pode aparecer como geografia sem determinar acesso.
 
 ### RNF-007 — Criptografia de Dados
 
@@ -1078,7 +1105,8 @@ RNF-001 e RNF-011 continuam como metas de dashboard e nuvem, respectivamente. Se
 
 | Entidade | Dados/relações mínimos e invariantes |
 | :--- | :--- |
-| Configuração municipal | Tenant, calendário, modalidade, catálogos, regras de cálculo, modelo de relatório e respectivas versões/vigências. |
+| Cliente/prefeitura e organização | `cliente_id` identifica o tenant; perfil prefeitura aponta município geográfico; unidades organizacionais têm hierarquia, vigência e módulos. Secretaria não é tenant por pressuposição. |
+| Configuração por cliente/unidade | Calendário, modalidade, catálogos, regras de cálculo, modelo de relatório, escopo e versões/vigências, sem aplicar configuração de outra unidade. |
 | Território/imóvel (base operacional restrita) | Hierarquia territorial, identificador estável, endereço quando necessário, situação cadastral, origem e atualização. Não inferir domicílio familiar a partir de imóvel. |
 | Ciclo/planejamento | Período, área, responsável, modalidade, atribuições e aprovação. Plano amostral tem seleção e denominadores próprios. |
 | Visita/tentativa (base operacional restrita) | UUID, data da atividade/lançamento, autoria, origem digital/papel, imóvel, ciclo, modalidade, acesso, vínculo de retorno e versão. |
@@ -1089,6 +1117,14 @@ RNF-001 e RNF-011 continuam como metas de dashboard e nuvem, respectivamente. Se
 | Sincronização | Operação UUID, versão, origem/dispositivo, reconhecimento e erro; não eliminar dado pendente por expiração da sessão. |
 
 **Regras de cálculo a homologar:** definição de imóvel trabalhado, inspecionado e tratado; contagem de recuperados entre semanas; inclusão de PE e amostra; tratamento de imóvel vago/recusa; conclusão de quarteirão; denominadores de índices; soma de produtos e arredondamento. Até validação, usar indicadores descritivos explícitos e rótulo provisório, sem reproduzir número como estatística oficial.
+
+### Organização e propriedade dos dados
+
+- `cliente` é a raiz de isolamento. `prefeitura` é a especialização institucional do cliente; `municipio` é cadastro geográfico. O código IBGE, o nome da cidade ou o nome de uma secretaria não identifica a sessão ou o proprietário dos dados.
+- `unidade_organizacional` pertence a um cliente e pode conter secretaria/departamento/setor. `vinculo_usuario`, `lotacao` e `concessao_papel` representam participação, unidade de atuação e autorização distintas; existência de uma lotação não libera todos os registros da secretaria.
+- `cliente_modulo`, `unidade_modulo` e `configuracao_versao` separam habilitação e configuração por escopo. `compartilhamento_autorizado` especifica o que pode cruzar unidades do mesmo cliente; não é autorização entre prefeituras.
+- Dados operacionais sensíveis têm `cliente_id` e unidade responsável coerentes com sua origem. Cadastros compartilhados do cliente não concedem acesso a visitas, atendimentos ou documentos de todas as áreas. Consultas gerenciais na prefeitura exigem escopo explícito, não privilégio derivado do nível hierárquico.
+- Logs de auditoria, idempotência, chaves de cache/storage, jobs e conteúdo offline usam cliente/unidade/autor. Mudança de contexto do usuário não reaproveita cache, credenciais ou dados locais de outro cliente.
 
 ### 11.1 Passagem de responsabilidade
 
@@ -1117,33 +1153,11 @@ ACE registra e entrega → coordenação confere/aprova → operador emite e enc
 
 ### 11.2 Modelo conceitual detalhado de dados
 
-```mermaid
-erDiagram
-  MUNICIPIO ||--o{ IMOVEL : cadastra
-  IMOVEL ||--o{ REFERENCIA_TERRITORIAL : possui_historico
-  IMOVEL ||--o{ VISITA : recebe
-  ACE ||--o{ VISITA : executa
-  PLANEJAMENTO ||--o{ VISITA : contextualiza
-  JORNADA ||--o{ VISITA : agrupa
-  VISITA ||--o{ PENDENCIA : gera
-  PENDENCIA o|--o{ VISITA : motiva_retorno
-  VISITA ||--o{ OBSERVACAO_DEPOSITO : registra
-  VISITA ||--o{ ACAO_CONTROLE : contem
-  ACAO_CONTROLE ||--o{ APLICACAO : utiliza_produto
-  ACAO_CONTROLE ||--o{ ALVO_CONTROLE : relaciona
-  OBSERVACAO_DEPOSITO o|--o{ ALVO_CONTROLE : identifica
-  CARGA o|--o{ APLICACAO : abastece
-  VISITA ||--o{ AMOSTRA : origina
-  OBSERVACAO_DEPOSITO o|--o{ AMOSTRA : localiza
-  AMOSTRA ||--o{ MOVIMENTO_AMOSTRA : acompanha
-  AMOSTRA ||--o{ RESULTADO_ANALISE : versiona
-  VISITA ||--o{ OPERACAO_SYNC : sincroniza
-  FECHAMENTO_DIARIO ||--o{ ITEM_FECHAMENTO : referencia_versao
-  VISITA ||--o{ ITEM_FECHAMENTO : compoe
-  CONSOLIDACAO_SEMANAL ||--o{ ITEM_CONSOLIDACAO : referencia
-  FECHAMENTO_DIARIO ||--o{ ITEM_CONSOLIDACAO : compoe
-  CONSOLIDACAO_SEMANAL ||--o{ DOCUMENTO_EMITIDO : fundamenta
-```
+**DER técnico proposto:** [esboço por domínio, com entidades, cardinalidades e restrições](arquitetura/banco/README.md). Esse artefato traduz os requisitos abaixo; não representa banco implementado nem altera os status de progresso.
+
+![Núcleo do DER em notação de Chen](arquitetura/banco/00_visao_resumida.svg)
+
+Entidades em retângulos, relacionamentos em losangos e cardinalidades mínimo–máximo. Os diagramas por domínio e o dicionário técnico estão no [guia do DER](arquitetura/banco/README.md).
 
 **Granularidade e identidade:**
 
@@ -1180,7 +1194,7 @@ erDiagram
 6. Quarteirão trabalhado decorre da execução elegível. Concluído exige cobertura/plano e decisão previstos; soma de quarteirões diários não equivale à quantidade distinta semanal.
 7. Recuperação conserva as duas datas e vínculo. Se ocorrer em outra semana, cada tentativa pertence à sua data, e o indicador de recuperação aplica regra de competência homologada sem reescrever semana já emitida.
 8. Resultado laboratorial tardio/corrigido recebe data e versão; eventual atualização de demonstrativo segue retificação, sem alterar PDF anterior. Pendente/inconclusivo não vira negativo.
-9. `UNIQUE(tenant_id, operation_uuid)` e controle de versão evitam reenvio duplicado; o registro de negócio preserva o mesmo `visita_id`. UUIDs distintos para o mesmo imóvel/data não provam duplicata: comparar contexto e sinalizar para conferência, pois duas tentativas podem ser legítimas.
+9. `UNIQUE(cliente_id, operation_uuid)` e controle de versão evitam reenvio duplicado; o registro de negócio preserva o mesmo `visita_id`. UUIDs distintos para o mesmo imóvel/data não provam duplicata: comparar contexto e sinalizar para conferência, pois duas tentativas podem ser legítimas.
 10. Não preencher silêncio como zero. Mostrar campos desconhecidos, não aplicáveis e pendentes. Nenhuma correção silenciosa de contagem inconsistente: mostrar erro contextual ou devolver com motivo.
 11. Totais permitem navegação até itens de origem conforme permissão. Anulação/correção mantém autor, motivo, data, versão anterior e impacto; totais e documento são recalculados em nova versão.
 12. Ficha em papel transcrita conserva autor da visita, digitador e data real; chave de ficha/origem apoia prevenção de duplicidade com registros digitais.
@@ -1486,8 +1500,9 @@ O detalhamento desta análise orienta requisitos e próximo protótipo. Nenhuma 
 | V-10 | Quem responde por equipamento, acesso, correção, perda, retenção e restauração? | Gestão + operação responsável | Definir suporte e contingência antes de uso produtivo. |
 | V-11 | Comparar consulta do setor, localização do imóvel e abertura da ficha com o sistema atual: termos, ordem, número de passos, tempo de tarefa e dificuldades de leitura. | ACE de diferentes níveis de familiaridade digital | Homologar ficha com usuários de campo, além da aprovação gerencial. |
 | V-12 | Qual sistema da Atenção Básica é a fonte de moradores? Qual identificador liga imóvel/endereço, quais campos o ACE pode consultar, quem corrige cadastro, com que atualização e possibilidade de acesso offline? | APS + ACE + gestão de acesso/privacidade | Implementar somente mock sintético até validar contrato, vinculação, permissões e guarda protegida dos dados reais. |
-| V-13 | Conferir campos C-01..56 do detalhamento deste documento com fotos legíveis das fichas diária/semanal e fichas específicas; validar estados, contagens, cargas e cenários T-01..32. | ACE + coordenação + laboratório + destinatário | Subcampos de leitura incerta e leiaute oficial pendentes; não impor fórmula, dose ou indicador sem regra aprovada. |
+| V-13 | Conferir campos C-01..58 do detalhamento deste documento com fotos legíveis das fichas diária/semanal e fichas específicas; validar estados, contagens, cargas e cenários T-01..37. | ACE + coordenação + laboratório + destinatário | Subcampos de leitura incerta e leiaute oficial pendentes; não impor fórmula, dose ou indicador sem regra aprovada. |
 | V-14 | Comparar telas públicas do e-Visit@ com a ferramenta/versão efetivamente usada pelos ACE do piloto; validar fluxo familiar e fechamento gerencial da referência pública documentada na seção 13, inclusive dados atrasados e equipe offline. | ACE + coordenação + direção | Não prometer equivalência exata, melhor desempenho medido ou integração com e-Visit@ sem demonstração e acesso. |
+| V-15 | Identificar prefeitura cliente, secretarias/unidades, hierarquia, módulos, responsáveis e regras de compartilhamento, distinguindo cadastro geográfico de organização. | Administração do cliente + direção de cada área | Não usar municipio_id como tenant nem permitir acesso cruzado por lotação/hierarquia implícita. |
 
 ### 14.1 Roteiro de aceite ponta a ponta do piloto
 
@@ -1505,7 +1520,7 @@ O detalhamento desta análise orienta requisitos e próximo protótipo. Nenhuma 
 
 12. Validar horários/fuso de RF-033, entrega sem duplicação e acesso restrito/compartilhado, incluindo API e exportação; confirmar que encaminhar uma orientação não libera automaticamente a previsão à equipe.
 
-13. Executar os cenários T-01..32 do detalhamento deste documento, reconciliar demonstrativos com conjunto de referência municipal e concluir a conferência visual dos campos antes de homologar o leiaute.
+13. Executar os cenários T-01..37 do detalhamento deste documento, reconciliar demonstrativos com conjunto de referência municipal e concluir a conferência visual dos campos antes de homologar o leiaute.
 
 14. Executar cenário de fechamento com entrega parcial, correção tardia e previsão restrita, conferindo o mesmo snapshot em lista, mapa e documento; comparar tarefas territoriais com a ferramenta local conhecida.
 
@@ -1514,7 +1529,7 @@ O detalhamento desta análise orienta requisitos e próximo protótipo. Nenhuma 
 | ID local | Validação necessária | Responsável / ligação com requisitos |
 | :--- | :--- | :--- |
 | PV-01 | Confirmar edição/vigência das duas fotos inspecionadas, obter frente/verso e originais mais legíveis dos subcampos. Título diário confirmado em I1; periodicidade semanal de I2 depende do procedimento relatado. | ACE, coordenação e destino; V-01/V-04 do documento principal. |
-| PV-02 | Conferir C-01..56 com originais, especialmente duas sequências de I1, categoria/tipo de localidade, número de quarteirão no rodapé, unidades de larvicida/adulticida e zona concluída. Confirmar códigos e obrigatoriedade por modalidade. | ACE e responsável técnico; V-01/V-05. |
+| PV-02 | Conferir C-01..58 com originais, especialmente duas sequências de I1, categoria/tipo de localidade, número de quarteirão no rodapé, unidades de larvicida/adulticida e zona concluída. Confirmar códigos e obrigatoriedade por modalidade. | ACE e responsável técnico; V-01/V-05. |
 | PV-03 | Definir trabalhado, inspecionado, acesso parcial, recusa, recuperação e competência do retorno entre semanas. | Coordenação/destino; RF-022/025. |
 | PV-04 | Validar contagens de depósitos/alvos, vínculos entre indicadores, categoria limítrofe e granularidade suficiente para amostras e demonstrativos. | Responsável técnico/laboratório; RF-021/023. |
 | PV-05 | Identificar quadros de focal/perifocal/adulticida/PE, cargas, produtos, unidades e eventual proteção/equipamento. Não deduzir dos exemplos. | Responsável técnico; V-05/V-06. |
@@ -1591,6 +1606,16 @@ Executar com dados sintéticos, modalidade/catálogos configurados e conjunto de
 | T-31 Períodos | Mesmo conjunto de origem gera mês/ciclo/semana epidemiológica consistentes, sem somar distintos indevidamente e com corte versionado. |
 | T-32 Tarefa | Recebimento offline posterior não equivale a execução; impedimento, reatribuição e validação preservam autoria e não liberam previsão restrita. |
 
+### Aceite multiclientes e entre secretarias
+
+| Cenário | Resultado exigido |
+| :--- | :--- |
+| T-33 Duas prefeituras | Mesmo código local/endereço em clientes diferentes não colide; consultas, FKs, cache, jobs, anexos e exportações não atravessam o tenant. |
+| T-34 Saúde e Educação | Usuário lotado em Educação não vê visitas/prontuários da Saúde apenas por pertencer à mesma prefeitura; módulo e concessão são conferidos. |
+| T-35 Compartilhamento restrito | Autorizar recurso/campos/finalidade entre unidades do mesmo cliente, registrar uso e revogar; novas consultas/envios são bloqueados sem apagar histórico. |
+| T-36 Múltiplas lotações/offline | Usuário com acesso a duas prefeituras/unidades troca contexto; dados, rascunhos, filas e credenciais permanecem segregados; nada é enviado ao tenant/unidade incorretos. |
+| T-37 Reestruturação organizacional | Desativar/reorganizar unidade ou módulo preserva autoria, unidade histórica, documentos e vigência; pai de outro cliente/ciclo hierárquico é rejeitado. |
+
 **Pendências de habilitação:** aprovar catálogos e linguagem clínica/social, setores destinatários, campos por finalidade, política de mídia e localização, calendários e contratos externos antes de ativar dados reais desses módulos. Validar com ACE e responsáveis de cada setor; todos os cenários usam dados sintéticos até aprovação do acesso.
 
 ## 15. Índice de requisitos por módulo
@@ -1606,4 +1631,4 @@ Este índice aponta a definição principal. Todos os detalhamentos, critérios 
 | Direção/gestor | RF-008, RF-017, RF-009, RF-011, RF-033 | RNF-001 |
 | Epidemiologista | RF-010, RF-007, RF-005, RF-006, RF-016 | RNF-012, RNF-014 |
 | Integrações/APS e destinos | RF-001, RF-015, RF-003, RF-004, RF-038 | RNF-010, RNF-006 |
-| Administração/plataforma | Compartilhados referenciados no módulo | RNF-008, RNF-002, RNF-007, RNF-019, RNF-020, RNF-003, RNF-011, RNF-021 |
+| Administração/plataforma | RF-041 | RNF-008, RNF-002, RNF-007, RNF-019, RNF-020, RNF-003, RNF-011, RNF-021 |

@@ -1,0 +1,135 @@
+@startchen Denguinhos_DER_05_integracao_pessoas_ml
+left to right direction
+' Entidades em retângulos; relacionamentos em losangos; cardinalidades min–máx.
+' Cada cardinalidade indica a participação da entidade ligada naquele relacionamento.
+' Atributos e restrições de implementação: dicionario_entidades.md e README.md.
+entity "Imovel [ref]" as Im {
+}
+entity "Territorio [ref]" as Ter {
+}
+entity "Fonte dados" as Source {
+}
+entity "Lote ingestao" as Batch {
+}
+entity "Mapeamento externo" as External {
+}
+entity "Pessoa" as Person {
+}
+entity "Pessoa fonte" as PR {
+}
+entity "Vinculo residencia" as Residence {
+}
+entity "Registro saude" as Health {
+}
+entity "Dataset versao" as Data {
+}
+entity "Dataset lote" as Lineage {
+}
+entity "Modelo versao" as Model {
+}
+entity "Execucao modelo" as Run {
+}
+entity "Previsao territorial" as Forecast {
+}
+entity "Cenario simulacao" as Sim {
+}
+entity "Unidade organizacional [ref]" as Unit {
+}
+relationship "Fornece lote" as R01 {
+}
+R01 -(0,N)- Source
+R01 -(1,1)- Batch
+relationship "Define código externo" as R02 {
+}
+R02 -(0,N)- Source
+R02 -(1,1)- External
+relationship "Corresponde a imóvel" as R03 {
+}
+R03 -(0,N)- Im
+R03 -(0,1)- External
+relationship "Corresponde a território" as R04 {
+}
+R04 -(0,N)- Ter
+R04 -(0,1)- External
+relationship "Possui origem" as R05 {
+}
+R05 -(0,N)- Person
+R05 -(1,1)- PR
+relationship "Identifica pessoa" as R06 {
+}
+R06 -(0,N)- Source
+R06 -(1,1)- PR
+relationship "Possui vínculo residencial" as R07 {
+}
+R07 -(0,N)- Person
+R07 -(1,1)- Residence
+relationship "Localiza residência" as R08 {
+}
+R08 -(0,N)- Im
+R08 -(1,1)- Residence
+relationship "Informa residência" as R09 {
+}
+R09 -(0,N)- Source
+R09 -(1,1)- Residence
+relationship "Fornece registro" as R10 {
+}
+R10 -(0,N)- Batch
+R10 -(1,1)- Health
+relationship "Identifica registro" as R11 {
+}
+R11 -(0,N)- Person
+R11 -(0,1)- Health
+relationship "Localiza registro" as R12 {
+}
+R12 -(0,N)- Ter
+R12 -(0,1)- Health
+relationship "Possui linhagem" as R13 {
+}
+R13 -(0,N)- Data
+R13 -(1,1)- Lineage
+relationship "Compõe linhagem" as R14 {
+}
+R14 -(0,N)- Batch
+R14 -(1,1)- Lineage
+relationship "Treina versão" as R15 {
+}
+R15 -(0,N)- Data
+R15 -(1,1)- Model
+relationship "É executado" as R16 {
+}
+R16 -(0,N)- Model
+R16 -(1,1)- Run
+relationship "Fornece entrada" as R17 {
+}
+R17 -(0,N)- Data
+R17 -(1,1)- Run
+relationship "Produz previsão" as R18 {
+}
+R18 -(0,N)- Run
+R18 -(1,1)- Forecast
+relationship "Baseia simulação" as R19 {
+}
+R19 -(0,N)- Run
+R19 -(1,1)- Sim
+
+' Regras preservadas:
+' Operação identificada é restrita por finalidade; dataset de ML usa transformação/agregação.
+' Pessoa vinculada ao imóvel não vira cópia do cadastro em cada visita.
+' UNIQUE(fonte, registro_externo, versão) nos registros externos versionados.
+' Mapeamento externo tem exatamente um alvo: imóvel OU território.
+' APS permanece mock no protótipo: estas são entidades propostas, não integração pronta.
+' Não assumir esquema do SINAN/SisPNCD nem acesso a API pelo nome da fonte.
+' Dataset, modelo, execução e publicação são versões distintas e rastreáveis.
+relationship "É responsável por" as R20 {
+}
+R20 -(0,N)- Unit
+R20 -(1,1)- Source
+relationship "É responsável por" as R21 {
+}
+R21 -(0,N)- Unit
+R21 -(1,1)- Data
+relationship "É responsável por" as R22 {
+}
+R22 -(0,N)- Unit
+R22 -(1,1)- Model
+@endchen

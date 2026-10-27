@@ -1,0 +1,58 @@
+@startchen Denguinhos_DER_00_visao_resumida
+left to right direction
+' Visão reduzida; os demais diagramas detalham os domínios.
+entity "Cliente / prefeitura" as Mun {
+}
+entity "Imóvel" as Im {
+}
+entity "Visita" as Visit {
+}
+entity "Revisão da visita" as Rev {
+}
+entity "Jornada" as Day {
+}
+entity "Consolidação" as Con {
+}
+entity "Item da consolidação" as Item {
+}
+entity "Documento" as Doc {
+}
+entity "Secretaria / unidade" as Unit {
+}
+relationship "Cadastra" as R01 {
+}
+R01 -(0,N)- Mun
+R01 -(1,1)- Im
+relationship "Recebe tentativa" as R02 {
+}
+R02 -(0,N)- Im
+R02 -(1,1)- Visit
+relationship "Preserva versão" as R03 {
+}
+R03 -(1,N)- Visit
+R03 -(1,1)- Rev
+relationship "Agrupa" as R04 {
+}
+R04 -(0,N)- Day
+R04 -(1,1)- Rev
+relationship "Inclui" as R05 {
+}
+R05 -(0,N)- Con
+R05 -(1,1)- Item
+relationship "Referencia versão" as R06 {
+}
+R06 -(0,N)- Rev
+R06 -(1,1)- Item
+relationship "Fundamenta" as R07 {
+}
+R07 -(0,N)- Con
+R07 -(1,1)- Doc
+relationship "Organiza" as R08 {
+}
+R08 -(0,N)- Mun
+R08 -(1,1)- Unit
+relationship "Opera jornada" as R09 {
+}
+R09 -(0,N)- Unit
+R09 -(1,1)- Day
+@endchen
