@@ -1153,9 +1153,11 @@ ACE registra e entrega → coordenação confere/aprova → operador emite e enc
 
 ### 11.2 Modelo conceitual detalhado de dados
 
+**Modelo consolidado para o banco:** [arquivo único com entidades, atributos e relacionamentos](arquitetura/banco/modelo_completo.puml) · [visualização SVG](arquitetura/banco/modelo_completo.svg). Os tipos não estabelecidos no esboço estão marcados como `A_DEFINIR` e devem ser resolvidos no schema físico; isso não altera os status de implementação.
+
 **DER técnico proposto:** [esboço por domínio, com entidades, cardinalidades e restrições](arquitetura/banco/README.md). Esse artefato traduz os requisitos abaixo; não representa banco implementado nem altera os status de progresso.
 
-![Núcleo do DER em notação de Chen](arquitetura/banco/00_visao_resumida.svg)
+![Núcleo do DER em notação de Chen](arquitetura/banco/DER/00_visao_resumida.svg)
 
 Entidades em retângulos, relacionamentos em losangos e cardinalidades mínimo–máximo. Os diagramas por domínio e o dicionário técnico estão no [guia do DER](arquitetura/banco/README.md).
 

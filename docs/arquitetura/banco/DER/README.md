@@ -1,8 +1,10 @@
 # Esboço do modelo entidade-relacionamento — Denguinhos
 
-**Data:** 27/10/2026. **Nível:** esboço entidade-relacionamento em notação de Chen (mínimo–máximo), derivado do [documento de requisitos v2.2](../../documento_de_requisitos.md). Não é migração, schema Prisma ou implementação do banco. Os requisitos continuam centralizados no documento principal; este diretório apenas propõe sua tradução em entidades, atributos e relacionamentos.
+**Data:** 27/10/2026. **Nível:** esboço entidade-relacionamento em notação de Chen (mínimo–máximo), derivado do [documento de requisitos v2.2](../../../documento_de_requisitos.md). Não é migração, schema Prisma ou implementação do banco. Os requisitos continuam centralizados no documento principal; este diretório apenas propõe sua tradução em entidades, atributos e relacionamentos.
 
 A proposta assume PostgreSQL/PostGIS para dados operacionais e geometrias, com arquivos/modelos em object storage referenciados por chave. Essa escolha orienta os tipos indicados, mas nomes físicos, índices e detalhes de implantação ainda serão refinados. Não houve acesso a banco externo ou alteração de dados.
+
+**Modelo unificado:** [todas as entidades, atributos e relacionamentos](../modelo_completo.puml) · [SVG completo](../modelo_completo.svg) · [Visualizador com busca e zoom](../modelo_completo.html). Estes arquivos por domínio continuam como recortes de consulta do esboço.
 
 ## Cliente, prefeitura, secretaria e município
 

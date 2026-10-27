@@ -1,0 +1,2712 @@
+@startchen Denguinhos_Modelo_Completo
+left to right direction
+' ARQUIVO CONSOLIDADO DE REVISÃO DO BANCO — requisitos v2.2.
+' Preserva entidades, atributos e relações de DER/01..07 e seu dicionário.
+' Não executar SQL a partir deste arquivo sem refinamento físico e revisão.
+' A_DEFINIR = tipo ainda não estabelecido na origem; não é tipo PostgreSQL.
+' Atributos agrupados na origem foram separados; não se inferiu tipo de enum/data/número.
+' UUID para IDs e FKs é convenção explícita do esboço; demais tipos só quando declarados.
+' FK nula/opcional é indicada em comentário; a coluna cliente_id é sempre NOT NULL.
+' FKs operacionais são compostas com cliente_id para impedir relações entre tenants.
+' Prefeitura = cliente; secretaria = unidade; município = geografia.
+' Concessão por unidade/finalidade; compartilhamento interno precisa de aprovação.
+' Em autorrelacionamentos, extremos: origem e destino, respectivamente.
+
+entity "cliente" as E_cliente {
+  "id" as F_cliente_id : UUID <<key>>
+  "tipo" as F_cliente_tipo : A_DEFINIR
+  "nome" as F_cliente_nome : A_DEFINIR
+  "status" as F_cliente_status : A_DEFINIR
+  "fuso_horario" as F_cliente_fuso_horario : A_DEFINIR
+  "criado_em" as F_cliente_criado_em : A_DEFINIR
+}
+' cliente: Origem: id : uuid PK
+' cliente: Origem: tipo : PREFEITURA (demais tipos dependem de habilitação)
+' cliente: Origem: nome / status / fuso_horario / criado_em
+
+entity "prefeitura" as E_prefeitura {
+  "cliente_id" as F_prefeitura_cliente_id : UUID <<key>>
+  ' FK cliente_id -> cliente.id; obrigatório
+  "municipio_id" as F_prefeitura_municipio_id : UUID
+  ' FK municipio_id -> municipio.id; obrigatório
+  "nome_oficial" as F_prefeitura_nome_oficial : A_DEFINIR
+  "identificador_institucional" as F_prefeitura_identificador_institucional : A_DEFINIR
+}
+' prefeitura: Origem: cliente_id : uuid PK, FK cliente
+' prefeitura: Origem: municipio_id : uuid FK município (geografia)
+' prefeitura: Origem: nome_oficial / identificador_institucional opcional
+' prefeitura: UNIQUE(cliente_id); identidade contratual não deriva do código IBGE
+
+entity "unidade_organizacional" as E_unidade_organizacional {
+  "id" as F_unidade_organizacional_id : UUID <<key>>
+  "cliente_id" as F_unidade_organizacional_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "unidade_pai_id" as F_unidade_organizacional_unidade_pai_id : UUID
+  ' FK unidade_pai_id -> unidade_organizacional.id; opcional
+  "tipo" as F_unidade_organizacional_tipo : A_DEFINIR
+  "codigo" as F_unidade_organizacional_codigo : A_DEFINIR
+  "nome" as F_unidade_organizacional_nome : A_DEFINIR
+  "status" as F_unidade_organizacional_status : A_DEFINIR
+  "inicio" as F_unidade_organizacional_inicio : A_DEFINIR
+  "fim" as F_unidade_organizacional_fim : A_DEFINIR
+}
+' unidade_organizacional: Origem: id : uuid PK
+' unidade_organizacional: Origem: cliente_id : uuid FK obrigatório
+' unidade_organizacional: Origem: unidade_pai_id : uuid FK opcional no mesmo cliente
+' unidade_organizacional: Origem: tipo : SECRETARIA / DEPARTAMENTO / SETOR / OUTRA
+' unidade_organizacional: Origem: codigo / nome / status / inicio / fim
+' unidade_organizacional: UNIQUE(cliente_id, codigo); impedir ciclos de subordinação
+
+entity "lotacao" as E_lotacao {
+  "id" as F_lotacao_id : UUID <<key>>
+  "cliente_id" as F_lotacao_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "vinculo_usuario_id" as F_lotacao_vinculo_usuario_id : UUID
+  ' FK vinculo_usuario_id -> vinculo_usuario.id; obrigatório
+  "unidade_id" as F_lotacao_unidade_id : UUID
+  ' FK unidade_id -> unidade_organizacional.id; obrigatório
+  "inicio" as F_lotacao_inicio : A_DEFINIR
+  "fim" as F_lotacao_fim : A_DEFINIR
+  "status" as F_lotacao_status : A_DEFINIR
+}
+' lotacao: Origem: id : uuid PK
+' lotacao: Origem: cliente_id : uuid FK obrigatório
+' lotacao: Origem: vinculo_usuario_id : uuid FK
+' lotacao: Origem: unidade_id : uuid FK
+' lotacao: Origem: inicio / fim / status
+' lotacao: vínculo não concede papéis ou acesso automaticamente
+
+entity "modulo" as E_modulo {
+  "id" as F_modulo_id : UUID <<key>>
+  "codigo" as F_modulo_codigo : TEXT
+  "nome" as F_modulo_nome : A_DEFINIR
+  "versao_contrato" as F_modulo_versao_contrato : A_DEFINIR
+}
+' modulo: Origem: id : uuid PK
+' modulo: Origem: codigo : text UK global
+' modulo: Origem: nome / versao_contrato; catálogo de capacidades técnicas
+
+entity "cliente_modulo" as E_cliente_modulo {
+  "id" as F_cliente_modulo_id : UUID <<key>>
+  "cliente_id" as F_cliente_modulo_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "modulo_id" as F_cliente_modulo_modulo_id : UUID
+  ' FK modulo_id -> modulo.id; obrigatório
+  "status" as F_cliente_modulo_status : A_DEFINIR
+  "inicio" as F_cliente_modulo_inicio : A_DEFINIR
+  "fim" as F_cliente_modulo_fim : A_DEFINIR
+}
+' cliente_modulo: Origem: id : uuid PK
+' cliente_modulo: Origem: cliente_id : uuid FK obrigatório
+' cliente_modulo: Origem: modulo_id : uuid FK
+' cliente_modulo: Origem: status / inicio / fim
+' cliente_modulo: UNIQUE(cliente_id, modulo_id, inicio)
+
+entity "unidade_modulo" as E_unidade_modulo {
+  "id" as F_unidade_modulo_id : UUID <<key>>
+  "cliente_id" as F_unidade_modulo_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "cliente_modulo_id" as F_unidade_modulo_cliente_modulo_id : UUID
+  ' FK cliente_modulo_id -> cliente_modulo.id; obrigatório
+  "unidade_id" as F_unidade_modulo_unidade_id : UUID
+  ' FK unidade_id -> unidade_organizacional.id; obrigatório
+  "status" as F_unidade_modulo_status : A_DEFINIR
+  "inicio" as F_unidade_modulo_inicio : A_DEFINIR
+  "fim" as F_unidade_modulo_fim : A_DEFINIR
+}
+' unidade_modulo: Origem: id : uuid PK
+' unidade_modulo: Origem: cliente_id : uuid FK obrigatório
+' unidade_modulo: Origem: cliente_modulo_id : uuid FK
+' unidade_modulo: Origem: unidade_id : uuid FK
+' unidade_modulo: Origem: status / inicio / fim
+' unidade_modulo: habilitação na unidade requer módulo habilitado no cliente
+
+entity "configuracao_versao" as E_configuracao_versao {
+  "id" as F_configuracao_versao_id : UUID <<key>>
+  "cliente_id" as F_configuracao_versao_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "unidade_id" as F_configuracao_versao_unidade_id : UUID
+  ' FK unidade_id -> unidade_organizacional.id; opcional
+  "modulo_id" as F_configuracao_versao_modulo_id : UUID
+  ' FK modulo_id -> modulo.id; obrigatório
+  "chave" as F_configuracao_versao_chave : A_DEFINIR
+  "versao" as F_configuracao_versao_versao : A_DEFINIR
+  "parametros" as F_configuracao_versao_parametros : A_DEFINIR
+  "vigencia" as F_configuracao_versao_vigencia : A_DEFINIR
+  "autor_id" as F_configuracao_versao_autor_id : UUID
+  ' FK autor_id -> vinculo_usuario.id; obrigatório
+  "aprovador_id" as F_configuracao_versao_aprovador_id : UUID
+  ' FK aprovador_id -> vinculo_usuario.id; obrigatório
+}
+' configuracao_versao: Origem: id : uuid PK
+' configuracao_versao: Origem: cliente_id : uuid FK obrigatório
+' configuracao_versao: Origem: unidade_id : uuid FK opcional; nulo = configuração do cliente
+' configuracao_versao: Origem: modulo_id : uuid FK
+' configuracao_versao: Origem: chave / versao / parametros validados / vigencia
+' configuracao_versao: Origem: autor_id / aprovador_id : FK vínculo do cliente
+' configuracao_versao: resolução de configuração por escopo explícita, sem vazamento de unidade
+
+entity "compartilhamento_autorizado" as E_compartilhamento_autorizado {
+  "id" as F_compartilhamento_autorizado_id : UUID <<key>>
+  "cliente_id" as F_compartilhamento_autorizado_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "unidade_origem_id" as F_compartilhamento_autorizado_unidade_origem_id : UUID
+  ' FK unidade_origem_id -> unidade_organizacional.id; obrigatório
+  "unidade_destino_id" as F_compartilhamento_autorizado_unidade_destino_id : UUID
+  ' FK unidade_destino_id -> unidade_organizacional.id; obrigatório
+  "tipo_recurso" as F_compartilhamento_autorizado_tipo_recurso : A_DEFINIR
+  "escopo_registros" as F_compartilhamento_autorizado_escopo_registros : A_DEFINIR
+  "campos_permitidos" as F_compartilhamento_autorizado_campos_permitidos : A_DEFINIR
+  "finalidade" as F_compartilhamento_autorizado_finalidade : A_DEFINIR
+  "aprovador_id" as F_compartilhamento_autorizado_aprovador_id : UUID
+  ' FK aprovador_id -> vinculo_usuario.id; obrigatório
+  "inicio" as F_compartilhamento_autorizado_inicio : A_DEFINIR
+  "fim" as F_compartilhamento_autorizado_fim : A_DEFINIR
+  "estado" as F_compartilhamento_autorizado_estado : A_DEFINIR
+  "motivo_revogacao" as F_compartilhamento_autorizado_motivo_revogacao : A_DEFINIR
+}
+' compartilhamento_autorizado: Origem: id : uuid PK
+' compartilhamento_autorizado: Origem: cliente_id : uuid FK obrigatório
+' compartilhamento_autorizado: Origem: unidade_origem_id : uuid FK
+' compartilhamento_autorizado: Origem: unidade_destino_id : uuid FK no mesmo cliente
+' compartilhamento_autorizado: Origem: tipo_recurso / escopo_registros / campos_permitidos / finalidade
+' compartilhamento_autorizado: Origem: aprovador_id : uuid FK vínculo autorizado
+' compartilhamento_autorizado: Origem: inicio / fim / estado / motivo_revogacao
+' compartilhamento_autorizado: não autoriza outro tenant; acesso técnico não implica acesso clínico
+
+entity "municipio" as E_municipio {
+  "id" as F_municipio_id : UUID <<key>>
+  "codigo_ibge" as F_municipio_codigo_ibge : TEXT
+  "nome" as F_municipio_nome : TEXT
+}
+' municipio: Origem: id : uuid PK
+' municipio: Origem: codigo_ibge : text UK
+' municipio: Origem: nome : text
+
+entity "usuario" as E_usuario {
+  "id" as F_usuario_id : UUID <<key>>
+  "identidade_externa" as F_usuario_identidade_externa : TEXT
+  "nome" as F_usuario_nome : TEXT
+  "ativo" as F_usuario_ativo : BOOLEAN
+}
+' usuario: Origem: id : uuid PK
+' usuario: Origem: identidade_externa : text UK
+' usuario: Origem: nome : text
+' usuario: Origem: ativo : boolean
+
+entity "vinculo_usuario" as E_vinculo_usuario {
+  "id" as F_vinculo_usuario_id : UUID <<key>>
+  "cliente_id" as F_vinculo_usuario_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "usuario_id" as F_vinculo_usuario_usuario_id : UUID
+  ' FK usuario_id -> usuario.id; obrigatório
+  "inicio" as F_vinculo_usuario_inicio : TIMESTAMPTZ
+  "fim" as F_vinculo_usuario_fim : TIMESTAMPTZ
+  "status" as F_vinculo_usuario_status : A_DEFINIR
+  "vinculo_institucional" as F_vinculo_usuario_vinculo_institucional : A_DEFINIR
+}
+' vinculo_usuario: Origem: id : uuid PK
+' vinculo_usuario: Origem: cliente_id : uuid FK
+' vinculo_usuario: Origem: usuario_id : uuid FK
+' vinculo_usuario: Origem: inicio / fim : timestamptz
+' vinculo_usuario: UNIQUE(cliente_id, usuario_id, inicio); histórico de participação
+' vinculo_usuario: Origem: status / vinculo_institucional
+
+entity "papel" as E_papel {
+  "id" as F_papel_id : UUID <<key>>
+  "cliente_id" as F_papel_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "codigo" as F_papel_codigo : TEXT
+}
+' papel: Origem: id : uuid PK
+' papel: Origem: cliente_id : uuid FK obrigatório
+' papel: Origem: codigo : text; UNIQUE(cliente_id, codigo)
+
+entity "concessao_papel" as E_concessao_papel {
+  "id" as F_concessao_papel_id : UUID <<key>>
+  "cliente_id" as F_concessao_papel_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "vinculo_usuario_id" as F_concessao_papel_vinculo_usuario_id : UUID
+  ' FK vinculo_usuario_id -> vinculo_usuario.id; obrigatório
+  "papel_id" as F_concessao_papel_papel_id : UUID
+  ' FK papel_id -> papel.id; obrigatório
+  "territorio_id" as F_concessao_papel_territorio_id : UUID
+  ' FK territorio_id -> territorio.id; opcional
+  "inicio" as F_concessao_papel_inicio : TIMESTAMPTZ
+  "fim" as F_concessao_papel_fim : TIMESTAMPTZ
+  "unidade_id" as F_concessao_papel_unidade_id : UUID
+  ' FK unidade_id -> unidade_organizacional.id; opcional
+  "finalidade" as F_concessao_papel_finalidade : A_DEFINIR
+}
+' concessao_papel: Origem: id : uuid PK
+' concessao_papel: Origem: cliente_id : uuid FK obrigatório
+' concessao_papel: Origem: vinculo_usuario_id : uuid FK
+' concessao_papel: Origem: papel_id : uuid FK
+' concessao_papel: Origem: territorio_id : uuid FK opcional
+' concessao_papel: Origem: inicio / fim : timestamptz
+' concessao_papel: Origem: unidade_id : uuid FK opcional; nulo = escopo cliente autorizado, não acesso irrestrito
+' concessao_papel: Origem: finalidade; lotacao ativa ou compartilhamento explícito
+
+entity "permissao" as E_permissao {
+  "id" as F_permissao_id : UUID <<key>>
+  "codigo" as F_permissao_codigo : TEXT
+}
+' permissao: Origem: id : uuid PK
+' permissao: Origem: codigo : text UK
+
+entity "papel_permissao" as E_papel_permissao {
+  "papel_id" as F_papel_permissao_papel_id : UUID <<key>>
+  ' FK papel_id -> papel.id; obrigatório
+  "cliente_id" as F_papel_permissao_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "permissao_id" as F_papel_permissao_permissao_id : UUID <<key>>
+  ' FK permissao_id -> permissao.id; obrigatório
+}
+' papel_permissao: Origem: papel_id : uuid PK, FK
+' papel_permissao: Origem: cliente_id : uuid FK obrigatório
+' papel_permissao: Origem: permissao_id : uuid PK, FK
+
+entity "territorio" as E_territorio {
+  "id" as F_territorio_id : UUID <<key>>
+  "cliente_id" as F_territorio_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "tipo" as F_territorio_tipo : A_DEFINIR
+  "codigo_local" as F_territorio_codigo_local : TEXT
+  "municipio_id" as F_territorio_municipio_id : UUID
+  ' FK municipio_id -> municipio.id; obrigatório
+}
+' territorio: Origem: id : uuid PK
+' territorio: Origem: cliente_id : uuid FK
+' territorio: Origem: tipo : bairro/distrito/area/quarteirao/lado/localidade; catálogo por cliente
+' territorio: Origem: codigo_local : text
+' territorio: Origem: municipio_id : uuid FK geográfica; não é chave do tenant
+
+entity "territorio_versao" as E_territorio_versao {
+  "id" as F_territorio_versao_id : UUID <<key>>
+  "cliente_id" as F_territorio_versao_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "territorio_id" as F_territorio_versao_territorio_id : UUID
+  ' FK territorio_id -> territorio.id; obrigatório
+  "versao" as F_territorio_versao_versao : INT
+  "nome" as F_territorio_versao_nome : A_DEFINIR
+  "geometria" as F_territorio_versao_geometria : A_DEFINIR
+  "vigencia" as F_territorio_versao_vigencia : A_DEFINIR
+}
+' territorio_versao: Origem: id : uuid PK
+' territorio_versao: Origem: cliente_id : uuid FK obrigatório
+' territorio_versao: Origem: territorio_id : uuid FK
+' territorio_versao: Origem: versao : int
+' territorio_versao: Origem: nome / geometria / vigencia
+
+entity "vinculo_territorial" as E_vinculo_territorial {
+  "id" as F_vinculo_territorial_id : UUID <<key>>
+  "cliente_id" as F_vinculo_territorial_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "origem_versao_id" as F_vinculo_territorial_origem_versao_id : UUID
+  ' FK origem_versao_id -> territorio_versao.id; obrigatório
+  "destino_versao_id" as F_vinculo_territorial_destino_versao_id : UUID
+  ' FK destino_versao_id -> territorio_versao.id; obrigatório
+  "tipo_relacao" as F_vinculo_territorial_tipo_relacao : A_DEFINIR
+  "inicio" as F_vinculo_territorial_inicio : A_DEFINIR
+  "fim" as F_vinculo_territorial_fim : A_DEFINIR
+}
+' vinculo_territorial: Origem: id : uuid PK
+' vinculo_territorial: Origem: cliente_id : uuid FK obrigatório
+' vinculo_territorial: Origem: origem_versao_id : uuid FK
+' vinculo_territorial: Origem: destino_versao_id : uuid FK
+' vinculo_territorial: Origem: tipo_relacao / inicio / fim
+
+entity "imovel" as E_imovel {
+  "id" as F_imovel_id : UUID <<key>>
+  "cliente_id" as F_imovel_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "codigo_local" as F_imovel_codigo_local : TEXT
+  "origem_cadastro" as F_imovel_origem_cadastro : TEXT
+}
+' imovel: Origem: id : uuid PK
+' imovel: Origem: cliente_id : uuid FK
+' imovel: Origem: codigo_local : text
+' imovel: Origem: origem_cadastro : text
+
+entity "imovel_versao" as E_imovel_versao {
+  "id" as F_imovel_versao_id : UUID <<key>>
+  "cliente_id" as F_imovel_versao_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "imovel_id" as F_imovel_versao_imovel_id : UUID
+  ' FK imovel_id -> imovel.id; obrigatório
+  "versao" as F_imovel_versao_versao : INT
+  "logradouro" as F_imovel_versao_logradouro : A_DEFINIR
+  "numero" as F_imovel_versao_numero : A_DEFINIR
+  "complemento" as F_imovel_versao_complemento : A_DEFINIR
+  "tipo" as F_imovel_versao_tipo : A_DEFINIR
+  "situacao" as F_imovel_versao_situacao : A_DEFINIR
+  "zona" as F_imovel_versao_zona : A_DEFINIR
+  "vigencia" as F_imovel_versao_vigencia : A_DEFINIR
+  "municipio_id" as F_imovel_versao_municipio_id : UUID
+  ' FK municipio_id -> municipio.id; obrigatório
+}
+' imovel_versao: Origem: id : uuid PK
+' imovel_versao: Origem: cliente_id : uuid FK obrigatório
+' imovel_versao: Origem: imovel_id : uuid FK
+' imovel_versao: Origem: versao : int
+' imovel_versao: Origem: logradouro / numero / complemento
+' imovel_versao: Origem: tipo / situacao / zona / vigencia
+' imovel_versao: Origem: municipio_id : uuid FK geográfica; unidade de origem quando necessário
+
+entity "imovel_territorio" as E_imovel_territorio {
+  "id" as F_imovel_territorio_id : UUID <<key>>
+  "cliente_id" as F_imovel_territorio_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "imovel_versao_id" as F_imovel_territorio_imovel_versao_id : UUID
+  ' FK imovel_versao_id -> imovel_versao.id; obrigatório
+  "territorio_versao_id" as F_imovel_territorio_territorio_versao_id : UUID
+  ' FK territorio_versao_id -> territorio_versao.id; obrigatório
+  "tipo_vinculo" as F_imovel_territorio_tipo_vinculo : TEXT
+}
+' imovel_territorio: Origem: id : uuid PK
+' imovel_territorio: Origem: cliente_id : uuid FK obrigatório
+' imovel_territorio: Origem: imovel_versao_id : uuid FK
+' imovel_territorio: Origem: territorio_versao_id : uuid FK
+' imovel_territorio: Origem: tipo_vinculo : text
+
+entity "modalidade_versao" as E_modalidade_versao {
+  "id" as F_modalidade_versao_id : UUID <<key>>
+  "cliente_id" as F_modalidade_versao_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "codigo" as F_modalidade_versao_codigo : A_DEFINIR
+  "versao" as F_modalidade_versao_versao : A_DEFINIR
+  "regras_campos" as F_modalidade_versao_regras_campos : A_DEFINIR
+  "vigencia" as F_modalidade_versao_vigencia : A_DEFINIR
+  "periodicidade" as F_modalidade_versao_periodicidade : A_DEFINIR
+}
+' modalidade_versao: Origem: id : uuid PK
+' modalidade_versao: Origem: cliente_id : uuid FK obrigatório
+' modalidade_versao: Origem: codigo / versao / regras_campos
+' modalidade_versao: Origem: vigencia / periodicidade
+
+entity "ciclo" as E_ciclo {
+  "id" as F_ciclo_id : UUID <<key>>
+  "cliente_id" as F_ciclo_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "periodo_inicio" as F_ciclo_periodo_inicio : A_DEFINIR
+  "periodo_fim" as F_ciclo_periodo_fim : A_DEFINIR
+  "regra_calendario_versao" as F_ciclo_regra_calendario_versao : A_DEFINIR
+}
+' ciclo: Origem: id : uuid PK
+' ciclo: Origem: cliente_id : uuid FK
+' ciclo: Origem: periodo_inicio / periodo_fim
+' ciclo: Origem: regra_calendario_versao
+
+entity "planejamento" as E_planejamento {
+  "id" as F_planejamento_id : UUID <<key>>
+  "cliente_id" as F_planejamento_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "unidade_responsavel_id" as F_planejamento_unidade_responsavel_id : UUID
+  ' FK unidade_responsavel_id -> unidade_organizacional.id; obrigatório
+  "ciclo_id" as F_planejamento_ciclo_id : UUID
+  ' FK ciclo_id -> ciclo.id; opcional
+  "modalidade_versao_id" as F_planejamento_modalidade_versao_id : UUID
+  ' FK modalidade_versao_id -> modalidade_versao.id; obrigatório
+  "territorio_id" as F_planejamento_territorio_id : UUID
+  ' FK territorio_id -> territorio.id; obrigatório
+  "aprovador_id" as F_planejamento_aprovador_id : UUID
+  ' FK aprovador_id -> vinculo_usuario.id; opcional
+  "status" as F_planejamento_status : A_DEFINIR
+  "periodo" as F_planejamento_periodo : A_DEFINIR
+}
+' planejamento: Origem: id : uuid PK
+' planejamento: Origem: cliente_id : uuid FK obrigatório
+' planejamento: Origem: unidade_responsavel_id : uuid FK obrigatório
+' planejamento: Origem: ciclo_id : uuid FK opcional
+' planejamento: Origem: modalidade_versao_id : uuid FK
+' planejamento: Origem: territorio_id : uuid FK
+' planejamento: Origem: aprovador_id : uuid FK opcional
+' planejamento: Origem: status / periodo
+
+entity "atribuicao" as E_atribuicao {
+  "id" as F_atribuicao_id : UUID <<key>>
+  "cliente_id" as F_atribuicao_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "planejamento_id" as F_atribuicao_planejamento_id : UUID
+  ' FK planejamento_id -> planejamento.id; obrigatório
+  "responsavel_id" as F_atribuicao_responsavel_id : UUID
+  ' FK responsavel_id -> vinculo_usuario.id; obrigatório
+  "inicio" as F_atribuicao_inicio : A_DEFINIR
+  "fim" as F_atribuicao_fim : A_DEFINIR
+}
+' atribuicao: Origem: id : uuid PK
+' atribuicao: Origem: cliente_id : uuid FK obrigatório
+' atribuicao: Origem: planejamento_id : uuid FK
+' atribuicao: Origem: responsavel_id : uuid FK
+' atribuicao: Origem: inicio / fim
+
+entity "item_planejamento" as E_item_planejamento {
+  "id" as F_item_planejamento_id : UUID <<key>>
+  "cliente_id" as F_item_planejamento_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "planejamento_id" as F_item_planejamento_planejamento_id : UUID
+  ' FK planejamento_id -> planejamento.id; obrigatório
+  "imovel_id" as F_item_planejamento_imovel_id : UUID
+  ' FK imovel_id -> imovel.id; obrigatório
+  "sequencia_percurso" as F_item_planejamento_sequencia_percurso : INT
+  "selecionado_amostra" as F_item_planejamento_selecionado_amostra : BOOLEAN
+  "estrato" as F_item_planejamento_estrato : A_DEFINIR
+  "origem_selecao" as F_item_planejamento_origem_selecao : A_DEFINIR
+}
+' item_planejamento: Origem: id : uuid PK
+' item_planejamento: Origem: cliente_id : uuid FK obrigatório
+' item_planejamento: Origem: planejamento_id : uuid FK
+' item_planejamento: Origem: imovel_id : uuid FK
+' item_planejamento: Origem: sequencia_percurso : int opcional
+' item_planejamento: Origem: selecionado_amostra : boolean opcional
+' item_planejamento: Origem: estrato / origem_selecao
+
+entity "jornada" as E_jornada {
+  "id" as F_jornada_id : UUID <<key>>
+  "cliente_id" as F_jornada_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "unidade_responsavel_id" as F_jornada_unidade_responsavel_id : UUID
+  ' FK unidade_responsavel_id -> unidade_organizacional.id; obrigatório
+  "responsavel_id" as F_jornada_responsavel_id : UUID
+  ' FK responsavel_id -> vinculo_usuario.id; obrigatório
+  "data_atividade" as F_jornada_data_atividade : DATE
+  "status_entrega" as F_jornada_status_entrega : TEXT
+}
+' jornada: Origem: id : uuid PK
+' jornada: Origem: cliente_id : uuid FK obrigatório
+' jornada: Origem: unidade_responsavel_id : uuid FK obrigatório
+' jornada: Origem: responsavel_id : uuid FK
+' jornada: Origem: data_atividade : date
+' jornada: Origem: status_entrega : text
+
+entity "visita" as E_visita {
+  "id" as F_visita_id : UUID <<key>>
+  "cliente_id" as F_visita_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "imovel_id" as F_visita_imovel_id : UUID
+  ' FK imovel_id -> imovel.id; obrigatório
+  "retorno_de_visita_id" as F_visita_retorno_de_visita_id : UUID
+  ' FK retorno_de_visita_id -> visita.id; opcional
+}
+' visita: Origem: id : uuid PK gerado offline
+' visita: Origem: cliente_id : uuid FK obrigatório
+' visita: Origem: imovel_id : uuid FK
+' visita: Origem: retorno_de_visita_id : uuid FK opcional
+
+entity "visita_revisao" as E_visita_revisao {
+  "id" as F_visita_revisao_id : UUID <<key>>
+  "cliente_id" as F_visita_revisao_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "visita_id" as F_visita_revisao_visita_id : UUID
+  ' FK visita_id -> visita.id; obrigatório
+  "revisao" as F_visita_revisao_revisao : INT
+  "imovel_versao_id" as F_visita_revisao_imovel_versao_id : UUID
+  ' FK imovel_versao_id -> imovel_versao.id; obrigatório
+  "jornada_id" as F_visita_revisao_jornada_id : UUID
+  ' FK jornada_id -> jornada.id; obrigatório
+  "item_planejamento_id" as F_visita_revisao_item_planejamento_id : UUID
+  ' FK item_planejamento_id -> item_planejamento.id; opcional
+  "modalidade_versao_id" as F_visita_revisao_modalidade_versao_id : UUID
+  ' FK modalidade_versao_id -> modalidade_versao.id; obrigatório
+  "autor_id" as F_visita_revisao_autor_id : UUID
+  ' FK autor_id -> vinculo_usuario.id; obrigatório
+  "digitador_id" as F_visita_revisao_digitador_id : UUID
+  ' FK digitador_id -> vinculo_usuario.id; obrigatório
+  "data_atividade" as F_visita_revisao_data_atividade : A_DEFINIR
+  "lancada_em" as F_visita_revisao_lancada_em : A_DEFINIR
+  "acesso" as F_visita_revisao_acesso : A_DEFINIR
+  "origem" as F_visita_revisao_origem : A_DEFINIR
+  "status_conteudo" as F_visita_revisao_status_conteudo : A_DEFINIR
+  "posicao" as F_visita_revisao_posicao : A_DEFINIR
+  "origem_posicao" as F_visita_revisao_origem_posicao : A_DEFINIR
+  "precisao" as F_visita_revisao_precisao : A_DEFINIR
+  "observacoes" as F_visita_revisao_observacoes : A_DEFINIR
+  "motivo_correcao" as F_visita_revisao_motivo_correcao : A_DEFINIR
+  "unidade_responsavel_id" as F_visita_revisao_unidade_responsavel_id : UUID
+  ' FK unidade_responsavel_id -> unidade_organizacional.id; obrigatório
+}
+' visita_revisao: Origem: id : uuid PK
+' visita_revisao: Origem: cliente_id : uuid FK obrigatório
+' visita_revisao: Origem: visita_id : uuid FK
+' visita_revisao: Origem: revisao : int
+' visita_revisao: Origem: imovel_versao_id : uuid FK
+' visita_revisao: Origem: jornada_id : uuid FK
+' visita_revisao: Origem: item_planejamento_id : uuid FK opcional
+' visita_revisao: Origem: modalidade_versao_id : uuid FK
+' visita_revisao: Origem: autor_id / digitador_id : uuid FK
+' visita_revisao: Origem: data_atividade / lancada_em
+' visita_revisao: Origem: acesso / origem / status_conteudo
+' visita_revisao: Origem: posicao / origem_posicao / precisao
+' visita_revisao: Origem: observacoes / motivo_correcao
+' visita_revisao: Origem: unidade_responsavel_id : uuid FK obrigatório, coerente com agregado de origem
+
+entity "pendencia_campo" as E_pendencia_campo {
+  "id" as F_pendencia_campo_id : UUID <<key>>
+  "cliente_id" as F_pendencia_campo_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "visita_origem_id" as F_pendencia_campo_visita_origem_id : UUID
+  ' FK visita_origem_id -> visita.id; obrigatório
+  "visita_resolucao_id" as F_pendencia_campo_visita_resolucao_id : UUID
+  ' FK visita_resolucao_id -> visita.id; opcional
+  "motivo" as F_pendencia_campo_motivo : A_DEFINIR
+  "estado" as F_pendencia_campo_estado : A_DEFINIR
+  "prazo" as F_pendencia_campo_prazo : A_DEFINIR
+}
+' pendencia_campo: Origem: id : uuid PK
+' pendencia_campo: Origem: cliente_id : uuid FK obrigatório
+' pendencia_campo: Origem: visita_origem_id : uuid FK
+' pendencia_campo: Origem: visita_resolucao_id : uuid FK opcional
+' pendencia_campo: Origem: motivo / estado / prazo
+
+entity "operacao_sync" as E_operacao_sync {
+  "id" as F_operacao_sync_id : UUID <<key>>
+  "cliente_id" as F_operacao_sync_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "operation_uuid" as F_operacao_sync_operation_uuid : UUID
+  "visita_id" as F_operacao_sync_visita_id : UUID
+  ' FK visita_id -> visita.id; obrigatório
+  "vinculo_usuario_id" as F_operacao_sync_vinculo_usuario_id : UUID
+  ' FK vinculo_usuario_id -> vinculo_usuario.id; obrigatório
+  "device_id" as F_operacao_sync_device_id : UUID
+  "base_version" as F_operacao_sync_base_version : A_DEFINIR
+  "status" as F_operacao_sync_status : A_DEFINIR
+  "recebida_em" as F_operacao_sync_recebida_em : A_DEFINIR
+  "resultado" as F_operacao_sync_resultado : A_DEFINIR
+}
+' operacao_sync: Origem: id : uuid PK
+' operacao_sync: Origem: cliente_id : uuid FK obrigatório
+' operacao_sync: Origem: operation_uuid : uuid
+' operacao_sync: Origem: visita_id : uuid FK
+' operacao_sync: Origem: vinculo_usuario_id : uuid FK
+' operacao_sync: Origem: device_id / base_version
+' operacao_sync: Origem: status / recebida_em / resultado
+
+entity "categoria_deposito_versao" as E_categoria_deposito_versao {
+  "id" as F_categoria_deposito_versao_id : UUID <<key>>
+  "cliente_id" as F_categoria_deposito_versao_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "codigo" as F_categoria_deposito_versao_codigo : A_DEFINIR
+  "versao" as F_categoria_deposito_versao_versao : A_DEFINIR
+  "descricao" as F_categoria_deposito_versao_descricao : A_DEFINIR
+  "vigencia" as F_categoria_deposito_versao_vigencia : A_DEFINIR
+}
+' categoria_deposito_versao: Origem: id : uuid PK
+' categoria_deposito_versao: Origem: cliente_id : uuid FK obrigatório
+' categoria_deposito_versao: Origem: codigo : A1/A2/B/C/D1/D2/E
+' categoria_deposito_versao: Origem: versao / descricao / vigencia
+
+entity "observacao_deposito" as E_observacao_deposito {
+  "id" as F_observacao_deposito_id : UUID <<key>>
+  "cliente_id" as F_observacao_deposito_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "visita_revisao_id" as F_observacao_deposito_visita_revisao_id : UUID
+  ' FK visita_revisao_id -> visita_revisao.id; obrigatório
+  "categoria_versao_id" as F_observacao_deposito_categoria_versao_id : UUID
+  ' FK categoria_versao_id -> categoria_deposito_versao.id; obrigatório
+  "modo" as F_observacao_deposito_modo : A_DEFINIR
+  "referencia_local" as F_observacao_deposito_referencia_local : TEXT
+  "qtd_encontrados" as F_observacao_deposito_qtd_encontrados : A_DEFINIR
+  "inspecionados" as F_observacao_deposito_inspecionados : A_DEFINIR
+  "qtd_positivos" as F_observacao_deposito_qtd_positivos : A_DEFINIR
+  "metodo_positividade" as F_observacao_deposito_metodo_positividade : A_DEFINIR
+  "unidade_responsavel_id" as F_observacao_deposito_unidade_responsavel_id : UUID
+  ' FK unidade_responsavel_id -> unidade_organizacional.id; obrigatório
+}
+' observacao_deposito: Origem: id : uuid PK
+' observacao_deposito: Origem: cliente_id : uuid FK obrigatório
+' observacao_deposito: Origem: visita_revisao_id : uuid FK
+' observacao_deposito: Origem: categoria_versao_id : uuid FK
+' observacao_deposito: Origem: modo : individual/quantitativo
+' observacao_deposito: Origem: referencia_local : text opcional
+' observacao_deposito: Origem: qtd_encontrados / inspecionados
+' observacao_deposito: Origem: qtd_positivos / metodo_positividade
+' observacao_deposito: Origem: unidade_responsavel_id : uuid FK obrigatório, coerente com agregado de origem
+
+entity "acao_controle" as E_acao_controle {
+  "id" as F_acao_controle_id : UUID <<key>>
+  "cliente_id" as F_acao_controle_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "visita_revisao_id" as F_acao_controle_visita_revisao_id : UUID
+  ' FK visita_revisao_id -> visita_revisao.id; obrigatório
+  "tipo_acao" as F_acao_controle_tipo_acao : TEXT
+  "realizada_em" as F_acao_controle_realizada_em : TIMESTAMPTZ
+  "unidade_responsavel_id" as F_acao_controle_unidade_responsavel_id : UUID
+  ' FK unidade_responsavel_id -> unidade_organizacional.id; obrigatório
+}
+' acao_controle: Origem: id : uuid PK
+' acao_controle: Origem: cliente_id : uuid FK obrigatório
+' acao_controle: Origem: visita_revisao_id : uuid FK
+' acao_controle: Origem: tipo_acao : text
+' acao_controle: Origem: realizada_em : timestamptz
+' acao_controle: Origem: unidade_responsavel_id : uuid FK obrigatório, coerente com agregado de origem
+
+entity "alvo_controle" as E_alvo_controle {
+  "id" as F_alvo_controle_id : UUID <<key>>
+  "cliente_id" as F_alvo_controle_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "acao_id" as F_alvo_controle_acao_id : UUID
+  ' FK acao_id -> acao_controle.id; obrigatório
+  "observacao_id" as F_alvo_controle_observacao_id : UUID
+  ' FK observacao_id -> observacao_deposito.id; opcional
+  "qtd_alvos" as F_alvo_controle_qtd_alvos : A_DEFINIR
+  "tipo_alvo" as F_alvo_controle_tipo_alvo : A_DEFINIR
+}
+' alvo_controle: Origem: id : uuid PK
+' alvo_controle: Origem: cliente_id : uuid FK obrigatório
+' alvo_controle: Origem: acao_id : uuid FK
+' alvo_controle: Origem: observacao_id : uuid FK opcional
+' alvo_controle: Origem: qtd_alvos / tipo_alvo
+
+entity "produto_versao" as E_produto_versao {
+  "id" as F_produto_versao_id : UUID <<key>>
+  "cliente_id" as F_produto_versao_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "codigo" as F_produto_versao_codigo : A_DEFINIR
+  "nome" as F_produto_versao_nome : A_DEFINIR
+  "versao" as F_produto_versao_versao : A_DEFINIR
+  "unidade_consumo" as F_produto_versao_unidade_consumo : A_DEFINIR
+  "vigencia" as F_produto_versao_vigencia : A_DEFINIR
+}
+' produto_versao: Origem: id : uuid PK
+' produto_versao: Origem: cliente_id : uuid FK obrigatório
+' produto_versao: Origem: codigo / nome / versao
+' produto_versao: Origem: unidade_consumo / vigencia
+
+entity "carga_produto" as E_carga_produto {
+  "id" as F_carga_produto_id : UUID <<key>>
+  "cliente_id" as F_carga_produto_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "unidade_responsavel_id" as F_carga_produto_unidade_responsavel_id : UUID
+  ' FK unidade_responsavel_id -> unidade_organizacional.id; obrigatório
+  "produto_versao_id" as F_carga_produto_produto_versao_id : UUID
+  ' FK produto_versao_id -> produto_versao.id; obrigatório
+  "preparada_em" as F_carga_produto_preparada_em : A_DEFINIR
+  "volume_calda" as F_carga_produto_volume_calda : A_DEFINIR
+  "unidade" as F_carga_produto_unidade : A_DEFINIR
+  "referencia_lote" as F_carga_produto_referencia_lote : TEXT
+}
+' carga_produto: Origem: id : uuid PK
+' carga_produto: Origem: cliente_id : uuid FK obrigatório
+' carga_produto: Origem: unidade_responsavel_id : uuid FK obrigatório
+' carga_produto: Origem: produto_versao_id : uuid FK
+' carga_produto: Origem: preparada_em / volume_calda / unidade
+' carga_produto: Origem: referencia_lote : text opcional
+
+entity "aplicacao_produto" as E_aplicacao_produto {
+  "id" as F_aplicacao_produto_id : UUID <<key>>
+  "cliente_id" as F_aplicacao_produto_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "acao_id" as F_aplicacao_produto_acao_id : UUID
+  ' FK acao_id -> acao_controle.id; obrigatório
+  "produto_versao_id" as F_aplicacao_produto_produto_versao_id : UUID
+  ' FK produto_versao_id -> produto_versao.id; obrigatório
+  "carga_id" as F_aplicacao_produto_carga_id : UUID
+  ' FK carga_id -> carga_produto.id; opcional
+  "quantidade_consumida" as F_aplicacao_produto_quantidade_consumida : A_DEFINIR
+  "unidade" as F_aplicacao_produto_unidade : A_DEFINIR
+  "unidade_responsavel_id" as F_aplicacao_produto_unidade_responsavel_id : UUID
+  ' FK unidade_responsavel_id -> unidade_organizacional.id; obrigatório
+}
+' aplicacao_produto: Origem: id : uuid PK
+' aplicacao_produto: Origem: cliente_id : uuid FK obrigatório
+' aplicacao_produto: Origem: acao_id : uuid FK
+' aplicacao_produto: Origem: produto_versao_id : uuid FK
+' aplicacao_produto: Origem: carga_id : uuid FK opcional
+' aplicacao_produto: Origem: quantidade_consumida / unidade
+' aplicacao_produto: Origem: unidade_responsavel_id : uuid FK obrigatório, coerente com agregado de origem
+
+entity "amostra" as E_amostra {
+  "id" as F_amostra_id : UUID <<key>>
+  "cliente_id" as F_amostra_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "visita_revisao_id" as F_amostra_visita_revisao_id : UUID
+  ' FK visita_revisao_id -> visita_revisao.id; obrigatório
+  "observacao_id" as F_amostra_observacao_id : UUID
+  ' FK observacao_id -> observacao_deposito.id; opcional
+  "codigo_fonte" as F_amostra_codigo_fonte : A_DEFINIR
+  "coletor_id" as F_amostra_coletor_id : UUID
+  ' FK coletor_id -> vinculo_usuario.id; obrigatório
+  "coletada_em" as F_amostra_coletada_em : A_DEFINIR
+  "estado" as F_amostra_estado : A_DEFINIR
+  "unidade_responsavel_id" as F_amostra_unidade_responsavel_id : UUID
+  ' FK unidade_responsavel_id -> unidade_organizacional.id; obrigatório
+}
+' amostra: Origem: id : uuid PK
+' amostra: Origem: cliente_id : uuid FK obrigatório
+' amostra: Origem: visita_revisao_id : uuid FK
+' amostra: Origem: observacao_id : uuid FK opcional
+' amostra: Origem: codigo_fonte / coletor_id : FK
+' amostra: Origem: coletada_em / estado
+' amostra: Origem: unidade_responsavel_id : uuid FK obrigatório, coerente com agregado de origem
+
+entity "recipiente_coleta" as E_recipiente_coleta {
+  "id" as F_recipiente_coleta_id : UUID <<key>>
+  "cliente_id" as F_recipiente_coleta_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "codigo_local" as F_recipiente_coleta_codigo_local : TEXT
+  "tipo" as F_recipiente_coleta_tipo : A_DEFINIR
+  "origem" as F_recipiente_coleta_origem : A_DEFINIR
+}
+' recipiente_coleta: Origem: id : uuid PK
+' recipiente_coleta: Origem: cliente_id : uuid FK obrigatório
+' recipiente_coleta: Origem: codigo_local : text opcional
+' recipiente_coleta: Origem: tipo / origem
+
+entity "amostra_recipiente" as E_amostra_recipiente {
+  "amostra_id" as F_amostra_recipiente_amostra_id : UUID <<key>>
+  ' FK amostra_id -> amostra.id; obrigatório
+  "cliente_id" as F_amostra_recipiente_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "recipiente_id" as F_amostra_recipiente_recipiente_id : UUID <<key>>
+  ' FK recipiente_id -> recipiente_coleta.id; obrigatório
+}
+' amostra_recipiente: Origem: amostra_id : uuid PK, FK
+' amostra_recipiente: Origem: cliente_id : uuid FK obrigatório
+' amostra_recipiente: Origem: recipiente_id : uuid PK, FK
+
+entity "movimento_amostra" as E_movimento_amostra {
+  "id" as F_movimento_amostra_id : UUID <<key>>
+  "cliente_id" as F_movimento_amostra_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "amostra_id" as F_movimento_amostra_amostra_id : UUID
+  ' FK amostra_id -> amostra.id; obrigatório
+  "estado" as F_movimento_amostra_estado : A_DEFINIR
+  "ocorrido_em" as F_movimento_amostra_ocorrido_em : A_DEFINIR
+  "responsavel_id" as F_movimento_amostra_responsavel_id : UUID
+  ' FK responsavel_id -> vinculo_usuario.id; obrigatório
+  "motivo" as F_movimento_amostra_motivo : TEXT
+}
+' movimento_amostra: Origem: id : uuid PK
+' movimento_amostra: Origem: cliente_id : uuid FK obrigatório
+' movimento_amostra: Origem: amostra_id : uuid FK
+' movimento_amostra: Origem: estado / ocorrido_em
+' movimento_amostra: Origem: responsavel_id : uuid FK
+' movimento_amostra: Origem: motivo : text opcional
+
+entity "resultado_analise" as E_resultado_analise {
+  "id" as F_resultado_analise_id : UUID <<key>>
+  "cliente_id" as F_resultado_analise_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "amostra_id" as F_resultado_analise_amostra_id : UUID
+  ' FK amostra_id -> amostra.id; obrigatório
+  "versao" as F_resultado_analise_versao : A_DEFINIR
+  "metodo" as F_resultado_analise_metodo : A_DEFINIR
+  "conclusao" as F_resultado_analise_conclusao : A_DEFINIR
+  "analisado_em" as F_resultado_analise_analisado_em : A_DEFINIR
+  "responsavel_id" as F_resultado_analise_responsavel_id : UUID
+  ' FK responsavel_id -> vinculo_usuario.id; obrigatório
+  "substitui_resultado_id" as F_resultado_analise_substitui_resultado_id : UUID
+  ' FK substitui_resultado_id -> resultado_analise.id; opcional
+  "unidade_responsavel_id" as F_resultado_analise_unidade_responsavel_id : UUID
+  ' FK unidade_responsavel_id -> unidade_organizacional.id; obrigatório
+}
+' resultado_analise: Origem: id : uuid PK
+' resultado_analise: Origem: cliente_id : uuid FK obrigatório
+' resultado_analise: Origem: amostra_id : uuid FK
+' resultado_analise: Origem: versao / metodo / conclusao
+' resultado_analise: Origem: analisado_em / responsavel_id : FK
+' resultado_analise: Origem: substitui_resultado_id : uuid FK opcional
+' resultado_analise: Origem: unidade_responsavel_id : uuid FK obrigatório, coerente com agregado de origem
+
+entity "contagem_especime" as E_contagem_especime {
+  "id" as F_contagem_especime_id : UUID <<key>>
+  "cliente_id" as F_contagem_especime_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "resultado_id" as F_contagem_especime_resultado_id : UUID
+  ' FK resultado_id -> resultado_analise.id; obrigatório
+  "especie" as F_contagem_especime_especie : A_DEFINIR
+  "fase" as F_contagem_especime_fase : A_DEFINIR
+  "quantidade" as F_contagem_especime_quantidade : A_DEFINIR
+}
+' contagem_especime: Origem: id : uuid PK
+' contagem_especime: Origem: cliente_id : uuid FK obrigatório
+' contagem_especime: Origem: resultado_id : uuid FK
+' contagem_especime: Origem: especie / fase / quantidade
+
+entity "consolidacao" as E_consolidacao {
+  "id" as F_consolidacao_id : UUID <<key>>
+  "cliente_id" as F_consolidacao_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "unidade_responsavel_id" as F_consolidacao_unidade_responsavel_id : UUID
+  ' FK unidade_responsavel_id -> unidade_organizacional.id; obrigatório
+  "tipo" as F_consolidacao_tipo : A_DEFINIR
+  "periodo" as F_consolidacao_periodo : A_DEFINIR
+  "data_corte" as F_consolidacao_data_corte : A_DEFINIR
+  "filtros" as F_consolidacao_filtros : A_DEFINIR
+  "versao" as F_consolidacao_versao : A_DEFINIR
+  "regra_calculo_versao" as F_consolidacao_regra_calculo_versao : A_DEFINIR
+  "status" as F_consolidacao_status : A_DEFINIR
+  "aprovador_id" as F_consolidacao_aprovador_id : UUID
+  ' FK aprovador_id -> vinculo_usuario.id; opcional
+}
+' consolidacao: Origem: id : uuid PK
+' consolidacao: Origem: cliente_id : uuid FK
+' consolidacao: Origem: unidade_responsavel_id : uuid FK obrigatório
+' consolidacao: Origem: tipo : diaria/semanal/mensal/ciclo
+' consolidacao: Origem: periodo / data_corte / filtros
+' consolidacao: Origem: versao / regra_calculo_versao
+' consolidacao: Origem: status / aprovador_id : FK opcional
+
+entity "item_consolidacao" as E_item_consolidacao {
+  "consolidacao_id" as F_item_consolidacao_consolidacao_id : UUID <<key>>
+  ' FK consolidacao_id -> consolidacao.id; obrigatório
+  "cliente_id" as F_item_consolidacao_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "visita_id" as F_item_consolidacao_visita_id : UUID <<key>>
+  ' FK visita_id -> visita.id; obrigatório
+  "visita_revisao_id" as F_item_consolidacao_visita_revisao_id : UUID
+  ' FK visita_revisao_id -> visita_revisao.id; obrigatório
+}
+' item_consolidacao: Origem: consolidacao_id : uuid PK, FK
+' item_consolidacao: Origem: cliente_id : uuid FK obrigatório
+' item_consolidacao: Origem: visita_id : uuid PK, FK
+' item_consolidacao: Origem: visita_revisao_id : uuid FK
+
+entity "indicador_consolidado" as E_indicador_consolidado {
+  "id" as F_indicador_consolidado_id : UUID <<key>>
+  "cliente_id" as F_indicador_consolidado_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "consolidacao_id" as F_indicador_consolidado_consolidacao_id : UUID
+  ' FK consolidacao_id -> consolidacao.id; obrigatório
+  "metrica" as F_indicador_consolidado_metrica : A_DEFINIR
+  "dimensoes" as F_indicador_consolidado_dimensoes : A_DEFINIR
+  "unidade" as F_indicador_consolidado_unidade : A_DEFINIR
+  "valor" as F_indicador_consolidado_valor : A_DEFINIR
+  "qualidade" as F_indicador_consolidado_qualidade : A_DEFINIR
+}
+' indicador_consolidado: Origem: id : uuid PK
+' indicador_consolidado: Origem: cliente_id : uuid FK obrigatório
+' indicador_consolidado: Origem: consolidacao_id : uuid FK
+' indicador_consolidado: Origem: metrica / dimensoes / unidade
+' indicador_consolidado: Origem: valor / qualidade
+
+entity "evento_conferencia" as E_evento_conferencia {
+  "id" as F_evento_conferencia_id : UUID <<key>>
+  "cliente_id" as F_evento_conferencia_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "consolidacao_id" as F_evento_conferencia_consolidacao_id : UUID
+  ' FK consolidacao_id -> consolidacao.id; obrigatório
+  "autor_id" as F_evento_conferencia_autor_id : UUID
+  ' FK autor_id -> vinculo_usuario.id; obrigatório
+  "tipo" as F_evento_conferencia_tipo : A_DEFINIR
+  "motivo" as F_evento_conferencia_motivo : A_DEFINIR
+  "ocorrido_em" as F_evento_conferencia_ocorrido_em : A_DEFINIR
+}
+' evento_conferencia: Origem: id : uuid PK
+' evento_conferencia: Origem: cliente_id : uuid FK obrigatório
+' evento_conferencia: Origem: consolidacao_id : uuid FK
+' evento_conferencia: Origem: autor_id : uuid FK
+' evento_conferencia: Origem: tipo / motivo / ocorrido_em
+
+entity "documento_emitido" as E_documento_emitido {
+  "id" as F_documento_emitido_id : UUID <<key>>
+  "cliente_id" as F_documento_emitido_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "consolidacao_id" as F_documento_emitido_consolidacao_id : UUID
+  ' FK consolidacao_id -> consolidacao.id; obrigatório
+  "modelo_versao" as F_documento_emitido_modelo_versao : A_DEFINIR
+  "versao" as F_documento_emitido_versao : A_DEFINIR
+  "object_key" as F_documento_emitido_object_key : A_DEFINIR
+  "checksum" as F_documento_emitido_checksum : A_DEFINIR
+  "emitido_em" as F_documento_emitido_emitido_em : A_DEFINIR
+  "assinatura_estado" as F_documento_emitido_assinatura_estado : A_DEFINIR
+}
+' documento_emitido: Origem: id : uuid PK
+' documento_emitido: Origem: cliente_id : uuid FK obrigatório
+' documento_emitido: Origem: consolidacao_id : uuid FK
+' documento_emitido: Origem: modelo_versao / versao
+' documento_emitido: Origem: object_key / checksum / emitido_em
+' documento_emitido: Origem: assinatura_estado
+
+entity "envio_documento" as E_envio_documento {
+  "id" as F_envio_documento_id : UUID <<key>>
+  "cliente_id" as F_envio_documento_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "documento_id" as F_envio_documento_documento_id : UUID
+  ' FK documento_id -> documento_emitido.id; obrigatório
+  "destino" as F_envio_documento_destino : A_DEFINIR
+  "protocolo" as F_envio_documento_protocolo : A_DEFINIR
+  "status" as F_envio_documento_status : A_DEFINIR
+  "enviado_em" as F_envio_documento_enviado_em : A_DEFINIR
+  "resposta" as F_envio_documento_resposta : A_DEFINIR
+}
+' envio_documento: Origem: id : uuid PK
+' envio_documento: Origem: cliente_id : uuid FK obrigatório
+' envio_documento: Origem: documento_id : uuid FK
+' envio_documento: Origem: destino / protocolo
+' envio_documento: Origem: status / enviado_em / resposta
+
+entity "decisao_gerencial" as E_decisao_gerencial {
+  "id" as F_decisao_gerencial_id : UUID <<key>>
+  "cliente_id" as F_decisao_gerencial_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "autor_id" as F_decisao_gerencial_autor_id : UUID
+  ' FK autor_id -> vinculo_usuario.id; obrigatório
+  "consolidacao_id" as F_decisao_gerencial_consolidacao_id : UUID
+  ' FK consolidacao_id -> consolidacao.id; opcional
+  "previsao_id" as F_decisao_gerencial_previsao_id : UUID
+  ' FK previsao_id -> previsao_territorial.id; opcional
+  "orientacao" as F_decisao_gerencial_orientacao : A_DEFINIR
+  "registrada_em" as F_decisao_gerencial_registrada_em : A_DEFINIR
+}
+' decisao_gerencial: Origem: id : uuid PK
+' decisao_gerencial: Origem: cliente_id : uuid FK obrigatório
+' decisao_gerencial: Origem: autor_id : uuid FK
+' decisao_gerencial: Origem: consolidacao_id : uuid FK opcional
+' decisao_gerencial: Origem: previsao_id : uuid FK opcional
+' decisao_gerencial: Origem: orientacao / registrada_em
+
+entity "ocorrencia" as E_ocorrencia {
+  "id" as F_ocorrencia_id : UUID <<key>>
+  "cliente_id" as F_ocorrencia_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "unidade_responsavel_id" as F_ocorrencia_unidade_responsavel_id : UUID
+  ' FK unidade_responsavel_id -> unidade_organizacional.id; obrigatório
+  "visita_revisao_id" as F_ocorrencia_visita_revisao_id : UUID
+  ' FK visita_revisao_id -> visita_revisao.id; opcional
+  "tipo" as F_ocorrencia_tipo : A_DEFINIR
+  "descricao" as F_ocorrencia_descricao : A_DEFINIR
+  "sigilo" as F_ocorrencia_sigilo : A_DEFINIR
+  "local" as F_ocorrencia_local : A_DEFINIR
+  "geometria" as F_ocorrencia_geometria : A_DEFINIR
+  "autor_id" as F_ocorrencia_autor_id : UUID
+  ' FK autor_id -> vinculo_usuario.id; obrigatório
+  "status" as F_ocorrencia_status : A_DEFINIR
+  "registrada_em" as F_ocorrencia_registrada_em : A_DEFINIR
+}
+' ocorrencia: Origem: id : uuid PK
+' ocorrencia: Origem: cliente_id : uuid FK
+' ocorrencia: Origem: unidade_responsavel_id : uuid FK obrigatório
+' ocorrencia: Origem: visita_revisao_id : uuid FK opcional
+' ocorrencia: Origem: tipo / descricao / sigilo
+' ocorrencia: Origem: local / geometria opcional
+' ocorrencia: Origem: autor_id : uuid FK
+' ocorrencia: Origem: status / registrada_em
+
+entity "tarefa" as E_tarefa {
+  "id" as F_tarefa_id : UUID <<key>>
+  "cliente_id" as F_tarefa_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "decisao_id" as F_tarefa_decisao_id : UUID
+  ' FK decisao_id -> decisao_gerencial.id; opcional
+  "ocorrencia_id" as F_tarefa_ocorrencia_id : UUID
+  ' FK ocorrencia_id -> ocorrencia.id; opcional
+  "visita_origem_id" as F_tarefa_visita_origem_id : UUID
+  ' FK visita_origem_id -> visita.id; opcional
+  "atribuicao_id" as F_tarefa_atribuicao_id : UUID
+  ' FK atribuicao_id -> atribuicao.id; obrigatório
+  "modalidade" as F_tarefa_modalidade : A_DEFINIR
+  "prazo" as F_tarefa_prazo : A_DEFINIR
+  "recursos" as F_tarefa_recursos : A_DEFINIR
+  "prioridade" as F_tarefa_prioridade : A_DEFINIR
+  "estado" as F_tarefa_estado : A_DEFINIR
+}
+' tarefa: Origem: id : uuid PK
+' tarefa: Origem: cliente_id : uuid FK obrigatório
+' tarefa: Origem: decisao_id : uuid FK opcional
+' tarefa: Origem: ocorrencia_id : uuid FK opcional
+' tarefa: Origem: visita_origem_id : uuid FK opcional
+' tarefa: Origem: atribuicao_id : uuid FK
+' tarefa: Origem: modalidade / prazo / recursos
+' tarefa: Origem: prioridade / estado
+
+entity "evento_tarefa" as E_evento_tarefa {
+  "id" as F_evento_tarefa_id : UUID <<key>>
+  "cliente_id" as F_evento_tarefa_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "tarefa_id" as F_evento_tarefa_tarefa_id : UUID
+  ' FK tarefa_id -> tarefa.id; obrigatório
+  "autor_id" as F_evento_tarefa_autor_id : UUID
+  ' FK autor_id -> vinculo_usuario.id; obrigatório
+  "tipo" as F_evento_tarefa_tipo : A_DEFINIR
+  "ocorrido_em" as F_evento_tarefa_ocorrido_em : A_DEFINIR
+  "motivo" as F_evento_tarefa_motivo : A_DEFINIR
+  "visita_executada_id" as F_evento_tarefa_visita_executada_id : UUID
+  ' FK visita_executada_id -> visita.id; opcional
+}
+' evento_tarefa: Origem: id : uuid PK
+' evento_tarefa: Origem: cliente_id : uuid FK obrigatório
+' evento_tarefa: Origem: tarefa_id : uuid FK
+' evento_tarefa: Origem: autor_id : uuid FK
+' evento_tarefa: Origem: tipo / ocorrido_em / motivo
+' evento_tarefa: Origem: visita_executada_id : uuid FK opcional
+
+entity "encaminhamento_ocorrencia" as E_encaminhamento_ocorrencia {
+  "id" as F_encaminhamento_ocorrencia_id : UUID <<key>>
+  "cliente_id" as F_encaminhamento_ocorrencia_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "ocorrencia_id" as F_encaminhamento_ocorrencia_ocorrencia_id : UUID
+  ' FK ocorrencia_id -> ocorrencia.id; obrigatório
+  "unidade_destino_id" as F_encaminhamento_ocorrencia_unidade_destino_id : UUID
+  ' FK unidade_destino_id -> unidade_organizacional.id; opcional
+  "contrato_dados_versao" as F_encaminhamento_ocorrencia_contrato_dados_versao : A_DEFINIR
+  "protocolo" as F_encaminhamento_ocorrencia_protocolo : A_DEFINIR
+  "status" as F_encaminhamento_ocorrencia_status : A_DEFINIR
+  "enviado_em" as F_encaminhamento_ocorrencia_enviado_em : A_DEFINIR
+  "orgao_externo_destino" as F_encaminhamento_ocorrencia_orgao_externo_destino : A_DEFINIR
+  "contrato" as F_encaminhamento_ocorrencia_contrato : A_DEFINIR
+}
+' encaminhamento_ocorrencia: Origem: id : uuid PK
+' encaminhamento_ocorrencia: Origem: cliente_id : uuid FK obrigatório
+' encaminhamento_ocorrencia: Origem: ocorrencia_id : uuid FK
+' encaminhamento_ocorrencia: Origem: unidade_destino_id : uuid FK opcional; destino interno
+' encaminhamento_ocorrencia: Origem: contrato_dados_versao / protocolo
+' encaminhamento_ocorrencia: Origem: status / enviado_em
+' encaminhamento_ocorrencia: Origem: orgao_externo_destino / contrato; não criar secretaria em outro cliente para simular um destinatário externo
+
+entity "evento_tratativa" as E_evento_tratativa {
+  "id" as F_evento_tratativa_id : UUID <<key>>
+  "cliente_id" as F_evento_tratativa_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "encaminhamento_id" as F_evento_tratativa_encaminhamento_id : UUID
+  ' FK encaminhamento_id -> encaminhamento_ocorrencia.id; obrigatório
+  "autor_id" as F_evento_tratativa_autor_id : UUID
+  ' FK autor_id -> vinculo_usuario.id; obrigatório
+  "estado" as F_evento_tratativa_estado : A_DEFINIR
+  "motivo" as F_evento_tratativa_motivo : A_DEFINIR
+  "ocorrido_em" as F_evento_tratativa_ocorrido_em : A_DEFINIR
+}
+' evento_tratativa: Origem: id : uuid PK
+' evento_tratativa: Origem: cliente_id : uuid FK obrigatório
+' evento_tratativa: Origem: encaminhamento_id : uuid FK
+' evento_tratativa: Origem: autor_id : uuid FK
+' evento_tratativa: Origem: estado / motivo / ocorrido_em
+
+entity "anexo" as E_anexo {
+  "id" as F_anexo_id : UUID <<key>>
+  "cliente_id" as F_anexo_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "visita_revisao_id" as F_anexo_visita_revisao_id : UUID
+  ' FK visita_revisao_id -> visita_revisao.id; opcional
+  "ocorrencia_id" as F_anexo_ocorrencia_id : UUID
+  ' FK ocorrencia_id -> ocorrencia.id; opcional
+  "object_key" as F_anexo_object_key : A_DEFINIR
+  "checksum" as F_anexo_checksum : A_DEFINIR
+  "tipo_mime" as F_anexo_tipo_mime : A_DEFINIR
+  "autor_id" as F_anexo_autor_id : UUID
+  ' FK autor_id -> vinculo_usuario.id; obrigatório
+  "origem" as F_anexo_origem : A_DEFINIR
+  "finalidade" as F_anexo_finalidade : A_DEFINIR
+  "estado_envio" as F_anexo_estado_envio : A_DEFINIR
+  "original_id" as F_anexo_original_id : UUID
+  ' FK original_id -> anexo.id; opcional
+}
+' anexo: Origem: id : uuid PK
+' anexo: Origem: cliente_id : uuid FK obrigatório
+' anexo: Origem: visita_revisao_id : uuid FK opcional
+' anexo: Origem: ocorrencia_id : uuid FK opcional
+' anexo: Origem: object_key / checksum / tipo_mime
+' anexo: Origem: autor_id : uuid FK
+' anexo: Origem: origem / finalidade / estado_envio
+' anexo: Origem: original_id : uuid FK opcional
+
+entity "fonte_dados" as E_fonte_dados {
+  "id" as F_fonte_dados_id : UUID <<key>>
+  "cliente_id" as F_fonte_dados_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "unidade_responsavel_id" as F_fonte_dados_unidade_responsavel_id : UUID
+  ' FK unidade_responsavel_id -> unidade_organizacional.id; obrigatório
+  "nome" as F_fonte_dados_nome : A_DEFINIR
+  "sistema" as F_fonte_dados_sistema : A_DEFINIR
+  "contrato_versao" as F_fonte_dados_contrato_versao : A_DEFINIR
+  "finalidade" as F_fonte_dados_finalidade : A_DEFINIR
+  "campos_autorizados" as F_fonte_dados_campos_autorizados : A_DEFINIR
+}
+' fonte_dados: Origem: id : uuid PK
+' fonte_dados: Origem: cliente_id : uuid FK
+' fonte_dados: Origem: unidade_responsavel_id : uuid FK obrigatório
+' fonte_dados: Origem: nome / sistema / contrato_versao
+' fonte_dados: Origem: finalidade / campos_autorizados
+
+entity "lote_ingestao" as E_lote_ingestao {
+  "id" as F_lote_ingestao_id : UUID <<key>>
+  "cliente_id" as F_lote_ingestao_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "fonte_id" as F_lote_ingestao_fonte_id : UUID
+  ' FK fonte_id -> fonte_dados.id; obrigatório
+  "checksum" as F_lote_ingestao_checksum : A_DEFINIR
+  "competencia" as F_lote_ingestao_competencia : A_DEFINIR
+  "schema_versao" as F_lote_ingestao_schema_versao : A_DEFINIR
+  "status" as F_lote_ingestao_status : A_DEFINIR
+  "recebido_em" as F_lote_ingestao_recebido_em : A_DEFINIR
+  "qualidade" as F_lote_ingestao_qualidade : A_DEFINIR
+}
+' lote_ingestao: Origem: id : uuid PK
+' lote_ingestao: Origem: cliente_id : uuid FK obrigatório
+' lote_ingestao: Origem: fonte_id : uuid FK
+' lote_ingestao: Origem: checksum / competencia / schema_versao
+' lote_ingestao: Origem: status / recebido_em / qualidade
+
+entity "mapeamento_externo" as E_mapeamento_externo {
+  "id" as F_mapeamento_externo_id : UUID <<key>>
+  "cliente_id" as F_mapeamento_externo_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "fonte_id" as F_mapeamento_externo_fonte_id : UUID
+  ' FK fonte_id -> fonte_dados.id; obrigatório
+  "imovel_id" as F_mapeamento_externo_imovel_id : UUID
+  ' FK imovel_id -> imovel.id; opcional
+  "territorio_id" as F_mapeamento_externo_territorio_id : UUID
+  ' FK territorio_id -> territorio.id; opcional
+  "codigo_externo" as F_mapeamento_externo_codigo_externo : A_DEFINIR
+  "vigencia" as F_mapeamento_externo_vigencia : A_DEFINIR
+}
+' mapeamento_externo: Origem: id : uuid PK
+' mapeamento_externo: Origem: cliente_id : uuid FK obrigatório
+' mapeamento_externo: Origem: fonte_id : uuid FK
+' mapeamento_externo: Origem: imovel_id : uuid FK opcional
+' mapeamento_externo: Origem: territorio_id : uuid FK opcional
+' mapeamento_externo: Origem: codigo_externo / vigencia
+
+entity "pessoa" as E_pessoa {
+  "id" as F_pessoa_id : UUID <<key>>
+  "cliente_id" as F_pessoa_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "nome" as F_pessoa_nome : A_DEFINIR
+  "identificadores_restritos" as F_pessoa_identificadores_restritos : A_DEFINIR
+}
+' pessoa: Origem: id : uuid PK
+' pessoa: Origem: cliente_id : uuid FK
+' pessoa: Origem: nome / identificadores_restritos
+
+entity "pessoa_fonte" as E_pessoa_fonte {
+  "id" as F_pessoa_fonte_id : UUID <<key>>
+  "cliente_id" as F_pessoa_fonte_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "pessoa_id" as F_pessoa_fonte_pessoa_id : UUID
+  ' FK pessoa_id -> pessoa.id; obrigatório
+  "fonte_id" as F_pessoa_fonte_fonte_id : UUID
+  ' FK fonte_id -> fonte_dados.id; obrigatório
+  "registro_externo" as F_pessoa_fonte_registro_externo : A_DEFINIR
+  "atualizado_em" as F_pessoa_fonte_atualizado_em : A_DEFINIR
+}
+' pessoa_fonte: Origem: id : uuid PK
+' pessoa_fonte: Origem: cliente_id : uuid FK obrigatório
+' pessoa_fonte: Origem: pessoa_id : uuid FK
+' pessoa_fonte: Origem: fonte_id : uuid FK
+' pessoa_fonte: Origem: registro_externo / atualizado_em
+
+entity "vinculo_residencia" as E_vinculo_residencia {
+  "id" as F_vinculo_residencia_id : UUID <<key>>
+  "cliente_id" as F_vinculo_residencia_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "pessoa_id" as F_vinculo_residencia_pessoa_id : UUID
+  ' FK pessoa_id -> pessoa.id; obrigatório
+  "imovel_id" as F_vinculo_residencia_imovel_id : UUID
+  ' FK imovel_id -> imovel.id; obrigatório
+  "fonte_id" as F_vinculo_residencia_fonte_id : UUID
+  ' FK fonte_id -> fonte_dados.id; obrigatório
+  "inicio" as F_vinculo_residencia_inicio : A_DEFINIR
+  "fim" as F_vinculo_residencia_fim : A_DEFINIR
+  "estado_correspondencia" as F_vinculo_residencia_estado_correspondencia : A_DEFINIR
+  "confirmado_por_id" as F_vinculo_residencia_confirmado_por_id : UUID
+  ' FK confirmado_por_id -> vinculo_usuario.id; opcional
+}
+' vinculo_residencia: Origem: id : uuid PK
+' vinculo_residencia: Origem: cliente_id : uuid FK obrigatório
+' vinculo_residencia: Origem: pessoa_id : uuid FK
+' vinculo_residencia: Origem: imovel_id : uuid FK
+' vinculo_residencia: Origem: fonte_id : uuid FK
+' vinculo_residencia: Origem: inicio / fim / estado_correspondencia
+' vinculo_residencia: Origem: confirmado_por_id : uuid FK opcional
+
+entity "registro_saude" as E_registro_saude {
+  "id" as F_registro_saude_id : UUID <<key>>
+  "cliente_id" as F_registro_saude_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "lote_id" as F_registro_saude_lote_id : UUID
+  ' FK lote_id -> lote_ingestao.id; obrigatório
+  "pessoa_id" as F_registro_saude_pessoa_id : UUID
+  ' FK pessoa_id -> pessoa.id; opcional
+  "codigo_externo" as F_registro_saude_codigo_externo : A_DEFINIR
+  "agravo" as F_registro_saude_agravo : A_DEFINIR
+  "tipo_evento" as F_registro_saude_tipo_evento : A_DEFINIR
+  "data_evento" as F_registro_saude_data_evento : A_DEFINIR
+  "territorio_id" as F_registro_saude_territorio_id : UUID
+  ' FK territorio_id -> territorio.id; opcional
+  "versao" as F_registro_saude_versao : A_DEFINIR
+  "dados_autorizados" as F_registro_saude_dados_autorizados : A_DEFINIR
+  "unidade_responsavel_id" as F_registro_saude_unidade_responsavel_id : UUID
+  ' FK unidade_responsavel_id -> unidade_organizacional.id; obrigatório
+}
+' registro_saude: Origem: id : uuid PK
+' registro_saude: Origem: cliente_id : uuid FK obrigatório
+' registro_saude: Origem: lote_id : uuid FK
+' registro_saude: Origem: pessoa_id : uuid FK opcional
+' registro_saude: Origem: codigo_externo / agravo / tipo_evento
+' registro_saude: Origem: data_evento / territorio_id : FK opcional
+' registro_saude: Origem: versao / dados_autorizados
+' registro_saude: Origem: unidade_responsavel_id : uuid FK obrigatório, coerente com agregado de origem
+
+entity "dataset_versao" as E_dataset_versao {
+  "id" as F_dataset_versao_id : UUID <<key>>
+  "cliente_id" as F_dataset_versao_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "unidade_responsavel_id" as F_dataset_versao_unidade_responsavel_id : UUID
+  ' FK unidade_responsavel_id -> unidade_organizacional.id; obrigatório
+  "esquema_features_versao" as F_dataset_versao_esquema_features_versao : A_DEFINIR
+  "checksum" as F_dataset_versao_checksum : A_DEFINIR
+  "periodo" as F_dataset_versao_periodo : A_DEFINIR
+  "regras_transformacao" as F_dataset_versao_regras_transformacao : A_DEFINIR
+  "object_key" as F_dataset_versao_object_key : A_DEFINIR
+  "criado_em" as F_dataset_versao_criado_em : A_DEFINIR
+}
+' dataset_versao: Origem: id : uuid PK
+' dataset_versao: Origem: cliente_id : uuid FK
+' dataset_versao: Origem: unidade_responsavel_id : uuid FK obrigatório
+' dataset_versao: Origem: esquema_features_versao / checksum
+' dataset_versao: Origem: periodo / regras_transformacao
+' dataset_versao: Origem: object_key / criado_em
+
+entity "dataset_lote" as E_dataset_lote {
+  "dataset_id" as F_dataset_lote_dataset_id : UUID <<key>>
+  ' FK dataset_id -> dataset_versao.id; obrigatório
+  "cliente_id" as F_dataset_lote_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "lote_id" as F_dataset_lote_lote_id : UUID <<key>>
+  ' FK lote_id -> lote_ingestao.id; obrigatório
+}
+' dataset_lote: Origem: dataset_id : uuid PK, FK
+' dataset_lote: Origem: cliente_id : uuid FK obrigatório
+' dataset_lote: Origem: lote_id : uuid PK, FK
+
+entity "modelo_versao" as E_modelo_versao {
+  "id" as F_modelo_versao_id : UUID <<key>>
+  "cliente_id" as F_modelo_versao_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "unidade_responsavel_id" as F_modelo_versao_unidade_responsavel_id : UUID
+  ' FK unidade_responsavel_id -> unidade_organizacional.id; obrigatório
+  "dataset_treino_id" as F_modelo_versao_dataset_treino_id : UUID
+  ' FK dataset_treino_id -> dataset_versao.id; obrigatório
+  "algoritmo" as F_modelo_versao_algoritmo : A_DEFINIR
+  "versao" as F_modelo_versao_versao : A_DEFINIR
+  "metricas" as F_modelo_versao_metricas : A_DEFINIR
+  "object_key" as F_modelo_versao_object_key : A_DEFINIR
+  "aprovado_por_id" as F_modelo_versao_aprovado_por_id : UUID
+  ' FK aprovado_por_id -> vinculo_usuario.id; opcional
+  "status" as F_modelo_versao_status : A_DEFINIR
+  "aprovado_em" as F_modelo_versao_aprovado_em : A_DEFINIR
+}
+' modelo_versao: Origem: id : uuid PK
+' modelo_versao: Origem: cliente_id : uuid FK obrigatório
+' modelo_versao: Origem: unidade_responsavel_id : uuid FK obrigatório
+' modelo_versao: Origem: dataset_treino_id : uuid FK
+' modelo_versao: Origem: algoritmo / versao / metricas
+' modelo_versao: Origem: object_key / aprovado_por_id : FK opcional
+' modelo_versao: Origem: status / aprovado_em
+
+entity "execucao_modelo" as E_execucao_modelo {
+  "id" as F_execucao_modelo_id : UUID <<key>>
+  "cliente_id" as F_execucao_modelo_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "modelo_versao_id" as F_execucao_modelo_modelo_versao_id : UUID
+  ' FK modelo_versao_id -> modelo_versao.id; obrigatório
+  "dataset_id" as F_execucao_modelo_dataset_id : UUID
+  ' FK dataset_id -> dataset_versao.id; obrigatório
+  "tipo" as F_execucao_modelo_tipo : A_DEFINIR
+  "status" as F_execucao_modelo_status : A_DEFINIR
+  "iniciado_em" as F_execucao_modelo_iniciado_em : A_DEFINIR
+  "concluido_em" as F_execucao_modelo_concluido_em : A_DEFINIR
+}
+' execucao_modelo: Origem: id : uuid PK
+' execucao_modelo: Origem: cliente_id : uuid FK obrigatório
+' execucao_modelo: Origem: modelo_versao_id : uuid FK
+' execucao_modelo: Origem: dataset_id : uuid FK
+' execucao_modelo: Origem: tipo : inferencia/calibracao/validacao
+' execucao_modelo: Origem: status / iniciado_em / concluido_em
+
+entity "previsao_territorial" as E_previsao_territorial {
+  "id" as F_previsao_territorial_id : UUID <<key>>
+  "cliente_id" as F_previsao_territorial_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "execucao_id" as F_previsao_territorial_execucao_id : UUID
+  ' FK execucao_id -> execucao_modelo.id; obrigatório
+  "territorio_versao_id" as F_previsao_territorial_territorio_versao_id : UUID
+  ' FK territorio_versao_id -> territorio_versao.id; obrigatório
+  "agravo" as F_previsao_territorial_agravo : A_DEFINIR
+  "semana_alvo" as F_previsao_territorial_semana_alvo : A_DEFINIR
+  "horizonte" as F_previsao_territorial_horizonte : A_DEFINIR
+  "probabilidade" as F_previsao_territorial_probabilidade : A_DEFINIR
+  "casos_estimados" as F_previsao_territorial_casos_estimados : A_DEFINIR
+  "limite_inferior" as F_previsao_territorial_limite_inferior : A_DEFINIR
+  "limite_superior" as F_previsao_territorial_limite_superior : A_DEFINIR
+  "qualidade" as F_previsao_territorial_qualidade : A_DEFINIR
+  "publicada_em" as F_previsao_territorial_publicada_em : A_DEFINIR
+  "unidade_responsavel_id" as F_previsao_territorial_unidade_responsavel_id : UUID
+  ' FK unidade_responsavel_id -> unidade_organizacional.id; obrigatório
+}
+' previsao_territorial: Origem: id : uuid PK
+' previsao_territorial: Origem: cliente_id : uuid FK obrigatório
+' previsao_territorial: Origem: execucao_id : uuid FK
+' previsao_territorial: Origem: territorio_versao_id : uuid FK
+' previsao_territorial: Origem: agravo / semana_alvo / horizonte
+' previsao_territorial: Origem: probabilidade / casos_estimados
+' previsao_territorial: Origem: limite_inferior / limite_superior
+' previsao_territorial: Origem: qualidade / publicada_em
+' previsao_territorial: Origem: unidade_responsavel_id : uuid FK obrigatório, coerente com agregado de origem
+
+entity "cenario_simulacao" as E_cenario_simulacao {
+  "id" as F_cenario_simulacao_id : UUID <<key>>
+  "cliente_id" as F_cenario_simulacao_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "unidade_responsavel_id" as F_cenario_simulacao_unidade_responsavel_id : UUID
+  ' FK unidade_responsavel_id -> unidade_organizacional.id; obrigatório
+  "autor_id" as F_cenario_simulacao_autor_id : UUID
+  ' FK autor_id -> vinculo_usuario.id; obrigatório
+  "execucao_base_id" as F_cenario_simulacao_execucao_base_id : UUID
+  ' FK execucao_base_id -> execucao_modelo.id; obrigatório
+  "recursos" as F_cenario_simulacao_recursos : A_DEFINIR
+  "politica_versao" as F_cenario_simulacao_politica_versao : A_DEFINIR
+  "resultado" as F_cenario_simulacao_resultado : A_DEFINIR
+  "criado_em" as F_cenario_simulacao_criado_em : A_DEFINIR
+}
+' cenario_simulacao: Origem: id : uuid PK
+' cenario_simulacao: Origem: cliente_id : uuid FK obrigatório
+' cenario_simulacao: Origem: unidade_responsavel_id : uuid FK obrigatório
+' cenario_simulacao: Origem: autor_id : uuid FK
+' cenario_simulacao: Origem: execucao_base_id : uuid FK
+' cenario_simulacao: Origem: recursos / politica_versao
+' cenario_simulacao: Origem: resultado / criado_em
+
+entity "politica_visibilidade" as E_politica_visibilidade {
+  "id" as F_politica_visibilidade_id : UUID <<key>>
+  "cliente_id" as F_politica_visibilidade_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "unidade_responsavel_id" as F_politica_visibilidade_unidade_responsavel_id : UUID
+  ' FK unidade_responsavel_id -> unidade_organizacional.id; obrigatório
+  "territorio_id" as F_politica_visibilidade_territorio_id : UUID
+  ' FK territorio_id -> territorio.id; opcional
+  "modo" as F_politica_visibilidade_modo : A_DEFINIR
+  "versao" as F_politica_visibilidade_versao : A_DEFINIR
+  "inicio" as F_politica_visibilidade_inicio : A_DEFINIR
+  "fim" as F_politica_visibilidade_fim : A_DEFINIR
+  "responsavel_id" as F_politica_visibilidade_responsavel_id : UUID
+  ' FK responsavel_id -> vinculo_usuario.id; obrigatório
+}
+' politica_visibilidade: Origem: id : uuid PK
+' politica_visibilidade: Origem: cliente_id : uuid FK
+' politica_visibilidade: Origem: unidade_responsavel_id : uuid FK obrigatório
+' politica_visibilidade: Origem: territorio_id : uuid FK opcional
+' politica_visibilidade: Origem: modo : restrito/compartilhado
+' politica_visibilidade: Origem: versao / inicio / fim
+' politica_visibilidade: Origem: responsavel_id : uuid FK
+
+entity "publico_autorizado" as E_publico_autorizado {
+  "id" as F_publico_autorizado_id : UUID <<key>>
+  "cliente_id" as F_publico_autorizado_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "politica_id" as F_publico_autorizado_politica_id : UUID
+  ' FK politica_id -> politica_visibilidade.id; obrigatório
+  "vinculo_usuario_id" as F_publico_autorizado_vinculo_usuario_id : UUID
+  ' FK vinculo_usuario_id -> vinculo_usuario.id; obrigatório
+}
+' publico_autorizado: Origem: id : uuid PK
+' publico_autorizado: Origem: cliente_id : uuid FK obrigatório
+' publico_autorizado: Origem: politica_id : uuid FK
+' publico_autorizado: Origem: vinculo_usuario_id : uuid FK
+
+entity "agenda_predicao" as E_agenda_predicao {
+  "id" as F_agenda_predicao_id : UUID <<key>>
+  "cliente_id" as F_agenda_predicao_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "unidade_responsavel_id" as F_agenda_predicao_unidade_responsavel_id : UUID
+  ' FK unidade_responsavel_id -> unidade_organizacional.id; obrigatório
+  "responsavel_id" as F_agenda_predicao_responsavel_id : UUID
+  ' FK responsavel_id -> vinculo_usuario.id; obrigatório
+  "politica_id" as F_agenda_predicao_politica_id : UUID
+  ' FK politica_id -> politica_visibilidade.id; obrigatório
+  "territorio_id" as F_agenda_predicao_territorio_id : UUID
+  ' FK territorio_id -> territorio.id; opcional
+  "fuso" as F_agenda_predicao_fuso : A_DEFINIR
+  "dias_semana" as F_agenda_predicao_dias_semana : A_DEFINIR
+  "ativa" as F_agenda_predicao_ativa : A_DEFINIR
+}
+' agenda_predicao: Origem: id : uuid PK
+' agenda_predicao: Origem: cliente_id : uuid FK obrigatório
+' agenda_predicao: Origem: unidade_responsavel_id : uuid FK obrigatório
+' agenda_predicao: Origem: responsavel_id : uuid FK
+' agenda_predicao: Origem: politica_id : uuid FK
+' agenda_predicao: Origem: territorio_id : uuid FK opcional
+' agenda_predicao: Origem: fuso / dias_semana / ativa
+
+entity "horario_agenda" as E_horario_agenda {
+  "id" as F_horario_agenda_id : UUID <<key>>
+  "cliente_id" as F_horario_agenda_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "agenda_id" as F_horario_agenda_agenda_id : UUID
+  ' FK agenda_id -> agenda_predicao.id; obrigatório
+  "hora_local" as F_horario_agenda_hora_local : TIME
+}
+' horario_agenda: Origem: id : uuid PK
+' horario_agenda: Origem: cliente_id : uuid FK obrigatório
+' horario_agenda: Origem: agenda_id : uuid FK
+' horario_agenda: Origem: hora_local : time
+
+entity "destinatario_agenda" as E_destinatario_agenda {
+  "agenda_id" as F_destinatario_agenda_agenda_id : UUID <<key>>
+  ' FK agenda_id -> agenda_predicao.id; obrigatório
+  "cliente_id" as F_destinatario_agenda_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "vinculo_usuario_id" as F_destinatario_agenda_vinculo_usuario_id : UUID <<key>>
+  ' FK vinculo_usuario_id -> vinculo_usuario.id; obrigatório
+}
+' destinatario_agenda: Origem: agenda_id : uuid PK, FK
+' destinatario_agenda: Origem: cliente_id : uuid FK obrigatório
+' destinatario_agenda: Origem: vinculo_usuario_id : uuid PK, FK
+
+entity "entrega_predicao" as E_entrega_predicao {
+  "id" as F_entrega_predicao_id : UUID <<key>>
+  "cliente_id" as F_entrega_predicao_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "horario_agenda_id" as F_entrega_predicao_horario_agenda_id : UUID
+  ' FK horario_agenda_id -> horario_agenda.id; obrigatório
+  "destinatario_id" as F_entrega_predicao_destinatario_id : UUID
+  ' FK destinatario_id -> vinculo_usuario.id; obrigatório
+  "politica_id" as F_entrega_predicao_politica_id : UUID
+  ' FK politica_id -> politica_visibilidade.id; obrigatório
+  "previsao_id" as F_entrega_predicao_previsao_id : UUID
+  ' FK previsao_id -> previsao_territorial.id; opcional
+  "prevista_para" as F_entrega_predicao_prevista_para : A_DEFINIR
+  "disponibilizada_em" as F_entrega_predicao_disponibilizada_em : A_DEFINIR
+  "lida_em" as F_entrega_predicao_lida_em : A_DEFINIR
+  "status" as F_entrega_predicao_status : A_DEFINIR
+  "erro" as F_entrega_predicao_erro : A_DEFINIR
+}
+' entrega_predicao: Origem: id : uuid PK
+' entrega_predicao: Origem: cliente_id : uuid FK obrigatório
+' entrega_predicao: Origem: horario_agenda_id : uuid FK
+' entrega_predicao: Origem: destinatario_id : uuid FK
+' entrega_predicao: Origem: politica_id : uuid FK
+' entrega_predicao: Origem: previsao_id : uuid FK opcional
+' entrega_predicao: Origem: prevista_para / disponibilizada_em
+' entrega_predicao: Origem: lida_em / status / erro
+
+entity "comunicacao_equipe" as E_comunicacao_equipe {
+  "id" as F_comunicacao_equipe_id : UUID <<key>>
+  "cliente_id" as F_comunicacao_equipe_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "decisao_id" as F_comunicacao_equipe_decisao_id : UUID
+  ' FK decisao_id -> decisao_gerencial.id; obrigatório
+  "entrega_id" as F_comunicacao_equipe_entrega_id : UUID
+  ' FK entrega_id -> entrega_predicao.id; opcional
+  "autor_id" as F_comunicacao_equipe_autor_id : UUID
+  ' FK autor_id -> vinculo_usuario.id; obrigatório
+  "mensagem" as F_comunicacao_equipe_mensagem : A_DEFINIR
+  "enviada_em" as F_comunicacao_equipe_enviada_em : A_DEFINIR
+}
+' comunicacao_equipe: Origem: id : uuid PK
+' comunicacao_equipe: Origem: cliente_id : uuid FK obrigatório
+' comunicacao_equipe: Origem: decisao_id : uuid FK
+' comunicacao_equipe: Origem: entrega_id : uuid FK opcional
+' comunicacao_equipe: Origem: autor_id : uuid FK
+' comunicacao_equipe: Origem: mensagem / enviada_em
+
+entity "destinatario_comunicacao" as E_destinatario_comunicacao {
+  "comunicacao_id" as F_destinatario_comunicacao_comunicacao_id : UUID <<key>>
+  ' FK comunicacao_id -> comunicacao_equipe.id; obrigatório
+  "cliente_id" as F_destinatario_comunicacao_cliente_id : UUID
+  ' FK cliente_id -> cliente.id; obrigatório
+  "vinculo_usuario_id" as F_destinatario_comunicacao_vinculo_usuario_id : UUID <<key>>
+  ' FK vinculo_usuario_id -> vinculo_usuario.id; obrigatório
+  "disponibilizada_em" as F_destinatario_comunicacao_disponibilizada_em : A_DEFINIR
+  "lida_em" as F_destinatario_comunicacao_lida_em : A_DEFINIR
+}
+' destinatario_comunicacao: Origem: comunicacao_id : uuid PK, FK
+' destinatario_comunicacao: Origem: cliente_id : uuid FK obrigatório
+' destinatario_comunicacao: Origem: vinculo_usuario_id : uuid PK, FK
+' destinatario_comunicacao: Origem: disponibilizada_em / lida_em
+
+relationship "Autoriza participação" as REL_001 {
+}
+REL_001 -(0,N)- E_cliente
+REL_001 -(1,1)- E_vinculo_usuario
+
+relationship "Possui participação" as REL_002 {
+}
+REL_002 -(0,N)- E_usuario
+REL_002 -(1,1)- E_vinculo_usuario
+
+relationship "Recebe concessão" as REL_003 {
+}
+REL_003 -(0,N)- E_vinculo_usuario
+REL_003 -(1,1)- E_concessao_papel
+
+relationship "Define concessão" as REL_004 {
+}
+REL_004 -(0,N)- E_papel
+REL_004 -(1,1)- E_concessao_papel
+
+relationship "Delimita escopo" as REL_005 {
+}
+REL_005 -(0,N)- E_territorio
+REL_005 -(0,1)- E_concessao_papel
+
+relationship "Inclui permissão" as REL_006 {
+}
+REL_006 -(0,N)- E_papel
+REL_006 -(1,1)- E_papel_permissao
+
+relationship "Compõe papel" as REL_007 {
+}
+REL_007 -(0,N)- E_permissao
+REL_007 -(1,1)- E_papel_permissao
+
+relationship "Organiza" as REL_008 {
+}
+REL_008 -(0,N)- E_municipio
+REL_008 -(1,1)- E_territorio
+
+relationship "Possui versão" as REL_009 {
+}
+REL_009 -(1,N)- E_territorio
+REL_009 -(1,1)- E_territorio_versao
+
+relationship "Vincula como origem" as REL_010 {
+}
+REL_010 -(0,N)- E_territorio_versao
+REL_010 -(1,1)- E_vinculo_territorial
+
+relationship "Vincula como destino" as REL_011 {
+}
+REL_011 -(0,N)- E_territorio_versao
+REL_011 -(1,1)- E_vinculo_territorial
+
+relationship "Localiza versão do imóvel" as REL_012 {
+}
+REL_012 -(0,N)- E_municipio
+REL_012 -(1,1)- E_imovel_versao
+
+relationship "Possui versão" as REL_013 {
+}
+REL_013 -(1,N)- E_imovel
+REL_013 -(1,1)- E_imovel_versao
+
+relationship "Possui referência" as REL_014 {
+}
+REL_014 -(0,N)- E_imovel_versao
+REL_014 -(1,1)- E_imovel_territorio
+
+relationship "Localiza imóvel" as REL_015 {
+}
+REL_015 -(0,N)- E_territorio_versao
+REL_015 -(1,1)- E_imovel_territorio
+
+relationship "É dono do território" as REL_016 {
+}
+REL_016 -(0,N)- E_cliente
+REL_016 -(1,1)- E_territorio
+
+relationship "É dono do cadastro" as REL_017 {
+}
+REL_017 -(0,N)- E_cliente
+REL_017 -(1,1)- E_imovel
+
+relationship "Restringe concessão" as REL_018 {
+}
+REL_018 -(0,N)- E_unidade_organizacional
+REL_018 -(0,1)- E_concessao_papel
+
+relationship "Organiza unidades" as REL_019 {
+}
+REL_019 -(0,N)- E_cliente
+REL_019 -(1,1)- E_unidade_organizacional
+
+relationship "Organiza" as REL_020 {
+}
+REL_020 -(0,N)- E_ciclo
+REL_020 -(0,1)- E_planejamento
+
+relationship "Define atividade" as REL_021 {
+}
+REL_021 -(0,N)- E_modalidade_versao
+REL_021 -(1,1)- E_planejamento
+
+relationship "Delimita" as REL_022 {
+}
+REL_022 -(0,N)- E_territorio
+REL_022 -(1,1)- E_planejamento
+
+relationship "Possui atribuição" as REL_023 {
+}
+REL_023 -(0,N)- E_planejamento
+REL_023 -(1,1)- E_atribuicao
+
+relationship "Assume atribuição" as REL_024 {
+}
+REL_024 -(0,N)- E_vinculo_usuario
+REL_024 -(1,1)- E_atribuicao
+
+relationship "Seleciona" as REL_025 {
+}
+REL_025 -(0,N)- E_planejamento
+REL_025 -(1,1)- E_item_planejamento
+
+relationship "É selecionado" as REL_026 {
+}
+REL_026 -(0,N)- E_imovel
+REL_026 -(1,1)- E_item_planejamento
+
+relationship "Executa jornada" as REL_027 {
+}
+REL_027 -(0,N)- E_vinculo_usuario
+REL_027 -(1,1)- E_jornada
+
+relationship "Recebe tentativa" as REL_028 {
+}
+REL_028 -(0,N)- E_imovel
+REL_028 -(1,1)- E_visita
+
+relationship "Origina retorno" as REL_029 {
+}
+REL_029 -(0,N)- E_visita
+REL_029 -(0,1)- E_visita
+
+relationship "Possui revisão" as REL_030 {
+}
+REL_030 -(1,N)- E_visita
+REL_030 -(1,1)- E_visita_revisao
+
+relationship "Contextualiza" as REL_031 {
+}
+REL_031 -(0,N)- E_imovel_versao
+REL_031 -(1,1)- E_visita_revisao
+
+relationship "Agrupa" as REL_032 {
+}
+REL_032 -(0,N)- E_jornada
+REL_032 -(1,1)- E_visita_revisao
+
+relationship "Fundamenta" as REL_033 {
+}
+REL_033 -(0,N)- E_item_planejamento
+REL_033 -(0,1)- E_visita_revisao
+
+relationship "Classifica" as REL_034 {
+}
+REL_034 -(0,N)- E_modalidade_versao
+REL_034 -(1,1)- E_visita_revisao
+
+relationship "Registra autoria" as REL_035 {
+}
+REL_035 -(0,N)- E_vinculo_usuario
+REL_035 -(1,1)- E_visita_revisao
+
+relationship "Gera pendência" as REL_036 {
+}
+REL_036 -(0,N)- E_visita
+REL_036 -(1,1)- E_pendencia_campo
+
+relationship "Resolve pendência" as REL_037 {
+}
+REL_037 -(0,N)- E_visita
+REL_037 -(0,1)- E_pendencia_campo
+
+relationship "Recebe operação" as REL_038 {
+}
+REL_038 -(0,N)- E_visita
+REL_038 -(1,1)- E_operacao_sync
+
+relationship "Envia operação" as REL_039 {
+}
+REL_039 -(0,N)- E_vinculo_usuario
+REL_039 -(1,1)- E_operacao_sync
+
+relationship "É responsável por" as REL_040 {
+}
+REL_040 -(0,N)- E_unidade_organizacional
+REL_040 -(1,1)- E_planejamento
+
+relationship "É responsável por" as REL_041 {
+}
+REL_041 -(0,N)- E_unidade_organizacional
+REL_041 -(1,1)- E_jornada
+
+relationship "Registra depósito" as REL_042 {
+}
+REL_042 -(0,N)- E_visita_revisao
+REL_042 -(1,1)- E_observacao_deposito
+
+relationship "Classifica depósito" as REL_043 {
+}
+REL_043 -(0,N)- E_categoria_deposito_versao
+REL_043 -(1,1)- E_observacao_deposito
+
+relationship "Registra ação" as REL_044 {
+}
+REL_044 -(0,N)- E_visita_revisao
+REL_044 -(1,1)- E_acao_controle
+
+relationship "Possui alvo" as REL_045 {
+}
+REL_045 -(0,N)- E_acao_controle
+REL_045 -(1,1)- E_alvo_controle
+
+relationship "Identifica alvo" as REL_046 {
+}
+REL_046 -(0,N)- E_observacao_deposito
+REL_046 -(0,1)- E_alvo_controle
+
+relationship "Utiliza aplicação" as REL_047 {
+}
+REL_047 -(0,N)- E_acao_controle
+REL_047 -(1,1)- E_aplicacao_produto
+
+relationship "Identifica produto aplicado" as REL_048 {
+}
+REL_048 -(0,N)- E_produto_versao
+REL_048 -(1,1)- E_aplicacao_produto
+
+relationship "Compõe carga" as REL_049 {
+}
+REL_049 -(0,N)- E_produto_versao
+REL_049 -(1,1)- E_carga_produto
+
+relationship "Abastece aplicação" as REL_050 {
+}
+REL_050 -(0,N)- E_carga_produto
+REL_050 -(0,1)- E_aplicacao_produto
+
+relationship "Origina amostra" as REL_051 {
+}
+REL_051 -(0,N)- E_visita_revisao
+REL_051 -(1,1)- E_amostra
+
+relationship "Localiza coleta" as REL_052 {
+}
+REL_052 -(0,N)- E_observacao_deposito
+REL_052 -(0,1)- E_amostra
+
+relationship "Possui associação" as REL_053 {
+}
+REL_053 -(0,N)- E_amostra
+REL_053 -(1,1)- E_amostra_recipiente
+
+relationship "Compõe associação" as REL_054 {
+}
+REL_054 -(0,N)- E_recipiente_coleta
+REL_054 -(1,1)- E_amostra_recipiente
+
+relationship "Possui movimento" as REL_055 {
+}
+REL_055 -(0,N)- E_amostra
+REL_055 -(1,1)- E_movimento_amostra
+
+relationship "Recebe análise" as REL_056 {
+}
+REL_056 -(0,N)- E_amostra
+REL_056 -(1,1)- E_resultado_analise
+
+relationship "É corrigido por" as REL_057 {
+}
+REL_057 -(0,N)- E_resultado_analise
+REL_057 -(0,1)- E_resultado_analise
+
+relationship "Identifica espécimes" as REL_058 {
+}
+REL_058 -(0,N)- E_resultado_analise
+REL_058 -(1,1)- E_contagem_especime
+
+relationship "É responsável por" as REL_059 {
+}
+REL_059 -(0,N)- E_unidade_organizacional
+REL_059 -(1,1)- E_carga_produto
+
+relationship "Inclui item" as REL_060 {
+}
+REL_060 -(0,N)- E_consolidacao
+REL_060 -(1,1)- E_item_consolidacao
+
+relationship "Fundamenta item" as REL_061 {
+}
+REL_061 -(0,N)- E_visita_revisao
+REL_061 -(1,1)- E_item_consolidacao
+
+relationship "Produz indicador" as REL_062 {
+}
+REL_062 -(0,N)- E_consolidacao
+REL_062 -(1,1)- E_indicador_consolidado
+
+relationship "Recebe conferência" as REL_063 {
+}
+REL_063 -(0,N)- E_consolidacao
+REL_063 -(1,1)- E_evento_conferencia
+
+relationship "Realiza conferência" as REL_064 {
+}
+REL_064 -(0,N)- E_vinculo_usuario
+REL_064 -(1,1)- E_evento_conferencia
+
+relationship "Fundamenta documento" as REL_065 {
+}
+REL_065 -(0,N)- E_consolidacao
+REL_065 -(1,1)- E_documento_emitido
+
+relationship "Possui envio" as REL_066 {
+}
+REL_066 -(0,N)- E_documento_emitido
+REL_066 -(1,1)- E_envio_documento
+
+relationship "Subsidia decisão" as REL_067 {
+}
+REL_067 -(0,N)- E_consolidacao
+REL_067 -(0,1)- E_decisao_gerencial
+
+relationship "Subsidia decisão" as REL_068 {
+}
+REL_068 -(0,N)- E_previsao_territorial
+REL_068 -(0,1)- E_decisao_gerencial
+
+relationship "Registra decisão" as REL_069 {
+}
+REL_069 -(0,N)- E_vinculo_usuario
+REL_069 -(1,1)- E_decisao_gerencial
+
+relationship "Origina ocorrência" as REL_070 {
+}
+REL_070 -(0,N)- E_visita_revisao
+REL_070 -(0,1)- E_ocorrencia
+
+relationship "Orienta tarefa" as REL_071 {
+}
+REL_071 -(0,N)- E_decisao_gerencial
+REL_071 -(0,1)- E_tarefa
+
+relationship "Motiva tarefa" as REL_072 {
+}
+REL_072 -(0,N)- E_ocorrencia
+REL_072 -(0,1)- E_tarefa
+
+relationship "Possui evento" as REL_073 {
+}
+REL_073 -(0,N)- E_tarefa
+REL_073 -(1,1)- E_evento_tarefa
+
+relationship "Recebe encaminhamento" as REL_074 {
+}
+REL_074 -(0,N)- E_ocorrencia
+REL_074 -(1,1)- E_encaminhamento_ocorrencia
+
+relationship "Possui resposta" as REL_075 {
+}
+REL_075 -(0,N)- E_encaminhamento_ocorrencia
+REL_075 -(1,1)- E_evento_tratativa
+
+relationship "Documenta visita" as REL_076 {
+}
+REL_076 -(0,N)- E_visita_revisao
+REL_076 -(0,1)- E_anexo
+
+relationship "Documenta ocorrência" as REL_077 {
+}
+REL_077 -(0,N)- E_ocorrencia
+REL_077 -(0,1)- E_anexo
+
+relationship "Possui anotação" as REL_078 {
+}
+REL_078 -(0,N)- E_anexo
+REL_078 -(0,1)- E_anexo
+
+relationship "É responsável por" as REL_079 {
+}
+REL_079 -(0,N)- E_unidade_organizacional
+REL_079 -(1,1)- E_consolidacao
+
+relationship "É responsável por" as REL_080 {
+}
+REL_080 -(0,N)- E_unidade_organizacional
+REL_080 -(1,1)- E_ocorrencia
+
+relationship "Fornece lote" as REL_081 {
+}
+REL_081 -(0,N)- E_fonte_dados
+REL_081 -(1,1)- E_lote_ingestao
+
+relationship "Define código externo" as REL_082 {
+}
+REL_082 -(0,N)- E_fonte_dados
+REL_082 -(1,1)- E_mapeamento_externo
+
+relationship "Corresponde a imóvel" as REL_083 {
+}
+REL_083 -(0,N)- E_imovel
+REL_083 -(0,1)- E_mapeamento_externo
+
+relationship "Corresponde a território" as REL_084 {
+}
+REL_084 -(0,N)- E_territorio
+REL_084 -(0,1)- E_mapeamento_externo
+
+relationship "Possui origem" as REL_085 {
+}
+REL_085 -(0,N)- E_pessoa
+REL_085 -(1,1)- E_pessoa_fonte
+
+relationship "Identifica pessoa" as REL_086 {
+}
+REL_086 -(0,N)- E_fonte_dados
+REL_086 -(1,1)- E_pessoa_fonte
+
+relationship "Possui vínculo residencial" as REL_087 {
+}
+REL_087 -(0,N)- E_pessoa
+REL_087 -(1,1)- E_vinculo_residencia
+
+relationship "Localiza residência" as REL_088 {
+}
+REL_088 -(0,N)- E_imovel
+REL_088 -(1,1)- E_vinculo_residencia
+
+relationship "Informa residência" as REL_089 {
+}
+REL_089 -(0,N)- E_fonte_dados
+REL_089 -(1,1)- E_vinculo_residencia
+
+relationship "Fornece registro" as REL_090 {
+}
+REL_090 -(0,N)- E_lote_ingestao
+REL_090 -(1,1)- E_registro_saude
+
+relationship "Identifica registro" as REL_091 {
+}
+REL_091 -(0,N)- E_pessoa
+REL_091 -(0,1)- E_registro_saude
+
+relationship "Localiza registro" as REL_092 {
+}
+REL_092 -(0,N)- E_territorio
+REL_092 -(0,1)- E_registro_saude
+
+relationship "Possui linhagem" as REL_093 {
+}
+REL_093 -(0,N)- E_dataset_versao
+REL_093 -(1,1)- E_dataset_lote
+
+relationship "Compõe linhagem" as REL_094 {
+}
+REL_094 -(0,N)- E_lote_ingestao
+REL_094 -(1,1)- E_dataset_lote
+
+relationship "Treina versão" as REL_095 {
+}
+REL_095 -(0,N)- E_dataset_versao
+REL_095 -(1,1)- E_modelo_versao
+
+relationship "É executado" as REL_096 {
+}
+REL_096 -(0,N)- E_modelo_versao
+REL_096 -(1,1)- E_execucao_modelo
+
+relationship "Fornece entrada" as REL_097 {
+}
+REL_097 -(0,N)- E_dataset_versao
+REL_097 -(1,1)- E_execucao_modelo
+
+relationship "Produz previsão" as REL_098 {
+}
+REL_098 -(0,N)- E_execucao_modelo
+REL_098 -(1,1)- E_previsao_territorial
+
+relationship "Baseia simulação" as REL_099 {
+}
+REL_099 -(0,N)- E_execucao_modelo
+REL_099 -(1,1)- E_cenario_simulacao
+
+relationship "É responsável por" as REL_100 {
+}
+REL_100 -(0,N)- E_unidade_organizacional
+REL_100 -(1,1)- E_fonte_dados
+
+relationship "É responsável por" as REL_101 {
+}
+REL_101 -(0,N)- E_unidade_organizacional
+REL_101 -(1,1)- E_dataset_versao
+
+relationship "É responsável por" as REL_102 {
+}
+REL_102 -(0,N)- E_unidade_organizacional
+REL_102 -(1,1)- E_modelo_versao
+
+relationship "Define política" as REL_103 {
+}
+REL_103 -(0,N)- E_vinculo_usuario
+REL_103 -(1,1)- E_politica_visibilidade
+
+relationship "Delimita política" as REL_104 {
+}
+REL_104 -(0,N)- E_territorio
+REL_104 -(0,1)- E_politica_visibilidade
+
+relationship "Autoriza público" as REL_105 {
+}
+REL_105 -(0,N)- E_politica_visibilidade
+REL_105 -(1,1)- E_publico_autorizado
+
+relationship "Integra público" as REL_106 {
+}
+REL_106 -(0,N)- E_vinculo_usuario
+REL_106 -(1,1)- E_publico_autorizado
+
+relationship "Configura agenda" as REL_107 {
+}
+REL_107 -(0,N)- E_vinculo_usuario
+REL_107 -(1,1)- E_agenda_predicao
+
+relationship "Rege agenda" as REL_108 {
+}
+REL_108 -(0,N)- E_politica_visibilidade
+REL_108 -(1,1)- E_agenda_predicao
+
+relationship "Delimita agenda" as REL_109 {
+}
+REL_109 -(0,N)- E_territorio
+REL_109 -(0,1)- E_agenda_predicao
+
+relationship "Programa horário" as REL_110 {
+}
+REL_110 -(1,N)- E_agenda_predicao
+REL_110 -(1,1)- E_horario_agenda
+
+relationship "Possui destinatário" as REL_111 {
+}
+REL_111 -(0,N)- E_agenda_predicao
+REL_111 -(1,1)- E_destinatario_agenda
+
+relationship "Recebe programação" as REL_112 {
+}
+REL_112 -(0,N)- E_vinculo_usuario
+REL_112 -(1,1)- E_destinatario_agenda
+
+relationship "Gera entrega" as REL_113 {
+}
+REL_113 -(0,N)- E_horario_agenda
+REL_113 -(1,1)- E_entrega_predicao
+
+relationship "Recebe entrega" as REL_114 {
+}
+REL_114 -(0,N)- E_vinculo_usuario
+REL_114 -(1,1)- E_entrega_predicao
+
+relationship "Rege entrega" as REL_115 {
+}
+REL_115 -(0,N)- E_politica_visibilidade
+REL_115 -(1,1)- E_entrega_predicao
+
+relationship "Fundamenta entrega" as REL_116 {
+}
+REL_116 -(0,N)- E_previsao_territorial
+REL_116 -(0,1)- E_entrega_predicao
+
+relationship "Orienta comunicação" as REL_117 {
+}
+REL_117 -(0,N)- E_decisao_gerencial
+REL_117 -(1,1)- E_comunicacao_equipe
+
+relationship "Contextualiza comunicação" as REL_118 {
+}
+REL_118 -(0,N)- E_entrega_predicao
+REL_118 -(0,1)- E_comunicacao_equipe
+
+relationship "Possui destinatário" as REL_119 {
+}
+REL_119 -(0,N)- E_comunicacao_equipe
+REL_119 -(1,1)- E_destinatario_comunicacao
+
+relationship "Recebe comunicação" as REL_120 {
+}
+REL_120 -(0,N)- E_vinculo_usuario
+REL_120 -(1,1)- E_destinatario_comunicacao
+
+relationship "É responsável por" as REL_121 {
+}
+REL_121 -(0,N)- E_unidade_organizacional
+REL_121 -(1,1)- E_politica_visibilidade
+
+relationship "É responsável por" as REL_122 {
+}
+REL_122 -(0,N)- E_unidade_organizacional
+REL_122 -(1,1)- E_agenda_predicao
+
+relationship "Especializa cliente" as REL_123 {
+}
+REL_123 -(0,1)- E_cliente
+REL_123 -(1,1)- E_prefeitura
+
+relationship "Identifica município" as REL_124 {
+}
+REL_124 -(0,N)- E_municipio
+REL_124 -(1,1)- E_prefeitura
+
+relationship "Subordina unidade" as REL_125 {
+}
+REL_125 -(0,N)- E_unidade_organizacional
+REL_125 -(0,1)- E_unidade_organizacional
+
+relationship "Vincula usuário" as REL_126 {
+}
+REL_126 -(0,N)- E_cliente
+REL_126 -(1,1)- E_vinculo_usuario
+
+relationship "Possui lotação" as REL_127 {
+}
+REL_127 -(0,N)- E_vinculo_usuario
+REL_127 -(1,1)- E_lotacao
+
+relationship "Recebe lotação" as REL_128 {
+}
+REL_128 -(0,N)- E_unidade_organizacional
+REL_128 -(1,1)- E_lotacao
+
+relationship "Delimita concessão" as REL_129 {
+}
+REL_129 -(0,N)- E_unidade_organizacional
+REL_129 -(0,1)- E_concessao_papel
+
+relationship "Habilita módulo" as REL_130 {
+}
+REL_130 -(0,N)- E_cliente
+REL_130 -(1,1)- E_cliente_modulo
+
+relationship "Identifica módulo" as REL_131 {
+}
+REL_131 -(0,N)- E_modulo
+REL_131 -(1,1)- E_cliente_modulo
+
+relationship "Permite habilitar" as REL_132 {
+}
+REL_132 -(0,N)- E_cliente_modulo
+REL_132 -(1,1)- E_unidade_modulo
+
+relationship "Habilita na unidade" as REL_133 {
+}
+REL_133 -(0,N)- E_unidade_organizacional
+REL_133 -(1,1)- E_unidade_modulo
+
+relationship "Possui configuração" as REL_134 {
+}
+REL_134 -(0,N)- E_cliente
+REL_134 -(1,1)- E_configuracao_versao
+
+relationship "Especializa configuração" as REL_135 {
+}
+REL_135 -(0,N)- E_unidade_organizacional
+REL_135 -(0,1)- E_configuracao_versao
+
+relationship "Compartilha como origem" as REL_136 {
+}
+REL_136 -(0,N)- E_unidade_organizacional
+REL_136 -(1,1)- E_compartilhamento_autorizado
+
+relationship "Recebe compartilhamento" as REL_137 {
+}
+REL_137 -(0,N)- E_unidade_organizacional
+REL_137 -(1,1)- E_compartilhamento_autorizado
+
+relationship "Referencia cliente_id" as REL_138 {
+}
+REL_138 -(0,N)- E_cliente
+REL_138 -(1,1)- E_lotacao
+
+relationship "Referencia cliente_id" as REL_139 {
+}
+REL_139 -(0,N)- E_cliente
+REL_139 -(1,1)- E_unidade_modulo
+
+relationship "Referencia modulo_id" as REL_140 {
+}
+REL_140 -(0,N)- E_modulo
+REL_140 -(1,1)- E_configuracao_versao
+
+relationship "Referencia autor_id" as REL_141 {
+}
+REL_141 -(0,N)- E_vinculo_usuario
+REL_141 -(1,1)- E_configuracao_versao
+
+relationship "Referencia aprovador_id" as REL_142 {
+}
+REL_142 -(0,N)- E_vinculo_usuario
+REL_142 -(1,1)- E_configuracao_versao
+
+relationship "Referencia cliente_id" as REL_143 {
+}
+REL_143 -(0,N)- E_cliente
+REL_143 -(1,1)- E_compartilhamento_autorizado
+
+relationship "Referencia aprovador_id" as REL_144 {
+}
+REL_144 -(0,N)- E_vinculo_usuario
+REL_144 -(1,1)- E_compartilhamento_autorizado
+
+relationship "Referencia cliente_id" as REL_145 {
+}
+REL_145 -(0,N)- E_cliente
+REL_145 -(1,1)- E_papel
+
+relationship "Referencia cliente_id" as REL_146 {
+}
+REL_146 -(0,N)- E_cliente
+REL_146 -(1,1)- E_concessao_papel
+
+relationship "Referencia cliente_id" as REL_147 {
+}
+REL_147 -(0,N)- E_cliente
+REL_147 -(1,1)- E_papel_permissao
+
+relationship "Referencia cliente_id" as REL_148 {
+}
+REL_148 -(0,N)- E_cliente
+REL_148 -(1,1)- E_territorio_versao
+
+relationship "Referencia cliente_id" as REL_149 {
+}
+REL_149 -(0,N)- E_cliente
+REL_149 -(1,1)- E_vinculo_territorial
+
+relationship "Referencia cliente_id" as REL_150 {
+}
+REL_150 -(0,N)- E_cliente
+REL_150 -(1,1)- E_imovel_versao
+
+relationship "Referencia cliente_id" as REL_151 {
+}
+REL_151 -(0,N)- E_cliente
+REL_151 -(1,1)- E_imovel_territorio
+
+relationship "Referencia cliente_id" as REL_152 {
+}
+REL_152 -(0,N)- E_cliente
+REL_152 -(1,1)- E_modalidade_versao
+
+relationship "Referencia cliente_id" as REL_153 {
+}
+REL_153 -(0,N)- E_cliente
+REL_153 -(1,1)- E_ciclo
+
+relationship "Referencia cliente_id" as REL_154 {
+}
+REL_154 -(0,N)- E_cliente
+REL_154 -(1,1)- E_planejamento
+
+relationship "Referencia aprovador_id" as REL_155 {
+}
+REL_155 -(0,N)- E_vinculo_usuario
+REL_155 -(0,1)- E_planejamento
+
+relationship "Referencia cliente_id" as REL_156 {
+}
+REL_156 -(0,N)- E_cliente
+REL_156 -(1,1)- E_atribuicao
+
+relationship "Referencia cliente_id" as REL_157 {
+}
+REL_157 -(0,N)- E_cliente
+REL_157 -(1,1)- E_item_planejamento
+
+relationship "Referencia cliente_id" as REL_158 {
+}
+REL_158 -(0,N)- E_cliente
+REL_158 -(1,1)- E_jornada
+
+relationship "Referencia cliente_id" as REL_159 {
+}
+REL_159 -(0,N)- E_cliente
+REL_159 -(1,1)- E_visita
+
+relationship "Referencia cliente_id" as REL_160 {
+}
+REL_160 -(0,N)- E_cliente
+REL_160 -(1,1)- E_visita_revisao
+
+relationship "Referencia unidade_responsavel_id" as REL_161 {
+}
+REL_161 -(0,N)- E_unidade_organizacional
+REL_161 -(1,1)- E_visita_revisao
+
+relationship "Referencia cliente_id" as REL_162 {
+}
+REL_162 -(0,N)- E_cliente
+REL_162 -(1,1)- E_pendencia_campo
+
+relationship "Referencia cliente_id" as REL_163 {
+}
+REL_163 -(0,N)- E_cliente
+REL_163 -(1,1)- E_operacao_sync
+
+relationship "Referencia cliente_id" as REL_164 {
+}
+REL_164 -(0,N)- E_cliente
+REL_164 -(1,1)- E_categoria_deposito_versao
+
+relationship "Referencia cliente_id" as REL_165 {
+}
+REL_165 -(0,N)- E_cliente
+REL_165 -(1,1)- E_observacao_deposito
+
+relationship "Referencia unidade_responsavel_id" as REL_166 {
+}
+REL_166 -(0,N)- E_unidade_organizacional
+REL_166 -(1,1)- E_observacao_deposito
+
+relationship "Referencia cliente_id" as REL_167 {
+}
+REL_167 -(0,N)- E_cliente
+REL_167 -(1,1)- E_acao_controle
+
+relationship "Referencia unidade_responsavel_id" as REL_168 {
+}
+REL_168 -(0,N)- E_unidade_organizacional
+REL_168 -(1,1)- E_acao_controle
+
+relationship "Referencia cliente_id" as REL_169 {
+}
+REL_169 -(0,N)- E_cliente
+REL_169 -(1,1)- E_alvo_controle
+
+relationship "Referencia cliente_id" as REL_170 {
+}
+REL_170 -(0,N)- E_cliente
+REL_170 -(1,1)- E_produto_versao
+
+relationship "Referencia cliente_id" as REL_171 {
+}
+REL_171 -(0,N)- E_cliente
+REL_171 -(1,1)- E_carga_produto
+
+relationship "Referencia cliente_id" as REL_172 {
+}
+REL_172 -(0,N)- E_cliente
+REL_172 -(1,1)- E_aplicacao_produto
+
+relationship "Referencia unidade_responsavel_id" as REL_173 {
+}
+REL_173 -(0,N)- E_unidade_organizacional
+REL_173 -(1,1)- E_aplicacao_produto
+
+relationship "Referencia cliente_id" as REL_174 {
+}
+REL_174 -(0,N)- E_cliente
+REL_174 -(1,1)- E_amostra
+
+relationship "Referencia coletor_id" as REL_175 {
+}
+REL_175 -(0,N)- E_vinculo_usuario
+REL_175 -(1,1)- E_amostra
+
+relationship "Referencia unidade_responsavel_id" as REL_176 {
+}
+REL_176 -(0,N)- E_unidade_organizacional
+REL_176 -(1,1)- E_amostra
+
+relationship "Referencia cliente_id" as REL_177 {
+}
+REL_177 -(0,N)- E_cliente
+REL_177 -(1,1)- E_recipiente_coleta
+
+relationship "Referencia cliente_id" as REL_178 {
+}
+REL_178 -(0,N)- E_cliente
+REL_178 -(1,1)- E_amostra_recipiente
+
+relationship "Referencia cliente_id" as REL_179 {
+}
+REL_179 -(0,N)- E_cliente
+REL_179 -(1,1)- E_movimento_amostra
+
+relationship "Referencia responsavel_id" as REL_180 {
+}
+REL_180 -(0,N)- E_vinculo_usuario
+REL_180 -(1,1)- E_movimento_amostra
+
+relationship "Referencia cliente_id" as REL_181 {
+}
+REL_181 -(0,N)- E_cliente
+REL_181 -(1,1)- E_resultado_analise
+
+relationship "Referencia responsavel_id" as REL_182 {
+}
+REL_182 -(0,N)- E_vinculo_usuario
+REL_182 -(1,1)- E_resultado_analise
+
+relationship "Referencia unidade_responsavel_id" as REL_183 {
+}
+REL_183 -(0,N)- E_unidade_organizacional
+REL_183 -(1,1)- E_resultado_analise
+
+relationship "Referencia cliente_id" as REL_184 {
+}
+REL_184 -(0,N)- E_cliente
+REL_184 -(1,1)- E_contagem_especime
+
+relationship "Referencia cliente_id" as REL_185 {
+}
+REL_185 -(0,N)- E_cliente
+REL_185 -(1,1)- E_consolidacao
+
+relationship "Referencia aprovador_id" as REL_186 {
+}
+REL_186 -(0,N)- E_vinculo_usuario
+REL_186 -(0,1)- E_consolidacao
+
+relationship "Referencia cliente_id" as REL_187 {
+}
+REL_187 -(0,N)- E_cliente
+REL_187 -(1,1)- E_item_consolidacao
+
+relationship "Referencia visita_id" as REL_188 {
+}
+REL_188 -(0,N)- E_visita
+REL_188 -(1,1)- E_item_consolidacao
+
+relationship "Referencia cliente_id" as REL_189 {
+}
+REL_189 -(0,N)- E_cliente
+REL_189 -(1,1)- E_indicador_consolidado
+
+relationship "Referencia cliente_id" as REL_190 {
+}
+REL_190 -(0,N)- E_cliente
+REL_190 -(1,1)- E_evento_conferencia
+
+relationship "Referencia cliente_id" as REL_191 {
+}
+REL_191 -(0,N)- E_cliente
+REL_191 -(1,1)- E_documento_emitido
+
+relationship "Referencia cliente_id" as REL_192 {
+}
+REL_192 -(0,N)- E_cliente
+REL_192 -(1,1)- E_envio_documento
+
+relationship "Referencia cliente_id" as REL_193 {
+}
+REL_193 -(0,N)- E_cliente
+REL_193 -(1,1)- E_decisao_gerencial
+
+relationship "Referencia cliente_id" as REL_194 {
+}
+REL_194 -(0,N)- E_cliente
+REL_194 -(1,1)- E_ocorrencia
+
+relationship "Referencia autor_id" as REL_195 {
+}
+REL_195 -(0,N)- E_vinculo_usuario
+REL_195 -(1,1)- E_ocorrencia
+
+relationship "Referencia cliente_id" as REL_196 {
+}
+REL_196 -(0,N)- E_cliente
+REL_196 -(1,1)- E_tarefa
+
+relationship "Referencia visita_origem_id" as REL_197 {
+}
+REL_197 -(0,N)- E_visita
+REL_197 -(0,1)- E_tarefa
+
+relationship "Referencia atribuicao_id" as REL_198 {
+}
+REL_198 -(0,N)- E_atribuicao
+REL_198 -(1,1)- E_tarefa
+
+relationship "Referencia cliente_id" as REL_199 {
+}
+REL_199 -(0,N)- E_cliente
+REL_199 -(1,1)- E_evento_tarefa
+
+relationship "Referencia autor_id" as REL_200 {
+}
+REL_200 -(0,N)- E_vinculo_usuario
+REL_200 -(1,1)- E_evento_tarefa
+
+relationship "Referencia visita_executada_id" as REL_201 {
+}
+REL_201 -(0,N)- E_visita
+REL_201 -(0,1)- E_evento_tarefa
+
+relationship "Referencia cliente_id" as REL_202 {
+}
+REL_202 -(0,N)- E_cliente
+REL_202 -(1,1)- E_encaminhamento_ocorrencia
+
+relationship "Referencia unidade_destino_id" as REL_203 {
+}
+REL_203 -(0,N)- E_unidade_organizacional
+REL_203 -(0,1)- E_encaminhamento_ocorrencia
+
+relationship "Referencia cliente_id" as REL_204 {
+}
+REL_204 -(0,N)- E_cliente
+REL_204 -(1,1)- E_evento_tratativa
+
+relationship "Referencia autor_id" as REL_205 {
+}
+REL_205 -(0,N)- E_vinculo_usuario
+REL_205 -(1,1)- E_evento_tratativa
+
+relationship "Referencia cliente_id" as REL_206 {
+}
+REL_206 -(0,N)- E_cliente
+REL_206 -(1,1)- E_anexo
+
+relationship "Referencia autor_id" as REL_207 {
+}
+REL_207 -(0,N)- E_vinculo_usuario
+REL_207 -(1,1)- E_anexo
+
+relationship "Referencia cliente_id" as REL_208 {
+}
+REL_208 -(0,N)- E_cliente
+REL_208 -(1,1)- E_fonte_dados
+
+relationship "Referencia cliente_id" as REL_209 {
+}
+REL_209 -(0,N)- E_cliente
+REL_209 -(1,1)- E_lote_ingestao
+
+relationship "Referencia cliente_id" as REL_210 {
+}
+REL_210 -(0,N)- E_cliente
+REL_210 -(1,1)- E_mapeamento_externo
+
+relationship "Referencia cliente_id" as REL_211 {
+}
+REL_211 -(0,N)- E_cliente
+REL_211 -(1,1)- E_pessoa
+
+relationship "Referencia cliente_id" as REL_212 {
+}
+REL_212 -(0,N)- E_cliente
+REL_212 -(1,1)- E_pessoa_fonte
+
+relationship "Referencia cliente_id" as REL_213 {
+}
+REL_213 -(0,N)- E_cliente
+REL_213 -(1,1)- E_vinculo_residencia
+
+relationship "Referencia confirmado_por_id" as REL_214 {
+}
+REL_214 -(0,N)- E_vinculo_usuario
+REL_214 -(0,1)- E_vinculo_residencia
+
+relationship "Referencia cliente_id" as REL_215 {
+}
+REL_215 -(0,N)- E_cliente
+REL_215 -(1,1)- E_registro_saude
+
+relationship "Referencia unidade_responsavel_id" as REL_216 {
+}
+REL_216 -(0,N)- E_unidade_organizacional
+REL_216 -(1,1)- E_registro_saude
+
+relationship "Referencia cliente_id" as REL_217 {
+}
+REL_217 -(0,N)- E_cliente
+REL_217 -(1,1)- E_dataset_versao
+
+relationship "Referencia cliente_id" as REL_218 {
+}
+REL_218 -(0,N)- E_cliente
+REL_218 -(1,1)- E_dataset_lote
+
+relationship "Referencia cliente_id" as REL_219 {
+}
+REL_219 -(0,N)- E_cliente
+REL_219 -(1,1)- E_modelo_versao
+
+relationship "Referencia aprovado_por_id" as REL_220 {
+}
+REL_220 -(0,N)- E_vinculo_usuario
+REL_220 -(0,1)- E_modelo_versao
+
+relationship "Referencia cliente_id" as REL_221 {
+}
+REL_221 -(0,N)- E_cliente
+REL_221 -(1,1)- E_execucao_modelo
+
+relationship "Referencia cliente_id" as REL_222 {
+}
+REL_222 -(0,N)- E_cliente
+REL_222 -(1,1)- E_previsao_territorial
+
+relationship "Referencia territorio_versao_id" as REL_223 {
+}
+REL_223 -(0,N)- E_territorio_versao
+REL_223 -(1,1)- E_previsao_territorial
+
+relationship "Referencia unidade_responsavel_id" as REL_224 {
+}
+REL_224 -(0,N)- E_unidade_organizacional
+REL_224 -(1,1)- E_previsao_territorial
+
+relationship "Referencia cliente_id" as REL_225 {
+}
+REL_225 -(0,N)- E_cliente
+REL_225 -(1,1)- E_cenario_simulacao
+
+relationship "Referencia unidade_responsavel_id" as REL_226 {
+}
+REL_226 -(0,N)- E_unidade_organizacional
+REL_226 -(1,1)- E_cenario_simulacao
+
+relationship "Referencia autor_id" as REL_227 {
+}
+REL_227 -(0,N)- E_vinculo_usuario
+REL_227 -(1,1)- E_cenario_simulacao
+
+relationship "Referencia cliente_id" as REL_228 {
+}
+REL_228 -(0,N)- E_cliente
+REL_228 -(1,1)- E_politica_visibilidade
+
+relationship "Referencia cliente_id" as REL_229 {
+}
+REL_229 -(0,N)- E_cliente
+REL_229 -(1,1)- E_publico_autorizado
+
+relationship "Referencia cliente_id" as REL_230 {
+}
+REL_230 -(0,N)- E_cliente
+REL_230 -(1,1)- E_agenda_predicao
+
+relationship "Referencia cliente_id" as REL_231 {
+}
+REL_231 -(0,N)- E_cliente
+REL_231 -(1,1)- E_horario_agenda
+
+relationship "Referencia cliente_id" as REL_232 {
+}
+REL_232 -(0,N)- E_cliente
+REL_232 -(1,1)- E_destinatario_agenda
+
+relationship "Referencia cliente_id" as REL_233 {
+}
+REL_233 -(0,N)- E_cliente
+REL_233 -(1,1)- E_entrega_predicao
+
+relationship "Referencia cliente_id" as REL_234 {
+}
+REL_234 -(0,N)- E_cliente
+REL_234 -(1,1)- E_comunicacao_equipe
+
+relationship "Referencia autor_id" as REL_235 {
+}
+REL_235 -(0,N)- E_vinculo_usuario
+REL_235 -(1,1)- E_comunicacao_equipe
+
+relationship "Referencia cliente_id" as REL_236 {
+}
+REL_236 -(0,N)- E_cliente
+REL_236 -(1,1)- E_destinatario_comunicacao
+
+' REGRAS TRANSVERSAIS QUE EXIGEM DDL/TRIGGERS/POLÍTICAS NO SCHEMA FÍSICO:
+' 1. UNIQUE(cliente_id, operation_uuid); reenvio não gera visita.
+' 2. Revisão e snapshot aprovados são imutáveis; correção gera versão nova.
+' 3. Item de consolidação usa uma revisão por visita; FK comprova que a revisão pertence à visita.
+' 4. Proibir ciclos em unidade-pai, retorno de visita, original de anexo e substituição de resultado.
+' 5. Mapeamento externo: um alvo (imóvel OU território); anexo: uma origem principal.
+' 6. Quantidades não negativas; zero, desconhecido e não aplicável são diferentes.
+' 7. Não somar preparo da carga em cada aplicação; preservar produto/unidade.
+' 8. Agenda/ocorrência/destinatário únicos; leitura e comunicação não comprovam execução.
+' 9. Revalidar concessão/lotação/módulo, RLS por cliente/unidade e compartilhamento vigente.
+' 10. Amostra, tubito, espécime, depósito e imóvel possuem identidades/contagens distintas.
+' 11. Cliente do tipo PREFEITURA exige perfil prefeitura; código IBGE não é tenant.
+' 12. Validar destinos de todos os campos FK antes de migrar. Dados reais exigem controle de finalidade.
+' TOTAL: 79 entidades; 587 atributos; 236 relações; 248 tipos A_DEFINIR.
+@endchen
