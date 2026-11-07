@@ -1,0 +1,156 @@
+# Caminhos relativos à raiz do repositório. Python 3.10–3.12 recomendado.
+entrada: data/sinan/dengue-analitico.parquet
+saida: treinamentoDoModelo/artefatos
+ano_inicio: 2015
+ano_fim: 2025
+data_corte: '2026-11-05'
+ufs: ['21', '22', '23', '24', '25', '26', '27', '28', '29']
+municipios: []  # vazio = todos; teste rápido: ['2611606', '2304400', '2927408']
+threads: 4
+memoria_duckdb: 2GB
+semente: 42
+offline: false  # true: só lê os downloads explicitamente preparados nesta saída
+
+painel:
+  classificacoes: ['10', '11', '12']
+  id_alvo: confirmados_classi_fin_10_11_12_inicio_sintomas_v1
+  maturacao_dias: 90
+  # O SINAN aberto não comprova notificação negativa por município/semana.
+  # Os zeros do snapshot completo são INFERIDOS, com flag no painel e relatório.
+  zeros: snapshot_anual
+  cobertura_csv: null  # código, semana_inicio, fonte_recebida (0/1)
+  mapa_municipios_csv: null  # substitui dimensão atual por vínculos com vigência
+  # Não remover coincidências demográficas: podem representar pessoas diferentes.
+  excluir_duplicidade_marcada: true  # somente NDUPLIC_N=2, contabilizado no relatório
+  max_fracao_quarentena: 0.05
+
+geografia:
+  periodo: 2022
+  qualidade: intermediaria
+  # Malha fixa de referência; não é uma reconstrução histórica de fronteiras.
+
+populacao:
+  defasagem_publicacao_dias: 366
+  censo2022_disponivel_em: '2023-06-28'
+  max_idade_anos: 3
+  # Âncoras oficiais anteriores ao início permitem ffill causal, nunca bfill.
+  ano_ancora_inicio: 2013
+
+clima:
+  provedor: nasa_power  # nasa_power | inmet | nenhum (ablação explícita)
+  workers: 3
+  lat_grade: 0.5
+  lon_grade: 0.625
+  min_dias: 6
+  atraso_semanas: 1
+  ffill_semanas: 2
+  max_fracao_ausente: 0.60
+  inmet_zips: []  # vazio: descobre os ZIPs anuais no portal oficial
+  inmet_workers: 2
+  inmet_raio_km: 150
+  inmet_estacoes: 3
+  inmet_min_cobertura: 0.80
+
+# Tabelas agregadas opcionais com vigência e disponibilidade. Nunca usa estoque
+# atual como histórico. Veja ENRIQUECIMENTO.md para o contrato exato.
+fontes_opcionais: []
+# - nome: cnes
+#   caminho: dados/cnes_municipio.csv
+#   colunas: [qtd_cnes]
+#   max_idade_dias: 93
+# - nome: liraa
+#   caminho: dados/liraa_municipio.csv
+#   colunas: [indice_liraa]
+#   max_idade_dias: 120
+
+atributos:
+  # Usa história final com margem conservadora. Sem snapshots históricos,
+  # o experimento continua retrospectivo, não backtest operacional as-of.
+  atraso_casos_semanas: 8
+  lags: [0, 1, 2, 3, 4, 8, 13, 26, 52]
+  janelas: [2, 4, 8, 13, 26]
+  clima_lags: [0, 1, 2, 4, 8, 12]
+  clima_janelas: [2, 4, 8, 12]
+
+treino:
+  horizontes: [1, 2]
+  # Comparação temporal exclusiva em 2025; treino e calibração terminam em 2024.
+  # Não há ano posterior reservado para teste independente neste recorte.
+  validacao_anos: [2025]
+  testes_anos: []
+  treino_final_ate: 2024
+  fracao_municipios_reservados: 0.10
+  candidatos: [poisson, hurdle, logistica_poisson, ebm, xgboost, lightgbm, random_forest, extra_trees, bayes_hierarquico, nb_misto]
+  max_linhas_modelos_adicionais: 120000
+  max_atributos_ebm: 30
+  treinamento_rapido: true
+  progresso:
+    mostrar: false  # notebook Colab ativa; CatBoost imprime a cada intervalo_arvores
+    intervalo_arvores: 50
+  iterations: 350
+  depth: 5
+  learning_rate: 0.05
+  l2_leaf_reg: 5
+  early_stopping_rounds: 60
+  calibracao_semanas: 26
+  cobertura_intervalo: 0.90
+  # Limite EXPERIMENTAL, não definição oficial de epidemia.
+  alerta_quantil: 0.95
+  alerta_min_casos: 5
+  arquivo_candidatos: treinamentoDoModelo/modelosCandidatos
+  # Operação de alta sensibilidade: o corte é escolhido na calibração para
+  # maximizar recall, desde que a precisão não caia abaixo deste piso.
+  ocorrencia:
+    precisao_minima: 0.35
+    limiar_padrao: 0.50
+  smote:
+    habilitado: true
+    # Razão máxima positivos:zeros após SMOTE, aplicada separadamente por UF.
+    # O painel parte de cerca de 16 positivos para cada 100 semanas zero.
+    razao_pos_neg_max: 0.20
+    k_vizinhos: 2
+    max_sinteticos_por_uf: 50000
+  # Busca opcional separada; em modo de validação única usa somente 2025.
+  busca_hiperparametros:
+    habilitado: false
+    anos_triagem: [2025]
+    anos_confirmacao: [2025]
+    horizontes_triagem: [1]
+    horizontes_confirmacao: [1, 2]
+    finalistas: 2
+    tentativas:
+      - nome: referencia_smote
+        iterations: 300
+        depth: 5
+        learning_rate: 0.05
+        l2_leaf_reg: 5
+        peso_classe_positiva: 1.0
+        smote: {habilitado: true, razao_pos_neg_max: 0.20}
+      - nome: peso_positivo_4
+        iterations: 260
+        depth: 5
+        learning_rate: 0.06
+        l2_leaf_reg: 8
+        peso_classe_positiva: 4.0
+        smote: {habilitado: false}
+      - nome: peso_positivo_6
+        iterations: 260
+        depth: 5
+        learning_rate: 0.06
+        l2_leaf_reg: 8
+        peso_classe_positiva: 6.0
+        smote: {habilitado: false}
+      - nome: peso_positivo_8
+        iterations: 250
+        depth: 5
+        learning_rate: 0.06
+        l2_leaf_reg: 10
+        peso_classe_positiva: 8.0
+        smote: {habilitado: false}
+      - nome: peso_positivo_10
+        iterations: 250
+        depth: 4
+        learning_rate: 0.07
+        l2_leaf_reg: 10
+        peso_classe_positiva: 10.0
+        smote: {habilitado: false}
