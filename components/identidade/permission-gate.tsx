@@ -1,8 +1,8 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { hasPermission, type Permission } from "@/lib/rbac";
-import { useRole } from "@/components/rbac-context";
+import { hasPermission, type Permission } from "@/lib/identidade/permissions";
+import { useRole } from "@/components/identidade/rbac-context";
 
 export function PermissionGate({
   permission,

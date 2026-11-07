@@ -1,5 +1,5 @@
-import { MarcoDoisDemo } from "@/components/marco-dois-demo";
+import { TerritorialPrioritization } from "@/components/priorizacao/priorizacao-territorial";
 
-export default function MarcoDoisPage() {
-  return <MarcoDoisDemo />;
+export default function TerritorialPrioritizationPage() {
+  return <TerritorialPrioritization />;
 }

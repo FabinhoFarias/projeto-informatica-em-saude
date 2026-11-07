@@ -12,6 +12,7 @@
 
 # testing
 /coverage
+/.quality.lock
 
 # next.js
 /.next/

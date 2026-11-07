@@ -63,15 +63,16 @@ export function hasPermission(role: Role, permission: Permission) {
 
 export function canAccessPath(role: Role, pathname: string) {
   const routePermissions: Record<string, Permission> = {
-    "/": "dashboard:view",
+    "/painel": "dashboard:view",
+    "/hotspots": "dashboard:view",
     "/priorizacao-territorial": "dashboard:view",
     "/diagnostico": "diagnosis:view",
     "/ingestao": "ingestion:manage",
     "/simulacao": "simulation:view",
     "/usuarios": "users:manage",
   };
-  const path = Object.keys(routePermissions).find((route) =>
-    route === "/" ? pathname === "/" : pathname === route || pathname.startsWith(`${route}/`),
+  const path = Object.keys(routePermissions).find(
+    (route) => pathname === route || pathname.startsWith(`${route}/`),
   );
   return path ? hasPermission(role, routePermissions[path]) : false;
 }

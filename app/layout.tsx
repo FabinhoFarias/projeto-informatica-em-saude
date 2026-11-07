@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Denguinhos | Vigilância e alerta precoce",
-  description: "Plataforma de monitoramento territorial, Saúde Única e alerta antecipado de arboviroses.",
+  title: "VIGIA+ | Vigilância e alerta precoce",
+  description:
+    "Plataforma de monitoramento territorial, Saúde Única e alerta antecipado de arboviroses.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

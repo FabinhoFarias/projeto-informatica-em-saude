@@ -35,7 +35,6 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
-
 ## Scripts de integração
 
 Os atalhos estão no `package.json`. `dev` usa `dotenv-cli` para carregar `.env.local`; `lint` usa ESLint porque `next lint` foi removido no Next.js instalado.
@@ -52,6 +51,13 @@ Consulte [docs/documento_de_requisitos.md](docs/documento_de_requisitos.md) para
 
 Abra `/priorizacao-territorial` após `npm run dev` para demonstrar o fluxo de sinal territorial, explicação da regra e decisão da coordenação. O [roteiro do Marco 2](docs/marco2MvpSadc.md) separa entregas atuais, dados fictícios e tarefas restantes da apresentação. Não use os resultados exibidos no protótipo para decisões reais de saúde.
 
+A organização do front por contextos funcionais está descrita em [docs/arquitetura/frontDDD.md](docs/arquitetura/frontDDD.md).
+
+## VIGIA+: página inicial e mapa operacional
+
+A página pública está em `/`. A demonstração interna começa em `/painel`, e o mapa de concentração fica em `/hotspots`. O mapa usa uma representação esquemática e dados fictícios; a camada **Atividade ACE** conta posições registradas e a camada **Focos** conta eventos informados como foco. Nenhuma das duas, isoladamente, é uma estimativa validada de risco de dengue.
+
+Em `/hotspots`, é possível carregar localmente um CSV de até 2 MB e 5.000 registros com `agente_id,latitude,longitude,data_hora,tipo`, onde `tipo` é `posicao` ou `foco`. Use identificadores pseudônimos. O processamento ocorre no navegador, sem envio ao servidor. O recorte visual aceita apenas coordenadas aproximadas do Recife; linhas inválidas ou fora do recorte são ignoradas. O mapa não representa ruas ou limites oficiais. Para uso real, serão necessários base cartográfica validada, governança das posições dos agentes e integração com registros de campo autorizados.
 
 ## Progresso dos requisitos
 

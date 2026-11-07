@@ -1,12 +1,18 @@
 {
-  "name": "denguinhos",
+  "name": "vigia-plus",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "dotenv -e .env.local -- next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "node scripts/quality.mjs lint",
+    "lint:check": "node scripts/quality.mjs lint",
+    "typecheck": "node scripts/quality.mjs typecheck",
+    "format": "node scripts/quality.mjs format",
+    "format:check": "node scripts/quality.mjs format:check",
+    "test:unit": "node scripts/quality.mjs test",
+    "quality": "node scripts/quality.mjs",
     "remove-cache": "node -e \"require('fs').rmSync('.next', { recursive: true, force: true })\"",
     "git:reset-hard": "git fetch origin && git reset --hard origin/main",
     "git:pull-keep": "git stash && git pull && git stash pop",
@@ -31,7 +37,8 @@
     "test": "node testes/main.mjs"
   },
   "dependencies": {
-    "next": "16.4.0",
+    "lucide-react": "0.468.0",
+    "next": "16.4.5",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "read-excel-file": "^9.3.12"
@@ -43,7 +50,8 @@
     "@types/react-dom": "^19",
     "dotenv-cli": "^11.0.0",
     "eslint": "^9",
-    "eslint-config-next": "16.4.0",
+    "eslint-config-next": "16.4.5",
+    "prettier": "3.4.2",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

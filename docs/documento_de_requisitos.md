@@ -1,4 +1,4 @@
-# Documento de Requisitos de Software — Plataforma Denguinhos
+# Documento de Requisitos de Software — Plataforma VIGIA+
 
 **Versão:** 2.2 — múltiplas prefeituras, unidades organizacionais e isolamento de dados
 
@@ -93,7 +93,7 @@ A consulta de moradores pela Atenção Básica é consumida pelo ACE (RF-032); i
 
 **Status:** 🏗 **Parcial**
 
-**Evidência e lacunas:** [components/overview-dashboard.tsx](../components/overview-dashboard.tsx). FieldPortal apresenta rota estática e alterna estado de início; faltam imóveis, planejamento aprovado, atribuição persistente e aplicativo de campo.
+**Evidência e lacunas:** [components/vigilancia/overview-dashboard.tsx](../components/vigilancia/overview-dashboard.tsx). FieldPortal apresenta rota estática e alterna estado de início; faltam imóveis, planejamento aprovado, atribuição persistente e aplicativo de campo.
 
 O aplicativo deve exibir a área e o planejamento aprovados para o ACE, incluindo quarteirões, lados, imóveis, pendências e retornos. Sugestões preditivas são auxiliares e não substituem a cobertura do ciclo, o planejamento amostral ou a decisão da coordenação. Reatribuição deve ser autorizada e rastreável.
 
@@ -156,7 +156,7 @@ O aplicativo deve exibir a área e o planejamento aprovados para o ACE, incluind
 
 **Status:** 🏗 **Parcial**
 
-**Evidência e lacunas:** [components/overview-dashboard.tsx](../components/overview-dashboard.tsx). FieldPortal/ApsPortal apresentam alertas demonstrativos; faltam ingestão de eventos, entrega real, política de visibilidade e consulta offline.
+**Evidência e lacunas:** [components/vigilancia/overview-dashboard.tsx](../components/vigilancia/overview-dashboard.tsx). FieldPortal/ApsPortal apresentam alertas demonstrativos; faltam ingestão de eventos, entrega real, política de visibilidade e consulta offline.
 
 Alertas que incluam predições seguem a programação e a política de visibilidade de RF-033; a equipe pode receber somente orientações operacionais quando o gestor restringir os resultados do modelo.
 
@@ -607,7 +607,7 @@ O sistema deve mapear indicadores por bairro/distrito e suportar a hierarquia op
 
 **Status:** 🏗 **Parcial**
 
-**Evidência e lacunas:** [components/ingestion-dashboard.tsx](../components/ingestion-dashboard.tsx). A importação apresenta avisos e linhas ignoradas; faltam estados completos de origem, sincronização, conferência e atualização dos dados operacionais.
+**Evidência e lacunas:** [components/ingestao/ingestion-dashboard.tsx](../components/ingestao/ingestion-dashboard.tsx). A importação apresenta avisos e linhas ignoradas; faltam estados completos de origem, sincronização, conferência e atualização dos dados operacionais.
 
 diferenciar zero, desconhecido, não se aplica, não sincronizado e pendente de conferência. Exibir atualização por fonte; indisponibilidade de ML não bloqueia coleta nem relatório operacional de dados conferidos.
 
@@ -690,7 +690,7 @@ relatório emitido referencia um snapshot e regras versionadas; gerar novamente 
 
 **Status:** 🏗 **Parcial**
 
-**Evidência e lacunas:** [components/ingestion-dashboard.tsx](../components/ingestion-dashboard.tsx). Há interface de importação assistida com prévia e avisos; autonomia do gestor e fluxo completo de operação ainda precisam de integração e validação com usuários.
+**Evidência e lacunas:** [components/ingestao/ingestion-dashboard.tsx](../components/ingestao/ingestion-dashboard.tsx). Há interface de importação assistida com prévia e avisos; autonomia do gestor e fluxo completo de operação ainda precisam de integração e validação com usuários.
 
 A interface web de gestão e alimentação de dados por planilhas deve ser autoexplicativa e pronta para uso por gestores municipais, dispensando a necessidade de programadores ou técnicos de TI locais.
 
@@ -755,7 +755,7 @@ Registrar organismo, fase e contagens apenas quando exigidos; preservar método,
 
 **Status:** ⏳ **Futuro**
 
-**Evidência e lacunas:** components/overview-dashboard.tsx mostra cartões e tabela de bairros; não foi identificado mapa geoespacial interativo com polígonos/camadas de risco.
+**Evidência e lacunas:** components/vigilancia/overview-dashboard.tsx mostra cartões e tabela de bairros; não foi identificado mapa geoespacial interativo com polígonos/camadas de risco.
 
 O dashboard deve apresentar um mapa geoespacial interativo do município com camadas de risco visual (ex.: verde, amarelo, laranja, vermelho) por bairro e distrito.
 
@@ -763,7 +763,7 @@ O dashboard deve apresentar um mapa geoespacial interativo do município com cam
 
 **Status:** 🏗 **Parcial**
 
-**Evidência e lacunas:** [components/diagnosis-dashboard.tsx](../components/diagnosis-dashboard.tsx). Há indicadores e relatório visual de diagnóstico com dados ilustrativos; faltam consolidação real, fechamento diário, qualidade e rastreabilidade dos registros de campo.
+**Evidência e lacunas:** [components/vigilancia/diagnosis-dashboard.tsx](../components/vigilancia/diagnosis-dashboard.tsx). Há indicadores e relatório visual de diagnóstico com dados ilustrativos; faltam consolidação real, fechamento diário, qualidade e rastreabilidade dos registros de campo.
 
 A plataforma deve gerar relatórios visuais consolidados com indicadores e temas prioritários do território, unificando os dados da APS e da Vigilância Epidemiológica para subsidiar planos de intervenção sem necessidade de análise manual.
 
@@ -773,7 +773,7 @@ A plataforma deve gerar relatórios visuais consolidados com indicadores e temas
 
 **Status:** 🏗 **Parcial**
 
-**Evidência e lacunas:** [lib/dashboard-data.ts](../lib/dashboard-data.ts). recommendationsFor produz recomendações por risco demonstrativo; faltam análise real, decisões persistidas, encaminhamento e acompanhamento da equipe.
+**Evidência e lacunas:** [lib/priorizacao/recommendations.ts](../lib/priorizacao/recommendations.ts). recommendationsFor produz recomendações por risco demonstrativo; faltam análise real, decisões persistidas, encaminhamento e acompanhamento da equipe.
 
 O sistema deve traduzir o risco territorial em recomendações explicadas e datadas para revisão da coordenação. A decisão operacional e os parâmetros de intervenção pertencem ao responsável autorizado; a IA não prescreve dose de produto, não confirma foco laboratorial e não altera automaticamente ciclos ou atribuições.
 
@@ -783,7 +783,7 @@ O sistema deve traduzir o risco territorial em recomendações explicadas e data
 
 **Status:** 🏗 **Parcial**
 
-**Evidência e lacunas:** [components/simulation-dashboard.tsx](../components/simulation-dashboard.tsx). Há simulação local e distribuição de recursos conservando totais; projeções usam regras ilustrativas, sem modelo validado, persistência ou capacidade territorial real.
+**Evidência e lacunas:** [components/planejamento/simulation-dashboard.tsx](../components/planejamento/simulation-dashboard.tsx). Há simulação local e distribuição de recursos conservando totais; projeções usam regras ilustrativas, sem modelo validado, persistência ou capacidade territorial real.
 
 O sistema deve permitir ao gestor simular o quantitativo de agentes (ACS/ACE) e insumos (larvicidas, testes rápidos) necessários com base na projeção de risco por região.
 
@@ -846,7 +846,7 @@ A tela deve responder: “O que recebemos?”, “Quanto está conferido?”, �
 
 **Status:** 🏗 **Parcial**
 
-**Evidência e lacunas:** [components/diagnosis-dashboard.tsx](../components/diagnosis-dashboard.tsx). Há séries ilustrativas, exportação CSV e ajuste visual de sensibilidade; faltam JSON/XLSX, dados reais e calibração/modelo integrado.
+**Evidência e lacunas:** [components/vigilancia/diagnosis-dashboard.tsx](../components/vigilancia/diagnosis-dashboard.tsx). Há séries ilustrativas, exportação CSV e ajuste visual de sensibilidade; faltam JSON/XLSX, dados reais e calibração/modelo integrado.
 
 O dashboard deve permitir a exportação de dados em formatos padrão (CSV, JSON, XLSX), visualização de séries temporais, curvas epidêmicas e ajuste de parâmetros de sensibilidade do modelo.
 
@@ -862,7 +862,7 @@ O sistema deve aplicar correção estatística ao volume de notificações recen
 
 **Status:** ⏳ **Futuro**
 
-**Evidência e lacunas:** lib/dashboard-data.ts e overview-dashboard.tsx contêm valores e projeções ilustrativos; não foi identificado modelo preditivo executado ou validado.
+**Evidência e lacunas:** lib/territorios/demo-data.ts e components/vigilancia/overview-dashboard.tsx contêm valores e projeções ilustrativos; não foi identificado modelo preditivo executado ou validado.
 
 O sistema deve gerar estimativas da probabilidade e magnitude de surtos epidêmicos com antecedência útil (de 2 a 4 semanas) separadamente por bairro/distrito.
 
@@ -870,7 +870,7 @@ O sistema deve gerar estimativas da probabilidade e magnitude de surtos epidêmi
 
 **Status:** ⏳ **Futuro**
 
-**Evidência e lacunas:** O atributo trigger em lib/dashboard-data.ts é estático; não foi identificado algoritmo de clusterização espacial.
+**Evidência e lacunas:** O atributo trigger em lib/territorios/demo-data.ts é estático; não foi identificado algoritmo de clusterização espacial.
 
 O sistema deve executar algoritmos de clusterização espacial (ex.: DBSCAN, SaTScan) no histórico de dados do município para identificar bairros "gatilho" (áreas com reincidência histórica de início de epidemias).
 
@@ -916,7 +916,7 @@ O sistema deve integrar bases oficiais (SINAN, DATASUS, InfoDengue) e dados clim
 
 **Status:** 🏗 **Parcial**
 
-**Evidência e lacunas:** [components/ingestion-dashboard.tsx](../components/ingestion-dashboard.tsx). Lê CSV/XLSX no navegador, valida dados e mostra prévia; faltam importação persistente, contrato de campos autorizado e processamento operacional na API.
+**Evidência e lacunas:** [components/ingestao/ingestion-dashboard.tsx](../components/ingestao/ingestion-dashboard.tsx). Lê CSV/XLSX no navegador, valida dados e mostra prévia; faltam importação persistente, contrato de campos autorizado e processamento operacional na API.
 
 O sistema deve permitir que gestores ou técnicos sem perfil técnico selecionem localmente relatórios e planilhas exportadas do PEC (Atenção Primária) e SINAN/SIM (Vigilância Epidemiológica), validem campos e importem os dados necessários ao ambiente operacional autorizado, inclusive registros identificados quando previstos na finalidade. Anonimização/agregação aplica-se às saídas analíticas e ao compartilhamento externo conforme RNF-006; arquivos brutos têm acesso restrito e retenção definida, sem publicação ou inclusão em logs. Atender também secretarias sem integração direta por API.
 
@@ -924,7 +924,7 @@ O sistema deve permitir que gestores ou técnicos sem perfil técnico selecionem
 
 **Status:** 🏗 **Parcial**
 
-**Evidência e lacunas:** [components/ingestion-dashboard.tsx](../components/ingestion-dashboard.tsx). Há normalização e aproximação de nomes de bairros contra a lista demonstrativa; faltam logradouros, catálogo municipal persistido e tratamento integrado ao pipeline.
+**Evidência e lacunas:** [components/ingestao/ingestion-dashboard.tsx](../components/ingestao/ingestion-dashboard.tsx). Há normalização e aproximação de nomes de bairros contra a lista demonstrativa; faltam logradouros, catálogo municipal persistido e tratamento integrado ao pipeline.
 
 O sistema deve normalizar e mapear inconsistências em nomes de bairros e logradouros locais presentes nas fichas manuais do SINAN.
 
@@ -1029,7 +1029,7 @@ O ambiente operacional autorizado do Denguinhos pode receber, armazenar e relaci
 
 **Status:** 🏗 **Parcial**
 
-**Evidência e lacunas:** [lib/rbac.ts](../lib/rbac.ts). Papéis e permissões controlam navegação e componentes em conjunto com PermissionGate; o papel é selecionável na demonstração, sem autenticação real, MFA ou autorização na API.
+**Evidência e lacunas:** [lib/identidade/permissions.ts](../lib/identidade/permissions.ts). Papéis e permissões controlam navegação e componentes em conjunto com PermissionGate; o papel é selecionável na demonstração, sem autenticação real, MFA ou autorização na API.
 
 O sistema deve adotar controle de acesso baseado em papéis (RBAC - *Role-Based Access Control*) com autenticação multifator (MFA) para perfis administrativos e de gestão. Concessões vinculam cliente/prefeitura, unidade organizacional, módulo, território/finalidade e vigência; lotação e hierarquia não autorizam acesso por si só. Administração técnica da plataforma não concede acesso automático aos dados de cada cliente. O contexto ativo deve ser revalidado no servidor e nas integrações, conforme RF-041/RNF-002.
 
@@ -1037,7 +1037,7 @@ O sistema deve adotar controle de acesso baseado em papéis (RBAC - *Role-Based 
 
 **Status:** ⏳ **Futuro**
 
-**Evidência e lacunas:** lib/dashboard-data.ts fixa um município demonstrativo; não há cadastro de clientes/prefeituras e unidades nem isolamento por cliente/unidade em API, banco ou armazenamento.
+**Evidência e lacunas:** lib/territorios/demo-data.ts fixa um município demonstrativo; não há cadastro de clientes/prefeituras e unidades nem isolamento por cliente/unidade em API, banco ou armazenamento.
 
 A arquitetura deve suportar múltiplos clientes/prefeituras isolados e escaláveis. O tenant é identificado por `cliente_id`; a prefeitura é a organização cliente, e secretaria de saúde, educação, assistência social, departamentos e setores são unidades organizacionais vinculadas a ela. Município é referência geográfica (por exemplo, código IBGE) e não deve ser usado como identidade de autenticação/contrato ou única chave de isolamento.
 

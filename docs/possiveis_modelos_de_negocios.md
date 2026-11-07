@@ -1,4 +1,4 @@
-# Modelo de Negócio: Plataforma Denguinhos
+# Modelo de Negócio: Plataforma VIGIA+
 
 **Projeto:** Plataforma SaaS de Monitoramento e Alerta Antecipado de Arboviroses  
 **Segmento Principal:** B2G (*Business to Government* - Gestão de Saúde Municipal e Estadual)  
@@ -9,7 +9,7 @@
 
 ## 1. Visão Geral da Estratégia de Receita
 
-O modelo de negócio da **Plataforma Denguinhos** é baseado no conceito de **SaaS Híbrido B2G** (Software as a Service com Taxa de Implantação e Consultoria). 
+O modelo de negócio da **Plataforma VIGIA+** é baseado no conceito de **SaaS Híbrido B2G** (Software as a Service com Taxa de Implantação e Consultoria). 
 
 Para garantir sustentabilidade financeira, alta retenção de clientes públicos e receita previsível, o modelo combina:
 1. **Taxa Única de Setup/Implantação:** Cobre a adequação inicial de dados, parametrização e treinamento de equipes.
