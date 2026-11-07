@@ -79,6 +79,7 @@ export const recommendationsFor = (neighborhood: Neighborhood) => {
 };
 
 export const navigationItems = [
+  { href: "/priorizacao-territorial", label: "Priorização territorial", icon: "◇" },
   { href: "/", label: "Visão geral", icon: "◫" },
   { href: "/diagnostico", label: "Diagnóstico situacional", icon: "⌁" },
   { href: "/ingestao", label: "Ingestão de dados", icon: "⇧" },

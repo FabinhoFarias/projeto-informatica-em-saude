@@ -48,6 +48,10 @@ Python/Uvicorn, Streamlit, Prisma, configuração financeira e testes da aplica�
 
 Consulte [docs/documento_de_requisitos.md](docs/documento_de_requisitos.md) para todo o escopo por papéis, campos, fluxos, regras, fontes do e-Visit@ e critérios de aceite. Os antigos arquivos de análise e especificação apenas redirecionam para esse documento.
 
+## Demonstração acadêmica do Marco 2
+
+Abra `/priorizacao-territorial` após `npm run dev` para demonstrar o fluxo de sinal territorial, explicação da regra e decisão da coordenação. O [roteiro do Marco 2](docs/marco2MvpSadc.md) separa entregas atuais, dados fictícios e tarefas restantes da apresentação. Não use os resultados exibidos no protótipo para decisões reais de saúde.
+
 
 ## Progresso dos requisitos
 

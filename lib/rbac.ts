@@ -64,6 +64,7 @@ export function hasPermission(role: Role, permission: Permission) {
 export function canAccessPath(role: Role, pathname: string) {
   const routePermissions: Record<string, Permission> = {
     "/": "dashboard:view",
+    "/priorizacao-territorial": "dashboard:view",
     "/diagnostico": "diagnosis:view",
     "/ingestao": "ingestion:manage",
     "/simulacao": "simulation:view",

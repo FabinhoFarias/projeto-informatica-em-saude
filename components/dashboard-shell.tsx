@@ -130,6 +130,9 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           </div>
         </header>
         <main className="mx-auto w-full max-w-[1440px] px-4 py-7 sm:px-7 lg:px-9">
+          <div role="note" className="mb-5 border-l-4 border-amber-500 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-950">
+            <strong>Protótipo acadêmico · dados fictícios.</strong> Bairros, notificações, probabilidades, recomendações e impactos exibidos nesta interface são exemplos de demonstração; não orientam condutas clínicas ou ações reais da prefeitura.
+          </div>
           {loggedOut ? (
             <section className="mx-auto max-w-xl border border-slate-200 bg-white p-8 text-center">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Sessão encerrada</p>
