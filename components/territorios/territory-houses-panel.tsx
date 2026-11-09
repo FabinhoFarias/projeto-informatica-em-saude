@@ -1,8 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { casasTerritoriaisDemo } from "@/lib/territorios/casas-demo";
-import { mappedTerritories } from "@/lib/territorios/demo-data";
+import { lagoaDeItaengaMockup } from "@/lib/mockups/lagoa-de-itaenga";
+
+const { houses: casasTerritoriaisDemo, territories: mappedTerritories } = lagoaDeItaengaMockup;
 
 export function TerritoryHousesPanel() {
   const [territoryId, setTerritoryId] = useState(mappedTerritories[0].id);
