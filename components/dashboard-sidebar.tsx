@@ -43,8 +43,8 @@ export function DashboardSidebar({
       onMouseLeave={onMouseLeave}
       className={`flex w-full flex-col bg-white border-r border-color-border transition-[width] duration-300 md:sticky md:top-0 md:h-[100dvh] md:shrink-0 ${expanded ? "md:w-64" : "md:w-20"}`}
     >
-      <div className="flex h-[8vh] items-center justify-center border-b border-color-border px-3 py-3 md:justify-start">
-        <div className={`flex h-16 items-center justify-center `}>
+      <div className="flex h-[8vh] w-full items-center justify-center border-b border-color-border px-3 py-3">
+        <div className="flex h-full w-full items-center justify-center">
           <Image
             src={
               expanded
@@ -52,9 +52,9 @@ export function DashboardSidebar({
                 : "/brandingPrefeioturaLagoaDeItaenga/logoQuadrada.png"
             }
             alt="Prefeitura de Lagoa de Itaenga"
-            width={expanded ? 190 : 52}
+            width={expanded ? 190 : 62}
             height={52}
-            className="h-[5vh] w-auto max-w-full object-contain"
+            className={`object-contain ${expanded ? "h-[7vh] w-full" : "h-[7.5vh]"}`}
           />
         </div>
       </div>

@@ -171,7 +171,7 @@ export default function HomePage() {
           <a href="#como-funciona">
             Conheça o fluxo <span aria-hidden="true">↓</span>
           </a>
-          <span>RECIFE · EXEMPLO VISUAL</span>
+          <span>LAGOA DE ITAENGA · EXEMPLO VISUAL</span>
         </div>
       </section>
 

@@ -6,7 +6,7 @@ import {
   PageHeading,
   Panel,
 } from "@/components/plataforma/dashboard-ui";
-import { municipality } from "@/lib/territorios/demo-data";
+import { mappedTerritories, municipality } from "@/lib/territorios/demo-data";
 import { roleLabels, roles, type Role } from "@/lib/identidade/permissions";
 import { initialUsers } from "@/lib/identidade/demo-users";
 import type {
@@ -18,19 +18,9 @@ import type {
 const territoryOptions = [
   "Secretaria Municipal de Saúde",
   "Vigilância Epidemiológica",
-  "Distrito Sanitário I",
-  "Distrito Sanitário II",
-  "Distrito Sanitário III",
-  "Distrito Sanitário IV",
-  "Distrito Sanitário V",
-  "Distrito Sanitário VI",
-  "Distrito Sanitário VII",
-  "Distrito Sanitário VIII",
-  "Ibura · Microárea 04",
-  "Água Fria · Microárea 02",
-  "Várzea · Microárea 01",
-  "USF Ibura",
-  "USF Água Fria",
+  ...mappedTerritories.map((territory) => territory.name),
+  ...mappedTerritories.slice(0, 3).map((territory) => `${territory.name} · Microárea 01`),
+  ...mappedTerritories.slice(0, 3).map((territory) => `UBS ${territory.name}`),
 ];
 
 const blankForm: UserForm = {
@@ -210,7 +200,7 @@ export function UsersDashboard() {
       return;
     }
     if (!territoryOptions.includes(form.territory)) {
-      setFormError("Selecione uma unidade ou território do Recife.");
+      setFormError(`Selecione uma unidade ou território de ${municipality.name}.`);
       return;
     }
 

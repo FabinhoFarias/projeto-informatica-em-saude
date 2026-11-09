@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { demoTerritories } from "@/lib/priorizacao/demo-data";
 import { evaluateDemoTerritory } from "@/lib/priorizacao/rules";
 import type { ReviewStatus } from "@/lib/priorizacao/types";
+import { TerritoryHousesPanel } from "@/components/territorios/territory-houses-panel";
 
 export function TerritorialPrioritization() {
   const [selectedId, setSelectedId] = useState(demoTerritories[0].id);
@@ -31,7 +32,7 @@ export function TerritorialPrioritization() {
         </h1>
         <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
           Demonstração interativa para a persona gestora da Vigilância
-          Ambiental. Escolha um bairro, veja quais critérios didáticos foram
+          Ambiental em Lagoa de Itaenga. Escolha um território, veja quais critérios didáticos foram
           acionados e registre uma decisão temporária nesta sessão.
         </p>
       </header>
@@ -40,7 +41,7 @@ export function TerritorialPrioritization() {
         <Summary
           title="Territórios fictícios"
           value={String(demoTerritories.length)}
-          detail="Recorte ilustrativo do Recife"
+          detail="Recorte ilustrativo de Lagoa de Itaenga"
         />
         <Summary
           title="Para revisão prioritária"
@@ -53,6 +54,8 @@ export function TerritorialPrioritization() {
           detail="Não são salvas nem enviadas"
         />
       </div>
+
+      <TerritoryHousesPanel />
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
         <section

@@ -539,18 +539,18 @@ function RecommendationsDrawer({
 function FieldPortal() {
   const [routeStarted, setRouteStarted] = useState(false);
   const assignedNeighborhood = neighborhoods.find(
-    (neighborhood) => neighborhood.id === "ibura",
+    (neighborhood) => neighborhood.id === "centro",
   )!;
 
   return (
     <div>
       <PageHeading
-        eyebrow="Área do agente · Recife, PE"
+        eyebrow="Área do agente · Lagoa de Itaenga, PE"
         title="Minha rota de campo"
         description="Acompanhe as visitas atribuídas à sua microárea e os alertas que precisam de verificação."
       />
       <section className="grid gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(280px,0.8fr)]">
-        <Panel title="Rota de hoje" description="Ibura · Microárea 04 · Recife">
+        <Panel title="Rota de hoje" description="Centro · Microárea 04 · Lagoa de Itaenga">
           <p className="text-sm font-semibold text-slate-900">
             12 imóveis prioritários
           </p>
@@ -582,7 +582,7 @@ function FieldPortal() {
         >
           <RiskBadge risk={assignedNeighborhood.risk} />
           <p className="mt-4 text-sm font-semibold text-slate-900">
-            Aumento de notificações suspeitas no Ibura
+            Aumento de notificações suspeitas no Centro
           </p>
           <p className="mt-2 text-sm leading-6 text-slate-600">
             Verificar recipientes com água parada nas quadras prioritárias e
@@ -602,7 +602,7 @@ function ApsPortal() {
   return (
     <div>
       <PageHeading
-        eyebrow="Atenção Primária · Recife, PE"
+        eyebrow="Atenção Primária · Lagoa de Itaenga, PE"
         title="Alertas da unidade de saúde"
         description="Sinais de síndromes febris e alertas territoriais para apoiar a triagem e a notificação pela equipe da UBS."
       />

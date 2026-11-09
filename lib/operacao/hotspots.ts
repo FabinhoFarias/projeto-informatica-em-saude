@@ -17,7 +17,7 @@ export interface HotspotCell {
   y: number;
 }
 
-// Recorte apenas demonstrativo para projetar coordenadas do Recife na visualização esquemática.
+// Recorte apenas demonstrativo para projetar coordenadas de Lagoa de Itaenga na visualização esquemática.
 export const DEMO_BOUNDS = {
   minLat: -8.16,
   maxLat: -7.97,

@@ -81,7 +81,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           onLogout={handleLogout}
         />
 
-        <main className="mx-auto w-full max-w-[1440px] px-4 py-7 sm:px-7 lg:px-9">
+        <main className="w-full p-6">
           {/* <PrototypeNotice /> */}
 
           {loggedOut ? (

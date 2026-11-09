@@ -105,7 +105,7 @@ export function DashboardHeader({
                   : "Alertas críticos"}
               </h2>
               <p className="mt-3 text-sm text-slate-700">
-                Risco crítico · Ibura
+                Risco crítico · Centro
               </p>
               <p className="mt-1 text-xs leading-5 text-slate-500">
                 Aumento projetado de notificações para a semana 42.
