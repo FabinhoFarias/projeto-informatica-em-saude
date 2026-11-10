@@ -99,9 +99,9 @@ O aplicativo deve exibir a área e o planejamento aprovados para o ACE, incluind
 
 ### RF-031 — Meu setor, lista de imóveis e ficha do imóvel
 
-**Status:** ⏳ **Futuro**
+**Status:** 🏗 **Parcial — protótipo front-end; fluxo operacional ainda futuro**
 
-**Evidência e lacunas:** Não foi identificado fluxo operacional completo ou protótipo específico deste requisito nos arquivos app/, components/ e lib/ revisados; implementação e critérios de aceite permanecem pendentes.
+**Evidência e lacunas:** [Meu setor](../components/visitas/visits-workspace.tsx) e os [dados demonstrativos](../lib/visitas/demo-data.ts) apresentam imóveis, ficha resumida, mapa esquemático, filtros e estados simulados de visita/sincronização. A lista e os registros são fictícios e ficam apenas no estado do navegador; não há persistência, GPS, mapa geográfico real, autenticação/atribuição de setor ou integração com API/banco. Os critérios de aceite operacionais permanecem pendentes.
 
 **Entrada:** após autenticação, mostrar “Meu setor” com código/nome usado pelo município e contexto de ciclo. Se houver substituição ou mais de uma atribuição válida, permitir selecionar somente setores autorizados. Setor e área devem ter correspondência explícita na configuração municipal, sem presumir que sejam sempre a mesma divisão.
 

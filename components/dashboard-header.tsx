@@ -69,6 +69,7 @@ export function DashboardHeader({
   const pathname = usePathname();
   const titleByRoute: Record<string, string> = {
     "/painel": "Dashboard",
+    "/visitas": "Meu setor · visitas",
     "/hotspots": "Mapa de hotspots",
     "/priorizacao-territorial": "Priorização territorial",
     "/diagnostico": "Diagnóstico situacional",

@@ -6,6 +6,7 @@ export interface NavigationItem {
 
 export const navigationItems: NavigationItem[] = [
   { href: "/painel", label: "Visão geral", icon: "◫" },
+  { href: "/visitas", label: "Meu setor · visitas", icon: "✓" },
   { href: "/hotspots", label: "Mapa de hotspots", icon: "◉" },
   {
     href: "/priorizacao-territorial",

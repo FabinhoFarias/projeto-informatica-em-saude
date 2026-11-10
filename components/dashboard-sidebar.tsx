@@ -4,6 +4,7 @@ import Image from "next/image";
 import type { NavigationItem } from "@/lib/plataforma/navigation";
 import {
   BarChart3,
+  ClipboardCheck,
   Database,
   FileChartColumn,
   Gauge,
@@ -15,6 +16,7 @@ import {
 
 const navigationIcons = {
   "◫": House,
+  "✓": ClipboardCheck,
   "◉": MapPinned,
   "◇": Gauge,
   "⌁": FileChartColumn,

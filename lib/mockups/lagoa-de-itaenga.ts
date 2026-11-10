@@ -8,8 +8,13 @@
 import { initialUsers } from "@/lib/identidade/demo-users";
 import { demoHeaders, demoRows } from "@/lib/ingestao/demo-data";
 import { demoTerritories } from "@/lib/priorizacao/demo-data";
+import { sectorPropertiesDemo } from "@/lib/visitas/demo-data";
 import { casasTerritoriaisDemo } from "@/lib/territorios/casas-demo";
-import { mappedTerritories, municipality, neighborhoods } from "@/lib/territorios/demo-data";
+import {
+  mappedTerritories,
+  municipality,
+  neighborhoods,
+} from "@/lib/territorios/demo-data";
 
 export const lagoaDeItaengaMockup = {
   id: "lagoa-de-itaenga",
@@ -17,6 +22,7 @@ export const lagoaDeItaengaMockup = {
   territories: mappedTerritories,
   neighborhoods,
   houses: casasTerritoriaisDemo,
+  fieldVisits: sectorPropertiesDemo,
   users: initialUsers,
   prioritization: demoTerritories,
   ingestion: { headers: demoHeaders, rows: demoRows },
