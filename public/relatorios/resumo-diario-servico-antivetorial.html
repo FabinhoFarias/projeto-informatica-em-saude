@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <title>Registro diário do serviço antivetorial</title>
+    <link rel="stylesheet" href="/relatorios/boletins.css" />
+  </head>
+  <body>
+    <button class="print-button" type="button" onclick="window.print()">
+      Imprimir
+    </button>
+    <main class="sheet">
+      <header class="daily-header">
+        <div class="daily-brand">
+          <strong>✚<small>SUS</small></strong>
+          <div>
+            <b>PROGRAMA NACIONAL DE CONTROLE DA DENGUE – PNCD</b>
+            <h1>REGISTRO DIÁRIO DO SERVIÇO ANTIVETORIAL</h1>
+          </div>
+        </div>
+        <div class="daily-meta">
+          <label
+            >Município<span contenteditable="true"
+              >Lagoa de Itaenga</span
+            ></label
+          >
+          <label
+            >Código e nome da localidade<span contenteditable="true"></span
+          ></label>
+          <label>Categ. localid.<span contenteditable="true"></span></label>
+          <label>Zona<span contenteditable="true"></span></label>
+          <label
+            >Tipo<span class="choices">1–sede<br />2–outros</span></label
+          >
+          <label
+            >Concluída?<span class="choices">S–sim<br />N–não</span></label
+          >
+          <label
+            >Data da atividade<span contenteditable="true"
+              >&nbsp;/&nbsp;/&nbsp;</span
+            ></label
+          >
+          <label
+            >Ciclo/ano<span contenteditable="true">&nbsp;/&nbsp;</span></label
+          >
+          <div class="activities">
+            <b>Atividades</b><span>1–LI · Levantamento de Índice</span
+            ><span>2–LI+T · Levantamento de Índice + Tratamento</span
+            ><span>3–PE · Ponto Estratégico</span><span>4–T · Tratamento</span
+            ><span>5–DF · Delimitação de Foco</span
+            ><span>6–PVE · Pesquisa Vetorial Especial</span>
+          </div>
+        </div>
+      </header>
+      <h2 class="bar">PESQUISA ENTOMOLÓGICA/TRATAMENTO</h2>
+      <table class="daily-grid" aria-label="Pesquisa e tratamento por imóvel">
+        <colgroup>
+          <col style="width: 2%" />
+          <col style="width: 2%" />
+          <col style="width: 2%" />
+          <col style="width: 20%" />
+          <col style="width: 2.5%" />
+          <col style="width: 2.5%" />
+          <col style="width: 3%" />
+          <col style="width: 3%" />
+          <col style="width: 3%" />
+          <col style="width: 2.5%" />
+          <col style="width: 2.5%" />
+          <col span="7" style="width: 2%" />
+          <col style="width: 2.5%" />
+          <col span="3" style="width: 2%" />
+          <col span="9" style="width: 2%" />
+        </colgroup>
+        <thead>
+          <tr class="group-row">
+            <th colspan="11"></th>
+            <th colspan="8">Nº de depósitos<br />Inspecionados</th>
+            <th colspan="3">Coleta amostra</th>
+            <th colspan="9">Tratamento</th>
+          </tr>
+          <tr class="detail-row">
+            <th>Nº Quarteirão</th>
+            <th>Seq.</th>
+            <th>Lado</th>
+            <th>Nome do Logradouro</th>
+            <th>Nº</th>
+            <th>Seq.</th>
+            <th>Complemento</th>
+            <th>Tipo de imóvel</th>
+            <th>Hora da visita</th>
+            <th>Visita N/R</th>
+            <th>Pendência F/R</th>
+            <th>A1</th>
+            <th>A2</th>
+            <th>B</th>
+            <th>C</th>
+            <th>D1</th>
+            <th>D2</th>
+            <th>E</th>
+            <th>Imóvel inspecionado (LI)</th>
+            <th>Nº amostra inicial</th>
+            <th>Nº amostra final</th>
+            <th>Qtd. tubitos</th>
+            <th>Depósitos eliminados</th>
+            <th>Imóveis tratados</th>
+            <th>Larvicida 1 tipo</th>
+            <th>Larvicida 1 qtd.</th>
+            <th>Larvicida 1 depósitos</th>
+            <th>Larvicida 2 tipo</th>
+            <th>Larvicida 2 qtd.</th>
+            <th>Perifocal tipo</th>
+            <th>Perifocal qtd.</th>
+          </tr>
+        </thead>
+        <tbody id="imoveis"></tbody>
+      </table>
+      <div class="daily-total" aria-label="Totais">
+        <span contenteditable="true"></span><span contenteditable="true"></span
+        ><span contenteditable="true"></span
+        ><span contenteditable="true"></span>
+      </div>
+      <footer class="daily-footer">
+        <label>Assinatura do Agente<span contenteditable="true"></span></label
+        ><label
+          >Assinatura do Supervisor<span contenteditable="true"></span
+        ></label>
+        <div>
+          <b>Tipo do imóvel</b
+          ><span
+            >R–residência · C–comércio · TB–terreno baldio · PE–ponto
+            estratégico · O–outro</span
+          >
+        </div>
+        <div><b>Pendência</b><span>R–recusado · F–fechado</span></div>
+      </footer>
+    </main>
+    <script>
+      const body = document.getElementById("imoveis");
+      for (let row = 0; row < 24; row++) {
+        const tr = document.createElement("tr");
+        for (let column = 0; column < 31; column++) {
+          const td = document.createElement("td");
+          td.contentEditable = "true";
+          tr.appendChild(td);
+        }
+        body.appendChild(tr);
+      }
+    </script>
+  </body>
+</html>

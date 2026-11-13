@@ -6,6 +6,7 @@ import {
   Check,
   CheckCircle2,
   Clock3,
+  FileText,
   House,
   List,
   Map,
@@ -23,7 +24,7 @@ import {
 } from "@/lib/visitas/demo-data";
 
 type VisitFilter = "TODOS" | "A_VISITAR" | "ENVIADA" | "PENDENTE";
-type ViewMode = "mapa" | "lista";
+type ViewMode = "mapa" | "lista" | "relatorio";
 
 function visitStatus(property: SectorPropertyMock) {
   if (!property.ultimaVisita) return "A_VISITAR";
@@ -431,6 +432,15 @@ export function VisitsWorkspace() {
                   <List className="h-4 w-4" aria-hidden="true" />
                   Lista
                 </button>
+                <button
+                  type="button"
+                  aria-pressed={viewMode === "relatorio"}
+                  onClick={() => setViewMode("relatorio")}
+                  className={`flex min-h-9 items-center gap-2 px-3 text-xs font-semibold ${viewMode === "relatorio" ? "bg-emerald-800 text-white" : "text-slate-700 hover:bg-slate-100"}`}
+                >
+                  <FileText className="h-4 w-4" aria-hidden="true" />
+                  Relatório
+                </button>
               </div>
             </div>
             <div className="mt-4 grid gap-3 sm:grid-cols-[minmax(0,1fr)_190px]">
@@ -472,6 +482,27 @@ export function VisitsWorkspace() {
               selectedId={selectedProperty?.id ?? ""}
               onSelect={setSelectedId}
             />
+          ) : viewMode === "relatorio" ? (
+            <div className="bg-slate-100 p-3 sm:p-5">
+              <div className="mb-3 flex items-center justify-between gap-3 text-xs text-slate-600">
+                <span>
+                  Pré-visualização vertical para preenchimento do ACE.
+                </span>
+                <a
+                  href="/relatorios/resumo-diario-servico-antivetorial.html"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-semibold text-emerald-800 underline"
+                >
+                  Abrir para imprimir
+                </a>
+              </div>
+              <iframe
+                title="Resumo diário do serviço antivetorial"
+                src="/relatorios/resumo-diario-servico-antivetorial.html"
+                className="h-[820px] w-full border border-slate-300 bg-white"
+              />
+            </div>
           ) : (
             <div className="max-h-[470px] overflow-y-auto">
               {visibleProperties.map((property) => (
