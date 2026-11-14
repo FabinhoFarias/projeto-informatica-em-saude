@@ -128,20 +128,31 @@
                 <th>Nº e sequência dos quarteirões trabalhados</th>
               </tr>
               <tr>
-                <td contenteditable="true" style="height: 11mm"></td>
+                <td
+                  id="quarteiroes-trabalhados"
+                  contenteditable="true"
+                  style="height: 11mm"
+                ></td>
               </tr>
               <tr>
                 <th>Nº e sequência dos quarteirões concluídos</th>
               </tr>
               <tr>
-                <td contenteditable="true" style="height: 11mm"></td>
+                <td
+                  id="quarteiroes-concluidos"
+                  contenteditable="true"
+                  style="height: 11mm"
+                ></td>
               </tr>
             </table>
           </section>
         </div>
       </section>
-      <section class="summary-block">
-        <h2>RESUMO DO LABORATÓRIO</h2>
+      <section class="summary-block laboratory-pending">
+        <h2>
+          RESUMO DO LABORATÓRIO
+          <small>Integração laboratorial ainda não implementada</small>
+        </h2>
         <div class="summary-grid" style="grid-template-columns: 1fr 1fr">
           <section>
             <table>
@@ -270,7 +281,7 @@
       </section>
     </main>
     <script>
-      for (const [id, count] of Object.entries({
+      const rowSizes = {
         "imoveis-trabalhados": 6,
         "imoveis-resumo": 4,
         amostras: 1,
@@ -279,7 +290,19 @@
         "depositos-tratados": 8,
         adulticida: 2,
         exemplares: 4,
-      })) {
+      };
+
+      function decorateNumericCell(cell, value) {
+        const normalizedValue = String(value ?? "").trim();
+        cell.classList.remove("numeric-value", "long-numeric-value");
+        if (!/^-?\d+(?:[.,]\d+)?$/.test(normalizedValue)) return;
+        cell.classList.add("numeric-value");
+        if (normalizedValue.replace(/\D/g, "").length > 3) {
+          cell.classList.add("long-numeric-value");
+        }
+      }
+
+      for (const [id, count] of Object.entries(rowSizes)) {
         const row = document.getElementById(id);
         for (let index = 0; index < count; index++) {
           const cell = document.createElement("td");
@@ -287,6 +310,49 @@
           row.appendChild(cell);
         }
       }
+
+      function fillRow(id, values) {
+        const cells = document.getElementById(id).cells;
+        values.forEach((value, index) => {
+          const cell = cells[index];
+          if (!cell) return;
+          cell.textContent = value ?? "";
+          decorateNumericCell(cell, value);
+        });
+      }
+
+      async function loadFieldSummary() {
+        const date = new URLSearchParams(window.location.search).get("data");
+        const endpoint = new URL(
+          "/api/relatorios/resumo-diario",
+          location.origin,
+        );
+        if (date) endpoint.searchParams.set("data", date);
+
+        try {
+          const response = await fetch(endpoint, { cache: "no-store" });
+          if (!response.ok) throw new Error("Resumo de campo indisponível");
+          const report = await response.json();
+          const field = report.fieldSummary;
+          fillRow("imoveis-trabalhados", field.propertiesByType);
+          fillRow("imoveis-resumo", field.properties);
+          fillRow("amostras", field.samples);
+          fillRow("pendencias", field.pending);
+          fillRow("depositos-inspecionados", field.depositsInspected);
+          fillRow("depositos-tratados", field.depositsTreated);
+          fillRow("adulticida", field.adulticide);
+          document.getElementById("quarteiroes-trabalhados").textContent =
+            field.workedBlocks || "—";
+          document.getElementById("quarteiroes-concluidos").textContent =
+            field.completedBlocks || "—";
+        } catch (error) {
+          document.getElementById("quarteiroes-trabalhados").textContent =
+            "Não foi possível carregar os registros de campo.";
+          console.error(error);
+        }
+      }
+
+      loadFieldSummary();
     </script>
   </body>
 </html>

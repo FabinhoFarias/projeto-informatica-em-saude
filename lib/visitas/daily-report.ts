@@ -99,6 +99,49 @@ export function buildDailyReport(date: string) {
   const treated = properties.filter(
     (property) => property.ultimaVisita!.formulario.imovelTratado,
   ).length;
+  const completedProperties = properties.filter(
+    (property) => property.ultimaVisita!.acesso === "REALIZADO",
+  );
+  const countType = (types: PropertyType[]) =>
+    completedProperties.filter((property) => types.includes(property.tipo))
+      .length;
+  const depositTypes = ["A1", "A2", "B", "C", "D1", "D2", "E"] as const;
+  const depositsByType = depositTypes.map((type) =>
+    properties.reduce(
+      (total, property) =>
+        total + property.ultimaVisita!.formulario.depositos[type],
+      0,
+    ),
+  );
+  const forms = properties.map((property) => property.ultimaVisita!.formulario);
+  const uniqueText = (values: string[]) =>
+    [...new Set(values.filter(Boolean))].join(" + ");
+  const sumForm = (select: (form: (typeof forms)[number]) => number) =>
+    forms.reduce((total, form) => total + select(form), 0);
+  const workedBlocks = [
+    ...new Set(properties.map((property) => property.quarteirao)),
+  ];
+  const completedBlocks = workedBlocks.filter((block) => {
+    const blockProperties = sectorPropertiesDemo.filter(
+      (property) => property.quarteirao === block,
+    );
+    return blockProperties.every(
+      (property) =>
+        property.ultimaVisita?.dataAtividade === date &&
+        property.ultimaVisita.acesso === "REALIZADO",
+    );
+  });
+  const refusals = properties.filter(
+    (property) => property.ultimaVisita!.acesso === "RECUSA",
+  ).length;
+  const closed = properties.filter(
+    (property) => property.ultimaVisita!.acesso === "FECHADO",
+  ).length;
+  const focalTreatments = forms.filter((form) => form.imovelTratado).length;
+  const perifocalTreatments = forms.filter(
+    (form) => form.perifocalCargas > 0,
+  ).length;
+  const inspected = forms.filter((form) => form.imovelInspecionado).length;
 
   return {
     metadata: {
@@ -119,6 +162,44 @@ export function buildDailyReport(date: string) {
       inspectedDeposits,
       samples,
       treated,
+    },
+    fieldSummary: {
+      propertiesByType: [
+        countType(["RESIDENCIAL"]),
+        countType(["COMERCIAL"]),
+        countType(["TERRENO"]),
+        countType(["PONTO_ESTRATEGICO"]),
+        countType(["PREDIO", "ESCOLA", "UBS", "IGREJA", "INDUSTRIAL", "OUTRO"]),
+        completedProperties.length,
+      ],
+      properties: [
+        focalTreatments,
+        perifocalTreatments,
+        inspected,
+        refusals + closed,
+      ],
+      samples: [samples],
+      pending: [refusals, closed],
+      depositsInspected: [
+        ...depositsByType,
+        depositsByType.reduce((total, value) => total + value, 0),
+      ],
+      depositsTreated: [
+        sumForm((form) => form.depositosEliminados),
+        uniqueText(forms.map((form) => form.larvicida1Tipo)),
+        sumForm((form) => form.larvicida1Quantidade),
+        sumForm((form) => form.larvicida1Depositos),
+        uniqueText(forms.map((form) => form.larvicida2Tipo)),
+        sumForm((form) => form.larvicida2Quantidade),
+        sumForm((form) => form.larvicida2Depositos),
+        sumForm((form) => form.perifocalCargas),
+      ],
+      adulticide: [
+        uniqueText(forms.map((form) => form.perifocalTipo)),
+        sumForm((form) => form.perifocalCargas),
+      ],
+      workedBlocks: workedBlocks.join(", "),
+      completedBlocks: completedBlocks.join(", "),
     },
   };
 }

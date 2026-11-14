@@ -10,7 +10,7 @@ body {
   background: #eef0f2;
   color: #111;
   font:
-    7px Arial,
+    7.5px Arial,
     sans-serif;
 }
 .sheet {
@@ -66,7 +66,7 @@ h1 {
   border: 1px solid #444;
   background: #e6e6e6;
   text-align: center;
-  font-size: 6px;
+  font-size: 6.5px;
   font-weight: bold;
 }
 .daily-meta label span,
@@ -97,7 +97,7 @@ h1 {
   border: 1px solid #444;
   background: #e6e6e6;
   text-align: center;
-  font-size: 5px;
+  font-size: 5.5px;
 }
 .activities b {
   grid-column: 1 / -1;
@@ -114,7 +114,7 @@ h1 {
   border: 1px solid #444;
   background: #e6e6e6;
   text-align: center;
-  font-size: 7px;
+  font-size: 7.5px;
 }
 table {
   width: 100%;
@@ -129,7 +129,7 @@ td {
 }
 th {
   background: #dedede;
-  font-size: 5px;
+  font-size: 5.5px;
 }
 .daily-grid .group-row {
   height: 6mm;
@@ -148,6 +148,21 @@ th {
 }
 .daily-grid tbody td {
   height: 3.3mm;
+  font-size: 8px;
+}
+.daily-grid tbody td.numeric-value,
+.summary-grid tbody td.numeric-value {
+  padding-right: 1.5px;
+  padding-left: 1.5px;
+  font-size: 8.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.daily-grid tbody td.long-numeric-value,
+.summary-grid tbody td.long-numeric-value {
+  padding-right: 3px;
+  padding-left: 3px;
+  letter-spacing: 0.1px;
 }
 .daily-grid tr > :nth-child(12),
 .daily-grid tr > :nth-child(20),
@@ -165,8 +180,11 @@ th {
 }
 .daily-total span {
   min-height: 5mm;
+  padding: 2px;
   border: 1px solid #444;
   background: #e6e6e6;
+  font-size: 7px;
+  font-weight: 600;
 }
 .daily-footer {
   display: grid;
@@ -186,6 +204,8 @@ th {
 }
 .daily-footer div span {
   padding: 3px;
+  font-size: 7px;
+  line-height: 1.25;
 }
 .summary-page {
   width: 330mm;
@@ -198,6 +218,16 @@ th {
   background: #e6e6e6;
   text-align: center;
   font-size: 8px;
+}
+.summary-page h2 small {
+  margin-left: 8px;
+  color: #555;
+  font-size: 6px;
+  font-weight: normal;
+  text-transform: none;
+}
+.laboratory-pending table {
+  color: #555;
 }
 .summary-grid {
   display: grid;
@@ -215,6 +245,10 @@ th {
 .summary-grid th,
 .summary-grid td {
   height: 7mm;
+}
+.summary-grid td {
+  font-size: 8px;
+  font-variant-numeric: tabular-nums;
 }
 .summary-grid th {
   font-size: 6px;
@@ -245,7 +279,7 @@ th {
 }
 .legend {
   margin-top: 8px;
-  font-size: 6px;
+  font-size: 6.5px;
 }
 @media print {
   html,

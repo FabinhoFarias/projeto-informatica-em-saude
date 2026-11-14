@@ -592,6 +592,7 @@ function FieldPortal() {
       : (reportDates[0] ?? defaultDailyReportDate),
   );
   const dailyReportUrl = `/relatorios/resumo-diario-servico-antivetorial.html?data=${reportDate}`;
+  const fieldSummaryUrl = `/relatorios/resumo-trabalho-campo-laboratorio.html?data=${reportDate}`;
   const assignedNeighborhood = neighborhoods.find(
     (neighborhood) => neighborhood.id === "centro",
   )!;
@@ -657,7 +658,7 @@ function FieldPortal() {
             Registro diário
           </a>
           <a
-            href="/relatorios/resumo-trabalho-campo-laboratorio.html"
+            href={fieldSummaryUrl}
             target="_blank"
             rel="noreferrer"
             className="inline-flex min-h-10 items-center border border-emerald-800 px-4 text-sm font-semibold text-emerald-900"
@@ -682,8 +683,9 @@ function FieldPortal() {
             Pré-visualizar resumo de campo e laboratório
           </summary>
           <iframe
+            key={fieldSummaryUrl}
             title="Pré-visualização do resumo de campo e laboratório"
-            src="/relatorios/resumo-trabalho-campo-laboratorio.html"
+            src={fieldSummaryUrl}
             loading="lazy"
             className="mt-3 h-[700px] w-full border border-slate-300 bg-white"
           />

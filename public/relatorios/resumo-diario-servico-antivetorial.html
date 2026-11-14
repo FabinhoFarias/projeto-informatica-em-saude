@@ -165,6 +165,12 @@
             const td = document.createElement("td");
             td.contentEditable = "true";
             td.textContent = values[column] ?? "";
+            const normalizedValue = String(values[column] ?? "").trim();
+            if (/^-?\d+(?:[.,]\d+)?$/.test(normalizedValue)) {
+              td.classList.add("numeric-value");
+              const digitCount = normalizedValue.replace(/\D/g, "").length;
+              if (digitCount > 3) td.classList.add("long-numeric-value");
+            }
             tr.appendChild(td);
           }
           body.appendChild(tr);
