@@ -12,20 +12,6 @@ import { navigationItems } from "@/lib/plataforma/navigation";
 
 const INITIAL_ROLE: Role = "GESTOR";
 
-function PrototypeNotice() {
-  return (
-    <div
-      role="note"
-      className="mb-5 border-l-4 border-amber-500 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-950"
-    >
-      <strong>Projeto PILOTO · dados fictícios.</strong> Bairros, notificações,
-      probabilidades, recomendações e impactos exibidos nesta interface são
-      exemplos de demonstração; não orientam condutas clínicas ou ações reais da
-      prefeitura.
-    </div>
-  );
-}
-
 function LoggedOutState({ onResume }: { onResume: () => void }) {
   return (
     <section className="mx-auto max-w-xl border border-slate-200 bg-white p-8 text-center">
@@ -82,8 +68,6 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         />
 
         <main className="w-full px-3 pb-24 pt-4 sm:p-6 sm:pb-6">
-          {/* <PrototypeNotice /> */}
-
           {loggedOut ? (
             <LoggedOutState onResume={handleResume} />
           ) : (

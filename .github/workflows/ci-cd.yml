@@ -1,0 +1,101 @@
+name: CI/CD — qualidade, build e entrega
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-cd-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: "22"
+  NEXT_TELEMETRY_DISABLED: "1"
+
+jobs:
+  quality:
+    name: Qualidade do código
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Instalar dependências bloqueadas
+        run: npm ci
+
+      - name: Verificar formatação
+        run: npm run format:check
+
+      - name: Verificar lint
+        run: npm run lint:check
+
+      - name: Verificar tipos
+        run: npm run typecheck
+
+      - name: Executar testes unitários
+        run: npm run test:unit
+
+  build:
+    name: Build de produção
+    needs: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Restaurar cache do Next.js
+        uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: ${{ runner.os }}-next-${{ hashFiles('package-lock.json') }}-${{ hashFiles('app/**/*', 'components/**/*', 'lib/**/*', 'next.config.ts') }}
+          restore-keys: |
+            ${{ runner.os }}-next-${{ hashFiles('package-lock.json') }}-
+
+      - name: Instalar dependências bloqueadas
+        run: npm ci
+
+      - name: Gerar build de produção
+        run: npm run build
+
+  delivery:
+    name: Entrega contínua
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: production
+    env:
+      DEPLOY_HOOK_URL: ${{ secrets.DEPLOY_HOOK_URL }}
+    steps:
+      - name: Acionar provedor de hospedagem
+        shell: bash
+        run: |
+          if [ -z "$DEPLOY_HOOK_URL" ]; then
+            echo "Build aprovado. Cadastre DEPLOY_HOOK_URL no ambiente production para ativar o deploy automático."
+            exit 0
+          fi
+          curl --fail --show-error --silent \
+            --retry 3 \
+            --request POST \
+            "$DEPLOY_HOOK_URL"
+          echo "Deploy solicitado ao provedor com sucesso."
