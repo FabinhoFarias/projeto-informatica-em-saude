@@ -62,6 +62,12 @@ const outcomeStyles: Record<Outcome, string> = {
     "border-color-border bg-white text-slate-900 hover:border-red-300 hover:bg-slate-50",
 };
 
+const outcomePriority: Record<Outcome, number> = {
+  NAO_VISITADO: 0,
+  PENDENCIA: 1,
+  VISITADO: 2,
+};
+
 function propertyType(type: SectorPropertyMock["tipo"]) {
   const labels: Record<SectorPropertyMock["tipo"], string> = {
     RESIDENCIAL: "Residência",
@@ -126,8 +132,18 @@ export function VisitsWorkspace() {
         grouping === "quarteirao" ? property.quarteirao : property.logradouro;
       grouped.set(key, [...(grouped.get(key) ?? []), property]);
     }
+    for (const properties of grouped.values()) {
+      properties.sort((a, b) => {
+        const stateA = sessionOutcomes[a.id] ?? outcome(a, cycle);
+        const stateB = sessionOutcomes[b.id] ?? outcome(b, cycle);
+        return (
+          outcomePriority[stateA] - outcomePriority[stateB] ||
+          a.sequenciaPercurso - b.sequenciaPercurso
+        );
+      });
+    }
     return [...grouped];
-  }, [filtered, grouping]);
+  }, [cycle, filtered, grouping, sessionOutcomes]);
 
   const counts = sectorPropertiesDemo.reduce<Record<Outcome, number>>(
     (result, property) => {
@@ -219,7 +235,7 @@ export function VisitsWorkspace() {
         {groups.map(([key, items]) => (
           <section
             key={key}
-            className="border border-slate-200 bg-white p-4 sm:p-5"
+            className="border border-slate-200 bg-white p-3 sm:p-5"
           >
             <h2 className="text-base font-bold text-slate-950">
               {grouping === "quarteirao" ? `Quarteirão ${key}` : key}
@@ -234,7 +250,7 @@ export function VisitsWorkspace() {
                     ...new Set(items.map((property) => property.quarteirao)),
                   ].join(" · ")}
             </p>
-            <div className="mt-4 flex flex-wrap gap-2">
+            <div className="mt-4 grid grid-cols-4 gap-2 md:flex md:flex-wrap">
               {items.map((property) => {
                 const state =
                   sessionOutcomes[property.id] ?? outcome(property, cycle);
@@ -250,26 +266,27 @@ export function VisitsWorkspace() {
                     key={property.id}
                     href={`/visitas/${property.id}?ciclo=${cycle}`}
                     aria-label={`${propertyType(property.tipo)}, número ${property.numero}, ${outcomeLabels[state]}`}
-                    className={`relative flex h-24 w-24 flex-col rounded-lg border-2 p-2 text-left shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 sm:h-28 sm:w-28 ${outcomeStyles[state]}`}
+                    className={`relative flex aspect-square min-w-0 flex-col rounded-lg border-2 p-1.5 text-left shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 md:h-28 md:w-28 md:p-2 ${outcomeStyles[state]}`}
                   >
-                    {state === "NAO_VISITADO" && (
-                      <span
-                        className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-red-500 shadow-sm ring-2 ring-white"
-                        aria-hidden="true"
-                      />
-                    )}
-                    {state !== "NAO_VISITADO" && (
-                      <span className="absolute right-2 top-2 text-[9px] font-bold">
-                        {deposits} dep.
+                    <span className="flex min-w-0 items-start justify-between gap-1">
+                      <span className="min-w-0 truncate text-[clamp(0.55rem,2.6vw,0.75rem)] font-medium leading-tight md:text-xs">
+                        {propertyType(property.tipo)}
                       </span>
-                    )}
-                    <span className="block text-xs font-medium">
-                      {propertyType(property.tipo)}
+                      {state === "NAO_VISITADO" ? (
+                        <span
+                          className="mt-0.5 h-2.5 w-2.5 shrink-0 rounded-full bg-red-500 shadow-sm ring-1 ring-white md:ring-2"
+                          aria-hidden="true"
+                        />
+                      ) : (
+                        <span className="shrink-0 whitespace-nowrap text-[8px] font-bold md:text-[9px]">
+                          {deposits} dep.
+                        </span>
+                      )}
                     </span>
-                    <strong className="absolute left-1/2 top-1/2 block -translate-x-1/2 -translate-y-1/2 text-2xl leading-none">
+                    <strong className="absolute left-1/2 top-1/2 block -translate-x-1/2 -translate-y-1/2 text-xl leading-none md:text-2xl">
                       {property.numero}
                     </strong>
-                    <span className="mt-auto block w-full truncate text-[10px]">
+                    <span className="mt-auto block w-full truncate text-[8px] leading-tight sm:text-[9px] md:text-[10px]">
                       {grouping === "quarteirao"
                         ? property.logradouro
                         : property.quarteirao}

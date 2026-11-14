@@ -215,12 +215,14 @@ export const sectorPropertiesDemo: SectorPropertyMock[] =
       const tipo =
         typeSequence[(sequence + blockIndex * 3) % typeSequence.length];
       const acesso =
-        sequence % 9 === 0
-          ? "RECUSA"
-          : sequence % 7 === 0
-            ? "FECHADO"
-            : "REALIZADO";
-      const visited = sequence % 3 !== 0;
+        blockIndex === 0
+          ? "REALIZADO"
+          : sequence % 9 === 0
+            ? "RECUSA"
+            : sequence % 7 === 0
+              ? "FECHADO"
+              : "REALIZADO";
+      const visited = blockIndex === 0 || sequence % 3 !== 0;
       const day = String(1 + (sequence % 13)).padStart(2, "0");
       return {
         id: `00000000-0000-4000-8000-${suffix}`,
