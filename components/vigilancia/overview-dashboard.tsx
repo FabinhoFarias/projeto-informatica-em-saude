@@ -16,6 +16,10 @@ import { recommendationsFor } from "@/lib/priorizacao/recommendations";
 import { riskColors } from "@/lib/territorios/risk";
 import type { Neighborhood } from "@/lib/territorios/types";
 import { sectorPropertiesDemo } from "@/lib/visitas/demo-data";
+import {
+  availableDailyReportDates,
+  defaultDailyReportDate,
+} from "@/lib/visitas/daily-report";
 
 type SortKey = "incidenceProbability" | "forecastCases" | "name" | "vectorFoci";
 
@@ -581,6 +585,13 @@ function RecommendationsDrawer({
 
 function FieldPortal() {
   const [routeStarted, setRouteStarted] = useState(false);
+  const reportDates = useMemo(() => availableDailyReportDates(), []);
+  const [reportDate, setReportDate] = useState(
+    reportDates.includes(defaultDailyReportDate)
+      ? defaultDailyReportDate
+      : (reportDates[0] ?? defaultDailyReportDate),
+  );
+  const dailyReportUrl = `/relatorios/resumo-diario-servico-antivetorial.html?data=${reportDate}`;
   const assignedNeighborhood = neighborhoods.find(
     (neighborhood) => neighborhood.id === "centro",
   )!;
@@ -619,11 +630,26 @@ function FieldPortal() {
           Relatórios de campo
         </h2>
         <p className="mt-1 text-sm text-slate-600">
-          Visualize e imprima os modelos demonstrativos do serviço antivetorial.
+          Selecione um dia para consolidar as fichas dos imóveis visitados e
+          visualizar o registro diário preenchido.
         </p>
+        <label className="mt-4 block max-w-xs text-xs font-semibold text-slate-700">
+          Data do trabalho de campo
+          <select
+            value={reportDate}
+            onChange={(event) => setReportDate(event.target.value)}
+            className="mt-1 h-10 w-full border border-slate-300 bg-white px-3 text-sm font-normal"
+          >
+            {reportDates.map((date) => (
+              <option key={date} value={date}>
+                {new Date(`${date}T12:00:00`).toLocaleDateString("pt-BR")}
+              </option>
+            ))}
+          </select>
+        </label>
         <div className="mt-4 flex flex-wrap gap-3">
           <a
-            href="/relatorios/resumo-diario-servico-antivetorial.html"
+            href={dailyReportUrl}
             target="_blank"
             rel="noreferrer"
             className="inline-flex min-h-10 items-center bg-emerald-800 px-4 text-sm font-semibold text-white"
@@ -644,8 +670,9 @@ function FieldPortal() {
             Pré-visualizar registro diário
           </summary>
           <iframe
+            key={dailyReportUrl}
             title="Pré-visualização do registro diário do ACE"
-            src="/relatorios/resumo-diario-servico-antivetorial.html"
+            src={dailyReportUrl}
             loading="lazy"
             className="mt-3 h-[700px] w-full border border-slate-300 bg-white"
           />

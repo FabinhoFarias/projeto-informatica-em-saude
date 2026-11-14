@@ -256,7 +256,11 @@ export const sectorPropertiesDemo: SectorPropertyMock[] =
           y: 15 + Math.floor(blockIndex / 5) * 44 + (propertyIndex % 5) * 4,
         },
         ultimaVisita: visited
-          ? makeVisit(sequence, `2026-11-${day}`, acesso)
+          ? makeVisit(
+              sequence,
+              blockIndex === 0 ? "2026-11-06" : `2026-11-${day}`,
+              acesso,
+            )
           : null,
       };
     }),
