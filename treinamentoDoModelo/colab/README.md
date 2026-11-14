@@ -1,30 +1,64 @@
 # Treinamento no Google Colab
 
-O pacote mantém **dois conjuntos separados**: o Parquet SINAN completo, dividido em partes de 128 MiB para upload, e `codigo_e_atributos.zip`, com o código mais os atributos preparados localmente. O ZIP não inclui `.venv`, modelos antigos nem downloads temporários. Tudo roda no armazenamento temporário `/content` do Colab, sem montar Google Drive.
+Abra [treinamento_dengue_colab.ipynb](../../notebooks/treinamento_dengue_colab.ipynb).
+O código do pipeline e a configuração estão diretamente nas células do
+notebook. Ele não importa módulos do projeto, não lê `config.yaml` e não precisa
+do repositório, de `manifesto.json`, de `codigo_e_atributos.zip` ou de artefatos
+previamente preparados.
 
-No Mac, a partir da raiz do repositório:
+## Entrada
 
-```bash
-treinamentoDoModelo/.venv/bin/python treinamentoDoModelo/colab/montar_pacote.py
-```
+No Colab, abra o notebook e envie para `/content` somente:
 
-Abra [treinamento_dengue_colab.ipynb](../../notebooks/treinamento_dengue_colab.ipynb) no Colab. Na aba **Arquivos** do Colab, envie para `/content`:
+- o Parquet completo `dengue-analitico.parquet`; ou
+- todas as partes sequenciais `dengue-analitico.parquet.part001`,
+  `.part002`, etc.
 
-1. `manifesto.json` e `codigo_e_atributos.zip` da pasta `treinamentoDoModelo/pacoteColab/`;
-2. **uma** destas opções: o arquivo original `data/sinan/dengue-analitico.parquet` inteiro, ou todas as partes `dengue-analitico.parquet.part001` a `.part005` da pasta do pacote.
+O notebook abre a janela de upload se não encontrar os dados. Também aceita
+arquivos dentro de `/content/pacoteColab/`. Não envie simultaneamente mais de
+um Parquet completo. O notebook valida se o dataset contém as colunas SINAN
+necessárias antes de começar. A entrada original não é modificada.
 
-Se o navegador criar `/content/pacoteColab/` com os arquivos dentro, o notebook detecta essa pasta automaticamente. O Parquet original no Mac não é modificado. Se usar as partes, o notebook as recompõe byte a byte e valida SHA-256; se enviar o Parquet inteiro, valida o arquivo e cria um link simbólico, sem duplicá-lo no disco.
+## Execução
 
-Execute as células na ordem. Elas validam os checksums, deixam o Parquet acessível em `/content/denguinhos/data/sinan/`, corrigem no esquema somente o caminho absoluto que apontava para o Mac, instalam dependências e executam diretamente `treinar`, reutilizando `artefatos/ouro/atributos.parquet`. Não há novos downloads de IBGE, clima ou SINAN nessa etapa.
+Execute todas as células em ordem. As células definem o pipeline diretamente
+na memória do notebook; não escrevem nem importam arquivos Python. Depois da
+instalação das bibliotecas, uma única célula prepara o dataset e treina o
+modelo. A última célula mostra as métricas e baixa o ZIP de resultados.
 
-O notebook usa o Python já disponível no Colab (3.12 ou 3.13) e instala `requirements-colab.txt` incluído no ZIP. Não envie o `.venv` do Mac. Se você já enviou um pacote antigo, execute `montar_pacote.py` novamente e substitua `manifesto.json` e `codigo_e_atributos.zip` no Colab. Python 3.1 literal não é compatível com as bibliotecas atuais; versões futuras do Colab precisam ser verificadas antes de ampliar a faixa suportada.
+O treinamento compara os candidatos configurados, incluindo ARIMA: uma série
+semanal de incidência por UF, convertida para a escala de cada município por
+população. Os resultados de ARIMA aparecem junto aos demais em
+`validacao_h1.json` e `validacao_h2.json`.
 
-Antes de treinar, o notebook mostra a quantidade de linhas, os anos, horizontes e candidatos. Durante o treino aparecem o número da etapa, a porcentagem concluída, a fase de cada modelo, o avanço do CatBoost a cada 50 árvores, as métricas ao fechar o candidato e um ETA aproximado. Um aviso a cada 30 segundos indica que modelos sem impressão de iterações ainda estão rodando. O relatório completo também fica em `artefatos/relatorios/pipeline.log` dentro do ZIP final.
+A preparação consulta fontes públicas geográficas, populacionais e climáticas,
+portanto requer rede e pode levar minutos ou mais. O notebook refaz painel e
+atributos; não reutiliza atributos multirregionais pré-calculados.
 
-O treino atual compara dez candidatos em 2025 para H1/H2, usando CPU; simplesmente selecionar GPU no Colab não ativa aceleração nas bibliotecas. Um runtime com mais RAM pode ajudar a evitar pressão de memória. O Parquet original serve também para o hash de proveniência; o treinamento usa os atributos preparados.
+O recorte usa `ID_MN_RESI`, município de residência, com prefixo `26`
+(Pernambuco), conforme a semântica dos campos do SINAN. `SG_UF_NOT` indica a UF
+de notificação e não determina residência: um caso residente em Pernambuco pode
+ser notificado em outra UF. A lista de municípios é extraída dos registros do
+Parquet, sem consulta às APIs de localidades e malhas municipais do IBGE. Os
+códigos de seis dígitos recebem o dígito verificador IBGE; códigos inválidos
+geram erro explícito.
 
-Ao terminar, a última célula cria e oferece para download `/content/resultados_treinamento.zip`, com modelos e relatórios, inclusive artefatos parciais se o treino falhar. **Baixe antes de o runtime desconectar**: arquivos em `/content` se perdem ao encerrar o ambiente. A versão atual não retoma automaticamente um horizonte interrompido: rodar `treinar` de novo cria um experimento novo. Não use 2025 como teste independente, pois ele seleciona o modelo.
+O runtime usa Python 3.12 ou 3.13 e `/content` é temporário. A validação
+configurada é em 2025, com treino até 2024; 2025 não é um teste independente
+posterior. Como não há coordenadas no SINAN, o notebook desativa clima e
+vizinhança geográfica. Continua consultando dados oficiais de população/área do
+IBGE, necessários para incidência e denominadores. O notebook remove Random
+Forest e Extra Trees para reduzir o custo no Colab. Baixe o ZIP antes que o
+runtime expire.
+
+O script `montar_pacote.py` ainda existe para gerar pacotes do fluxo antigo,
+mas não é necessário para executar este notebook.
 
 ### Resultados trazidos do Colab
 
-Guarde cada `resultados_treinamento.zip` em `treinamentoDoModelo/artefatos/importacoes_colab/<id_do_treino>/`. Essa árvore é ignorada pelo Git; não coloque modelos `.joblib`, logs ou arquivos ZIP de resultados no commit. Se descompactar para consulta, use uma subpasta `extraido/` dentro do mesmo diretório. O ZIP contém `modelos/ultimo_treino.json` com o caminho do runtime do Colab: ele **não** deve substituir o `ultimo_treino.json` local. Para comparar resultados, leia `extraido/modelos/<id_do_treino>/resumo.json`, `validacao_h1.json`, `validacao_h2.json` e `model_card.json`.
+Guarde cada `resultados_treinamento_pe.zip` em
+`treinamentoDoModelo/artefatos/importacoes_colab/<id_do_treino>/`. Essa árvore é
+ignorada pelo Git; não coloque modelos, logs ou ZIPs de resultados no commit.
+O ZIP contém modelos e relatórios, não o dataset. Para comparar resultados,
+consulte `modelos/<id_do_treino>/resumo.json`, `validacao_h1.json`,
+`validacao_h2.json` e `model_card.json`.

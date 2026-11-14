@@ -284,11 +284,44 @@ class PipelineTest(unittest.TestCase):
         self.assertLess(fit.data_alvo_h2.max(), cal.data_alvo_h2.min())
         self.assertLess(cal.data_alvo_h2.max(), pd.Timestamp('2020-01-01'))
 
+    def test_candidato_arima_preve_municipio_sem_historico_local(self):
+        semanas = pd.date_range('2020-01-05', periods=104, freq='7D')
+        treino = pd.DataFrame([
+            {'codigo_ibge': codigo, 'uf': '26', 'populacao': populacao,
+             'data_alvo_h1': semana}
+            for codigo, populacao in [('2611606', 100000), ('2609600', 50000)]
+            for semana in semanas
+        ])
+        y = np.array([
+            1 + (semana.isocalendar().week % 7)
+            for _codigo in ('2611606', '2609600')
+            for semana in semanas
+        ], dtype=float)
+        modelo = Candidato(self.cfg, 'arima').fit(
+            treino, y, [], [], data_alvo='data_alvo_h1')
+        futuro = pd.DataFrame({
+            'codigo_ibge': ['2611606', '2609600', '2610000'],
+            'uf': ['26', '26', '26'],
+            'populacao': [100000, 50000, 25000],
+            'data_alvo_h1': pd.date_range(semanas[-1] + pd.Timedelta(weeks=1), periods=3, freq='7D'),
+        })
+
+        previsoes = modelo.predict(futuro)
+        probabilidade = modelo.predict_ocorrencia(futuro)
+
+        self.assertEqual(len(previsoes), 3)
+        self.assertTrue(np.isfinite(previsoes).all())
+        self.assertTrue((previsoes >= 0).all())
+        self.assertTrue(np.isfinite(probabilidade).all())
+        self.assertTrue(((0 <= probabilidade) & (probabilidade <= 1)).all())
+        self.assertEqual(modelo.explicacao()['metodo'],
+                         'ARIMA_por_UF_em_incidencia_semanal; escala_por_populacao_municipal')
+
     def test_comparacao_2025_sem_teste_independente(self):
         self.cfg['treino'].update(validacao_anos=[2025], treino_final_ate=2024,
                                  testes_anos=[], horizontes=[1],
                                  candidatos=['poisson', 'hurdle', 'logistica_poisson',
-                                             'bayes_hierarquico', 'nb_misto'],
+                                             'bayes_hierarquico', 'nb_misto', 'arima'],
                                  max_linhas_modelos_adicionais=400)
         self.fixture_sinan()
         construir_painel(self.cfg)
@@ -302,6 +335,7 @@ class PipelineTest(unittest.TestCase):
                          set(self.cfg['treino']['candidatos']))
         self.assertIn('pesos numéricos inválidos', next(r['erro'] for r in registros
                                                      if r['modelo'] == 'nb_misto'))
+        self.assertTrue(any(r['modelo'] == 'arima' for r in registros))
         self.assertFalse(json.loads((pasta / 'model_card.json').read_text())['teste_independente_disponivel'])
         with self.assertRaisesRegex(ValueError, 'Não há ano de teste independente'):
             avaliar_testes(self.cfg, pasta)

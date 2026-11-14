@@ -176,7 +176,17 @@ class Candidato:
                     random_seed=self.cfg['semente'], allow_writing_files=False,
                     verbose=int(progresso.get('intervalo_arvores', 50)) if progresso.get('mostrar') else False)
 
-    def fit(self, df, y, numericas, categoricas):
+    def fit(self, df, y, numericas, categoricas, data_alvo=None):
+        if self.tipo == 'arima':
+            if data_alvo is None:
+                raise ValueError('ARIMA precisa da coluna com as datas dos alvos.')
+            self.data_alvo = data_alvo
+            self.adicional = ModeloAdicional(self.tipo, self.cfg).fit(
+                df[['uf', 'populacao']], np.asarray(y, float), [], [],
+                datas=df[data_alvo])
+            self.smote = self.adicional.smote
+            self.iterations = None
+            return self
         if self.tipo in TIPOS_ADICIONAIS:
             self.imputador = ImputadorTreino().fit(df, numericas, categoricas)
             x_adicional = self.imputador.transform(df)
@@ -242,6 +252,11 @@ class Candidato:
         return self
 
     def predict(self, df):
+        if self.tipo == 'arima':
+            pred = self.adicional.predict(df[['uf', 'populacao']], df[self.data_alvo])
+            if not np.isfinite(pred).all():
+                raise ValueError('Previsão ARIMA não finita.')
+            return np.maximum(pred, 0.)
         x = self.imputador.transform(df)
         if self.tipo in TIPOS_ADICIONAIS:
             pred = self.adicional.predict(x)
@@ -257,6 +272,9 @@ class Candidato:
         return np.maximum(pred, 0.)
 
     def predict_ocorrencia(self, df):
+        if self.tipo == 'arima':
+            return self.adicional.predict_ocorrencia(
+                df[['uf', 'populacao']], df[self.data_alvo])
         if self.tipo in TIPOS_ADICIONAIS:
             return self.adicional.predict_ocorrencia(self.imputador.transform(df))
         if self.tipo != 'hurdle':
@@ -416,7 +434,8 @@ def _avaliar_tentativa(cfg, dados, schema, reservados, anos, horizontes):
             if val.empty:
                 raise ValueError(f'Sem linhas de validação em {ano}/h{h}.')
             modelo = Candidato(cfg, 'hurdle').fit(
-                fit, fit[f'alvo_h{h}'], schema['numericas'], schema['categoricas'])
+                fit, fit[f'alvo_h{h}'], schema['numericas'], schema['categoricas'],
+                data_alvo=f'data_alvo_h{h}')
             calibrar_limiar_ocorrencia(cfg, modelo, cal, cal[f'alvo_h{h}'])
             pred = modelo.predict(val)
             registros.append({
@@ -526,7 +545,9 @@ def treinar(cfg):
                          h, ano, tipo, len(fit), len(cal), len(avaliacao))
                 iniciado = time.perf_counter()
                 try:
-                    modelo = Candidato(cfg, tipo).fit(fit, fit[f'alvo_h{h}'], schema['numericas'], schema['categoricas'])
+                    modelo = Candidato(cfg, tipo).fit(
+                        fit, fit[f'alvo_h{h}'], schema['numericas'], schema['categoricas'],
+                        data_alvo=f'data_alvo_h{h}')
                 except (ValueError, FloatingPointError) as erro:
                     if tipo != 'nb_misto':
                         raise
@@ -617,7 +638,9 @@ def treinar(cfg):
             modelo.limiares = limiares(cfg, fit, fit[f'alvo_h{h}'])
         else:
             fit, cal = separar_ajuste_calibracao(cfg, dados[conhecidos], fim_final, h)
-            modelo = Candidato(cfg, vencedor).fit(fit, fit[f'alvo_h{h}'], schema['numericas'], schema['categoricas'])
+            modelo = Candidato(cfg, vencedor).fit(
+                fit, fit[f'alvo_h{h}'], schema['numericas'], schema['categoricas'],
+                data_alvo=f'data_alvo_h{h}')
             modelo.limiares = limiares(cfg, fit, fit[f'alvo_h{h}'])
             ajustar_calibracao(cfg, modelo, cal, cal[f'alvo_h{h}'])
             if vencedor != 'poisson':
@@ -726,7 +749,7 @@ def avaliar_testes(cfg, pasta=None):
                 threshold = aplicar_limiar(df, modelo.limiares)
                 pred, lo, hi, prob = prever_com_intervalos(modelo, df, threshold)
                 metricas_teste = avaliar(df, df[f'alvo_h{h}'], pred, lo, hi, threshold, prob)
-                if modelo.tipo == 'hurdle':
+                if modelo.tipo in ('hurdle', 'arima'):
                     metricas_teste['ocorrencia'] = metricas_ocorrencia(
                         df[f'alvo_h{h}'], modelo.predict_ocorrencia(df),
                         getattr(modelo, 'limiar_ocorrencia', 0.5))
@@ -768,7 +791,7 @@ def inferir(cfg, pasta=None):
         out['semana_alvo'] = out.semana_inicio + pd.Timedelta(weeks=h)
         out['horizonte'], out['casos_previstos'], out['incidencia_100k'] = h, pred, pred/out.populacao*100000
         out['limite_inferior'], out['limite_superior'], out['prob_alerta_experimental'] = low, high, prob
-        if modelo.tipo == 'hurdle':
+        if modelo.tipo in ('hurdle', 'arima'):
             out['prob_ocorrencia'] = modelo.predict_ocorrencia(base)
             out['limiar_ocorrencia'] = getattr(modelo, 'limiar_ocorrencia', 0.5)
             out['ocorrencia_prevista'] = out['prob_ocorrencia'] >= out['limiar_ocorrencia']

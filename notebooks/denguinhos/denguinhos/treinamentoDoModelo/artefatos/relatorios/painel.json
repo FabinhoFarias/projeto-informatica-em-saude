@@ -1,0 +1,12 @@
+{
+  "linhas": 106764,
+  "municipios": 186,
+  "semanas": 574,
+  "casos": 209597,
+  "alvos_nulos": 0,
+  "zeros_inferidos": 67548,
+  "semanas_sem_casos": 86065,
+  "politica_zeros": "snapshot_anual",
+  "cobertura_explicita": false,
+  "aviso": "Presença do recurso anual não comprova cobertura municipal nem notificação negativa."
+}

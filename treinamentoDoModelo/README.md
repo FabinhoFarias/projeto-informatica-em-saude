@@ -58,9 +58,9 @@ Para outra configuração, passe `--config caminho/config.yaml` a todos os coman
 
 ### Comparação de modelos em 2025
 
-O corte do experimento atual treina e calibra até 2024, e compara em 2025, separadamente para H1 e H2. A configuração inclui CatBoost Poisson/Hurdle, logística com Poisson, EBM, XGBoost, LightGBM, Random Forest, Extra Trees, um baseline Gamma-Poisson hierárquico empírico por UF/município e um GLM binomial negativo com UF e correção municipal regularizada. Os dois últimos são aproximações interpretáveis, não modelos espaciais Bayesianos completos nem modelos mistos com likelihood integrada.
+O corte do experimento atual treina e calibra até 2024, e compara em 2025, separadamente para H1 e H2. A configuração inclui CatBoost Poisson/Hurdle, logística com Poisson, EBM, XGBoost, LightGBM, Random Forest, Extra Trees, um baseline Gamma-Poisson hierárquico empírico por UF/município, um GLM binomial negativo com UF e correção municipal regularizada e ARIMA. O ARIMA ajusta uma série semanal de incidência por UF e escala a previsão pela população municipal; assim também produz previsão para municípios sem histórico local. Os dois modelos hierárquico e binomial negativo são aproximações interpretáveis, não modelos espaciais Bayesianos completos nem modelos mistos com likelihood integrada.
 
-Para conter o custo no Mac, os candidatos adicionais usam até 120 mil linhas de treino por fold, amostradas por classe com pesos inversos; o CatBoost continua usando todas as linhas. A seleção favorece recall de semanas com pelo menos um caso quando a precisão na validação atinge 35%, e registra PR-AUC, F1, MAE, tempos e resultados por município/UF. `casos > 0` mede ocorrência; não é uma definição oficial de surto.
+Para conter o custo no Mac, os modelos tabulares adicionais usam até 120 mil linhas de treino por fold, amostradas por classe com pesos inversos; ARIMA usa as séries temporais agregadas completas e CatBoost continua usando todas as linhas. A seleção favorece recall de semanas com pelo menos um caso quando a precisão na validação atinge 35%, e registra PR-AUC, F1, MAE, tempos e resultados por município/UF. `casos > 0` mede ocorrência; não é uma definição oficial de surto.
 
 Como 2025 foi usado na seleção, ele não pode servir como teste independente do vencedor. O comando `avaliar` informa essa limitação até existir um recorte temporal posterior. Resultados antigos de 2024/2025 não devem ser tratados como novos testes cegos.
 
@@ -68,7 +68,7 @@ Como 2025 foi usado na seleção, ele não pode servir como teste independente d
 
 ## Google Colab
 
-Use o [pipeline de empacotamento e upload direto](colab/README.md) e o [notebook de treinamento](../notebooks/treinamento_dengue_colab.ipynb). Envie os arquivos pela aba Arquivos do Colab: o Parquet completo pode ser enviado inteiro ou em partes; o código e os atributos preparados vão em um ZIP separado. O notebook mostra o avanço e as métricas de cada candidato. Ao fim, baixe o ZIP dos modelos e relatórios antes que o runtime expire.
+Use o [guia do Colab](colab/README.md) e o [notebook de treinamento](../notebooks/treinamento_dengue_colab.ipynb). Todo o código e a configuração estão diretamente nas células; o notebook não importa módulos Python locais nem lê arquivos de configuração externos. Envie somente o Parquet SINAN completo ou todas as partes. O notebook refaz o preparo com recorte de Pernambuco (`ID_MN_RESI`, UF IBGE `26`) antes do treino e compara ARIMA com os demais candidatos. Ao fim, baixe o ZIP dos modelos e relatórios antes que o runtime expire.
 
 ## O que é produzido
 

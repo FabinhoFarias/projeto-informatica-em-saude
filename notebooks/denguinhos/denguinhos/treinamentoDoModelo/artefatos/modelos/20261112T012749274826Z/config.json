@@ -1,0 +1,223 @@
+{
+  "entrada": "/Users/fabinho/Projetos/denguinhos/notebooks/dengue-analitico.parquet",
+  "saida": "denguinhos/denguinhos/treinamentoDoModelo/artefatos",
+  "ano_inicio": 2015,
+  "ano_fim": 2025,
+  "data_corte": "2026-11-05",
+  "ufs": [
+    "26"
+  ],
+  "municipios": [],
+  "threads": 4,
+  "memoria_duckdb": "2GB",
+  "semente": 42,
+  "offline": false,
+  "painel": {
+    "classificacoes": [
+      "10",
+      "11",
+      "12"
+    ],
+    "id_alvo": "confirmados_classi_fin_10_11_12_inicio_sintomas_v1",
+    "maturacao_dias": 90,
+    "zeros": "snapshot_anual",
+    "cobertura_csv": null,
+    "mapa_municipios_csv": null,
+    "excluir_duplicidade_marcada": true,
+    "max_fracao_quarentena": 0.05
+  },
+  "geografia": {
+    "periodo": 2022,
+    "qualidade": "intermediaria"
+  },
+  "populacao": {
+    "defasagem_publicacao_dias": 366,
+    "censo2022_disponivel_em": "2023-06-28",
+    "max_idade_anos": 3,
+    "ano_ancora_inicio": 2013
+  },
+  "clima": {
+    "provedor": "nenhum",
+    "workers": 3,
+    "lat_grade": 0.5,
+    "lon_grade": 0.625,
+    "min_dias": 6,
+    "atraso_semanas": 1,
+    "ffill_semanas": 2,
+    "max_fracao_ausente": 0.6,
+    "inmet_zips": [],
+    "inmet_workers": 2,
+    "inmet_raio_km": 150,
+    "inmet_estacoes": 3,
+    "inmet_min_cobertura": 0.8
+  },
+  "fontes_opcionais": [],
+  "atributos": {
+    "atraso_casos_semanas": 8,
+    "lags": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      8,
+      13,
+      26,
+      52
+    ],
+    "janelas": [
+      2,
+      4,
+      8,
+      13,
+      26
+    ],
+    "clima_lags": [
+      0,
+      1,
+      2,
+      4,
+      8,
+      12
+    ],
+    "clima_janelas": [
+      2,
+      4,
+      8,
+      12
+    ]
+  },
+  "treino": {
+    "horizontes": [
+      1,
+      2
+    ],
+    "validacao_anos": [
+      2025
+    ],
+    "testes_anos": [],
+    "treino_final_ate": 2024,
+    "fracao_municipios_reservados": 0.1,
+    "candidatos": [
+      "poisson",
+      "hurdle",
+      "logistica_poisson",
+      "ebm",
+      "xgboost",
+      "lightgbm",
+      "bayes_hierarquico",
+      "nb_misto",
+      "arima"
+    ],
+    "max_linhas_modelos_adicionais": 120000,
+    "max_atributos_ebm": 30,
+    "arima": {
+      "ordem": [
+        1,
+        1,
+        1
+      ],
+      "min_semanas": 52
+    },
+    "treinamento_rapido": true,
+    "progresso": {
+      "mostrar": true,
+      "intervalo_arvores": 50
+    },
+    "iterations": 350,
+    "depth": 5,
+    "learning_rate": 0.05,
+    "l2_leaf_reg": 5,
+    "early_stopping_rounds": 60,
+    "calibracao_semanas": 26,
+    "cobertura_intervalo": 0.9,
+    "alerta_quantil": 0.95,
+    "alerta_min_casos": 5,
+    "arquivo_candidatos": "treinamentoDoModelo/modelosCandidatos",
+    "ocorrencia": {
+      "precisao_minima": 0.35,
+      "limiar_padrao": 0.5
+    },
+    "smote": {
+      "habilitado": true,
+      "razao_pos_neg_max": 0.2,
+      "k_vizinhos": 2,
+      "max_sinteticos_por_uf": 50000
+    },
+    "busca_hiperparametros": {
+      "habilitado": false,
+      "anos_triagem": [
+        2025
+      ],
+      "anos_confirmacao": [
+        2025
+      ],
+      "horizontes_triagem": [
+        1
+      ],
+      "horizontes_confirmacao": [
+        1,
+        2
+      ],
+      "finalistas": 2,
+      "tentativas": [
+        {
+          "nome": "referencia_smote",
+          "iterations": 300,
+          "depth": 5,
+          "learning_rate": 0.05,
+          "l2_leaf_reg": 5,
+          "peso_classe_positiva": 1.0,
+          "smote": {
+            "habilitado": true,
+            "razao_pos_neg_max": 0.2
+          }
+        },
+        {
+          "nome": "peso_positivo_4",
+          "iterations": 260,
+          "depth": 5,
+          "learning_rate": 0.06,
+          "l2_leaf_reg": 8,
+          "peso_classe_positiva": 4.0,
+          "smote": {
+            "habilitado": false
+          }
+        },
+        {
+          "nome": "peso_positivo_6",
+          "iterations": 260,
+          "depth": 5,
+          "learning_rate": 0.06,
+          "l2_leaf_reg": 8,
+          "peso_classe_positiva": 6.0,
+          "smote": {
+            "habilitado": false
+          }
+        },
+        {
+          "nome": "peso_positivo_8",
+          "iterations": 250,
+          "depth": 5,
+          "learning_rate": 0.06,
+          "l2_leaf_reg": 10,
+          "peso_classe_positiva": 8.0,
+          "smote": {
+            "habilitado": false
+          }
+        },
+        {
+          "nome": "peso_positivo_10",
+          "iterations": 250,
+          "depth": 4,
+          "learning_rate": 0.07,
+          "l2_leaf_reg": 10,
+          "peso_classe_positiva": 10.0,
+          "smote": {
+            "habilitado": false
+          }
+        }
+      ]
+    }
+  }
+}

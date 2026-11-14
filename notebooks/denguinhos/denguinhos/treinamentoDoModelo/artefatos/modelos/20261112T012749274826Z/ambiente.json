@@ -1,0 +1,17 @@
+{
+  "python": "3.9.6",
+  "pacotes": {
+    "duckdb": "1.4.5",
+    "pandas": "2.3.3",
+    "numpy": "1.26.4",
+    "pyarrow": "21.0.0",
+    "catboost": "1.2.10",
+    "scikit-learn": "1.5.2",
+    "imbalanced-learn": "0.12.4",
+    "shapely": "2.0.7",
+    "xgboost": "2.1.4",
+    "lightgbm": "4.6.0",
+    "interpret-core": "0.7.3",
+    "statsmodels": "0.14.6"
+  }
+}

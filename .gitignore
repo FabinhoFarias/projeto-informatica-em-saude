@@ -44,6 +44,7 @@ next-env.d.ts
 # Extrações locais do SINAN (CSV, checkpoints e logs)
 /data/sinan/
 /data/sinan-arquivos/
+/notebooks/dengue-analitico.parquet
 /treinamentoDoModelo/pacoteColab/
 __pycache__/
 *.py[cod]

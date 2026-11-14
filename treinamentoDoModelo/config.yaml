@@ -80,9 +80,12 @@ treino:
   testes_anos: []
   treino_final_ate: 2024
   fracao_municipios_reservados: 0.10
-  candidatos: [poisson, hurdle, logistica_poisson, ebm, xgboost, lightgbm, random_forest, extra_trees, bayes_hierarquico, nb_misto]
+  candidatos: [poisson, hurdle, logistica_poisson, ebm, xgboost, lightgbm, random_forest, extra_trees, bayes_hierarquico, nb_misto, arima]
   max_linhas_modelos_adicionais: 120000
   max_atributos_ebm: 30
+  arima:
+    ordem: [1, 1, 1]
+    min_semanas: 52
   treinamento_rapido: true
   progresso:
     mostrar: false  # notebook Colab ativa; CatBoost imprime a cada intervalo_arvores

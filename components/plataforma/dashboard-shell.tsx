@@ -18,10 +18,10 @@ function PrototypeNotice() {
       role="note"
       className="mb-5 border-l-4 border-amber-500 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-950"
     >
-      <strong>Protótipo acadêmico · dados fictícios.</strong> Bairros,
-      notificações, probabilidades, recomendações e impactos exibidos nesta
-      interface são exemplos de demonstração; não orientam condutas clínicas ou
-      ações reais da prefeitura.
+      <strong>Projeto PILOTO · dados fictícios.</strong> Bairros, notificações,
+      probabilidades, recomendações e impactos exibidos nesta interface são
+      exemplos de demonstração; não orientam condutas clínicas ou ações reais da
+      prefeitura.
     </div>
   );
 }
@@ -81,7 +81,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           onLogout={handleLogout}
         />
 
-        <main className="w-full p-6">
+        <main className="w-full px-3 pb-24 pt-4 sm:p-6 sm:pb-6">
           {/* <PrototypeNotice /> */}
 
           {loggedOut ? (

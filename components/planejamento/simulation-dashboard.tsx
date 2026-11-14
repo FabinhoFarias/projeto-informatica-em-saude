@@ -131,16 +131,16 @@ export function SimulationDashboard() {
   return (
     <div>
       <PageHeading
-        eyebrow={`Planejamento operacional · ${municipality.name}, ${municipality.state} · Cenários`}
-        title="Simulação de recursos"
-        description="Ajuste a disponibilidade municipal e compare cobertura territorial e impacto epidemiológico estimado."
+        eyebrow={`Planejamento operacional · ${municipality.name}, ${municipality.state} · Projeto PILOTO`}
+        title="Projeto PILOTO"
+        description="Explore a disponibilidade municipal e compare a cobertura territorial e o impacto epidemiológico estimado."
         action={
           <button
             type="button"
             onClick={resetScenario}
             className="min-h-10 border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50"
           >
-            Restaurar cenário base
+            Restaurar parâmetros do PILOTO
           </button>
         }
       />
@@ -148,7 +148,7 @@ export function SimulationDashboard() {
       <section className="mb-5 grid gap-5 xl:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
         <Panel
           title="Recursos disponíveis"
-          description="Ajuste os valores para construir um cenário de resposta."
+          description="Ajuste os valores para explorar possibilidades de resposta no Projeto PILOTO."
         >
           <div className="space-y-6">
             {controls.map((control) => (
@@ -199,7 +199,7 @@ export function SimulationDashboard() {
 
         <div className="space-y-5">
           <section
-            aria-label="Indicadores do cenário simulado"
+            aria-label="Indicadores do Projeto PILOTO"
             className="grid gap-3 sm:grid-cols-2"
           >
             <MetricCard
@@ -217,16 +217,16 @@ export function SimulationDashboard() {
           </section>
           <Panel
             title="Impacto projetado"
-            description="Casos estimados em quatro semanas · cenário atual versus simulado."
+            description="Casos estimados em quatro semanas · cenário base versus projeção do PILOTO."
           >
             <div className="mb-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-slate-600">
               <span className="inline-flex items-center gap-2">
                 <span className="h-3 w-3 bg-slate-300" />
-                Cenário atual sem ajuste
+                Cenário base
               </span>
               <span className="inline-flex items-center gap-2">
                 <span className="h-3 w-3 bg-blue-700" />
-                Cenário simulado
+                Projeção do PILOTO
               </span>
             </div>
             <div className="space-y-4">

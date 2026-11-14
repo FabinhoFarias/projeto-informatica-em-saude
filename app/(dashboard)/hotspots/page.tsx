@@ -1,5 +1,5 @@
-import { HotspotWorkspace } from "@/components/operacao/hotspot-workspace";
+import { redirect } from "next/navigation";
 
 export default function HotspotsPage() {
-  return <HotspotWorkspace />;
+  redirect("/mapas");
 }

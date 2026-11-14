@@ -10,14 +10,19 @@ export interface CasaTerritorialDemo {
 }
 
 /** Dados fictícios: não representam endereços ou coordenadas reais. */
-export const casasTerritoriaisDemo: CasaTerritorialDemo[] = mappedTerritories.flatMap(
-  (territorio, territorioIndex) =>
+export const casasTerritoriaisDemo: CasaTerritorialDemo[] =
+  mappedTerritories.flatMap((territorio, territorioIndex) =>
     Array.from({ length: 5 }, (_, casaIndex) => ({
       id: `${territorio.id}-casa-${casaIndex + 1}`,
       territorioId: territorio.id,
       codigo: `CASA-${territorio.id.toUpperCase()}-${String(casaIndex + 1).padStart(3, "0")}`,
       setor: `Setor ${String((territorioIndex % 4) + 1).padStart(2, "0")}`,
-      situacao: casaIndex === 0 ? "Revisão" : casaIndex % 2 === 0 ? "Visitado" : "Aguardando visita",
+      situacao:
+        casaIndex === 0
+          ? "Revisão"
+          : casaIndex % 2 === 0
+            ? "Visitado"
+            : "Aguardando visita",
       foco: casaIndex === 0 && territorioIndex % 3 === 0,
     })),
-);
+  );

@@ -3,7 +3,7 @@
 
 Sequência recomendada no terminal (a busca não recria fontes nem atributos):
 
-    # 1) Instale as bibliotecas dos dez candidatos.
+    # 1) Instale as bibliotecas dos candidatos configurados.
     treinamentoDoModelo/.venv/bin/python -m pip install -r treinamentoDoModelo/requirements.txt
 
     # 2) Compara candidatos em 2025, treinando até 2024.

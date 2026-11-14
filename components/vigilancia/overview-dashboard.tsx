@@ -15,6 +15,7 @@ import { formatNumber } from "@/lib/plataforma/format";
 import { recommendationsFor } from "@/lib/priorizacao/recommendations";
 import { riskColors } from "@/lib/territorios/risk";
 import type { Neighborhood } from "@/lib/territorios/types";
+import { sectorPropertiesDemo } from "@/lib/visitas/demo-data";
 
 type SortKey = "incidenceProbability" | "forecastCases" | "name" | "vectorFoci";
 
@@ -49,26 +50,39 @@ function projectedCasesFor(
   );
 }
 
+function normalizeSearchText(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase("pt-BR");
+}
+
 export function OverviewDashboard() {
   const role = useRole();
   const [period, setPeriod] = useState(4);
   const [condition, setCondition] = useState("Todos");
   const [sortKey, setSortKey] = useState<SortKey>("incidenceProbability");
+  const [neighborhoodSearch, setNeighborhoodSearch] = useState("");
   const [view, setView] = useState<"grid" | "table">("grid");
   const [selectedNeighborhood, setSelectedNeighborhood] =
     useState<Neighborhood | null>(null);
 
+  const normalizedSearch = normalizeSearchText(neighborhoodSearch.trim());
   const sortedNeighborhoods = useMemo(
     () =>
-      [...neighborhoods].sort((left, right) => {
-        if (sortKey === "name")
-          return left.name.localeCompare(right.name, "pt-BR");
-        return Number(right[sortKey]) - Number(left[sortKey]);
-      }),
-    [sortKey],
+      [...neighborhoods]
+        .filter((item) =>
+          normalizeSearchText(item.name).includes(normalizedSearch),
+        )
+        .sort((left, right) => {
+          if (sortKey === "name")
+            return left.name.localeCompare(right.name, "pt-BR");
+          return Number(right[sortKey]) - Number(left[sortKey]);
+        }),
+    [normalizedSearch, sortKey],
   );
 
-  const projectedCases = sortedNeighborhoods.reduce(
+  const projectedCases = neighborhoods.reduce(
     (total, item) => total + projectedCasesFor(item, period, condition),
     0,
   );
@@ -102,7 +116,7 @@ export function OverviewDashboard() {
 
       <section
         aria-label="Filtros do painel"
-        className="mb-5 grid gap-3 border border-slate-200 bg-white p-4 sm:grid-cols-2 xl:grid-cols-[1fr_1fr_1.5fr]"
+        className="mb-5 grid gap-3 border border-slate-200 bg-white p-4 sm:grid-cols-2 xl:grid-cols-[1fr_1fr_1.5fr_1fr]"
       >
         <div>
           <label
@@ -142,6 +156,28 @@ export function OverviewDashboard() {
             <option>Zika</option>
             <option>Chikungunya</option>
           </select>
+        </div>
+        <div>
+          <label
+            htmlFor="neighborhood-search"
+            className="mb-1.5 block text-xs font-medium text-slate-600"
+          >
+            Buscar bairro
+          </label>
+          <input
+            id="neighborhood-search"
+            type="search"
+            list="neighborhood-options"
+            value={neighborhoodSearch}
+            onChange={(event) => setNeighborhoodSearch(event.target.value)}
+            placeholder="Digite ou selecione"
+            className="min-h-10 w-full border border-slate-200 bg-white px-3 text-sm outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+          />
+          <datalist id="neighborhood-options">
+            {neighborhoods.map((item) => (
+              <option key={item.id} value={item.name} />
+            ))}
+          </datalist>
         </div>
         <div>
           <label
@@ -197,7 +233,7 @@ export function OverviewDashboard() {
 
       <Panel
         title="Ranking de risco por bairro"
-        description={`${municipality.name}, ${municipality.state} · ${sortedNeighborhoods.length} bairros · projeção para ${period} semanas`}
+        description={`${municipality.name}, ${municipality.state} · ${normalizedSearch ? `${sortedNeighborhoods.length} de ${neighborhoods.length}` : neighborhoods.length} bairros · projeção para ${period} semanas`}
         action={
           <div
             className="flex items-center gap-1 border border-slate-200 p-1"
@@ -222,7 +258,14 @@ export function OverviewDashboard() {
           </div>
         }
       >
-        {view === "grid" ? (
+        {sortedNeighborhoods.length === 0 ? (
+          <p
+            role="status"
+            className="border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-600"
+          >
+            Nenhum bairro encontrado para “{neighborhoodSearch}”.
+          </p>
+        ) : view === "grid" ? (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {sortedNeighborhoods.map((item, index) => (
               <NeighborhoodCard
@@ -541,6 +584,12 @@ function FieldPortal() {
   const assignedNeighborhood = neighborhoods.find(
     (neighborhood) => neighborhood.id === "centro",
   )!;
+  const sent = sectorPropertiesDemo.filter(
+    (property) => property.ultimaVisita?.operacaoSync.status === "RECEBIDA",
+  ).length;
+  const pending = sectorPropertiesDemo.filter(
+    (property) => property.ultimaVisita?.operacaoSync.status === "PENDENTE",
+  ).length;
 
   return (
     <div>
@@ -549,8 +598,75 @@ function FieldPortal() {
         title="Minha rota de campo"
         description="Acompanhe as visitas atribuídas à sua microárea e os alertas que precisam de verificação."
       />
+      <section
+        aria-label="Estatísticas do setor"
+        className="mb-5 grid gap-3 sm:grid-cols-3"
+      >
+        <Panel title="Imóveis atribuídos" description="Percurso demonstrativo">
+          <p className="text-3xl font-bold text-slate-950">
+            {sectorPropertiesDemo.length}
+          </p>
+        </Panel>
+        <Panel title="Visitas recebidas" description="Registros sincronizados">
+          <p className="text-3xl font-bold text-emerald-800">{sent}</p>
+        </Panel>
+        <Panel title="Envios pendentes" description="Aguardando sincronização">
+          <p className="text-3xl font-bold text-amber-700">{pending}</p>
+        </Panel>
+      </section>
+      <section className="mb-5 border border-slate-200 bg-white p-5">
+        <h2 className="text-lg font-bold text-slate-950">
+          Relatórios de campo
+        </h2>
+        <p className="mt-1 text-sm text-slate-600">
+          Visualize e imprima os modelos demonstrativos do serviço antivetorial.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <a
+            href="/relatorios/resumo-diario-servico-antivetorial.html"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex min-h-10 items-center bg-emerald-800 px-4 text-sm font-semibold text-white"
+          >
+            Registro diário
+          </a>
+          <a
+            href="/relatorios/resumo-trabalho-campo-laboratorio.html"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex min-h-10 items-center border border-emerald-800 px-4 text-sm font-semibold text-emerald-900"
+          >
+            Campo e laboratório
+          </a>
+        </div>
+        <details className="mt-4 border border-slate-200 bg-slate-50 p-3">
+          <summary className="cursor-pointer text-sm font-semibold text-slate-800">
+            Pré-visualizar registro diário
+          </summary>
+          <iframe
+            title="Pré-visualização do registro diário do ACE"
+            src="/relatorios/resumo-diario-servico-antivetorial.html"
+            loading="lazy"
+            className="mt-3 h-[700px] w-full border border-slate-300 bg-white"
+          />
+        </details>
+        <details className="mt-3 border border-slate-200 bg-slate-50 p-3">
+          <summary className="cursor-pointer text-sm font-semibold text-slate-800">
+            Pré-visualizar resumo de campo e laboratório
+          </summary>
+          <iframe
+            title="Pré-visualização do resumo de campo e laboratório"
+            src="/relatorios/resumo-trabalho-campo-laboratorio.html"
+            loading="lazy"
+            className="mt-3 h-[700px] w-full border border-slate-300 bg-white"
+          />
+        </details>
+      </section>
       <section className="grid gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(280px,0.8fr)]">
-        <Panel title="Rota de hoje" description="Centro · Microárea 04 · Lagoa de Itaenga">
+        <Panel
+          title="Rota de hoje"
+          description="Centro · Microárea 04 · Lagoa de Itaenga"
+        >
           <p className="text-sm font-semibold text-slate-900">
             12 imóveis prioritários
           </p>

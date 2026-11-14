@@ -31,9 +31,10 @@ export function TerritorialPrioritization() {
           Do sinal territorial à decisão da equipe
         </h1>
         <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
-          Demonstração interativa para a persona gestora da Vigilância
-          Ambiental em Lagoa de Itaenga. Escolha um território, veja quais critérios didáticos foram
-          acionados e registre uma decisão temporária nesta sessão.
+          Demonstração interativa para a persona gestora da Vigilância Ambiental
+          em Lagoa de Itaenga. Escolha um território, veja quais critérios
+          didáticos foram acionados e registre uma decisão temporária nesta
+          sessão.
         </p>
       </header>
 

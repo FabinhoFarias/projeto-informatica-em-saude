@@ -12,7 +12,7 @@ export const roleLabels: Record<Role, string> = {
   ADMIN: "Administrador do Sistema",
   GESTOR: "Gestor de Saúde Municipal",
   EPIDEMIOLOGISTA: "Epidemiologista / Pesquisador",
-  AGENTE_CAMPO: "Agente de Saúde / Endemias",
+  AGENTE_CAMPO: "Agente de Endemias",
   PROFISSIONAL_APS: "Profissional da Atenção Primária",
 };
 
@@ -65,6 +65,7 @@ export function canAccessPath(role: Role, pathname: string) {
   const routePermissions: Record<string, Permission> = {
     "/painel": "dashboard:view",
     "/visitas": "field:routes",
+    "/mapas": "dashboard:view",
     "/hotspots": "dashboard:view",
     "/priorizacao-territorial": "dashboard:view",
     "/diagnostico": "diagnosis:view",

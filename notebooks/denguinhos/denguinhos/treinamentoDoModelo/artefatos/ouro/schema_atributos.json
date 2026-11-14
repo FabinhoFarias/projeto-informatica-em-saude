@@ -1,0 +1,189 @@
+{
+  "numericas": [
+    "f_casos_lag10",
+    "f_casos_lag11",
+    "f_casos_lag12",
+    "f_casos_lag16",
+    "f_casos_lag21",
+    "f_casos_lag34",
+    "f_casos_lag60",
+    "f_casos_lag8",
+    "f_casos_lag9",
+    "f_casos_max13",
+    "f_casos_max2",
+    "f_casos_max26",
+    "f_casos_max4",
+    "f_casos_max8",
+    "f_casos_media13",
+    "f_casos_media2",
+    "f_casos_media26",
+    "f_casos_media4",
+    "f_casos_media8",
+    "f_casos_std13",
+    "f_casos_std2",
+    "f_casos_std26",
+    "f_casos_std4",
+    "f_casos_std8",
+    "f_cosseno_semana",
+    "f_densidade",
+    "f_historia_ausente",
+    "f_incidencia_recente",
+    "f_latitude",
+    "f_log_area",
+    "f_log_populacao",
+    "f_longitude",
+    "f_populacao_ausente",
+    "f_populacao_idade",
+    "f_seno_semana",
+    "f_tendencia4",
+    "f_vizinhos_cobertura",
+    "f_vizinhos_quantidade",
+    "f_vizinhos_soma",
+    "f_vizinhos_soma_lag1",
+    "f_vizinhos_soma_lag3"
+  ],
+  "categoricas": [
+    "codigo_ibge",
+    "uf",
+    "porte"
+  ],
+  "ausencias_antes_imputacao": {
+    "f_casos_lag10": 0.017421602787456445,
+    "f_casos_lag11": 0.01916376306620209,
+    "f_casos_lag12": 0.020905923344947737,
+    "f_casos_lag16": 0.027874564459930314,
+    "f_casos_lag21": 0.036585365853658534,
+    "f_casos_lag34": 0.059233449477351915,
+    "f_casos_lag60": 0.10452961672473868,
+    "f_casos_lag8": 0.013937282229965157,
+    "f_casos_lag9": 0.0156794425087108,
+    "f_casos_max13": 0.03484320557491289,
+    "f_casos_max2": 0.0156794425087108,
+    "f_casos_max26": 0.05749128919860627,
+    "f_casos_max4": 0.01916376306620209,
+    "f_casos_max8": 0.02613240418118467,
+    "f_casos_media13": 0.03484320557491289,
+    "f_casos_media2": 0.0156794425087108,
+    "f_casos_media26": 0.05749128919860627,
+    "f_casos_media4": 0.01916376306620209,
+    "f_casos_media8": 0.02613240418118467,
+    "f_casos_std13": 0.03484320557491289,
+    "f_casos_std2": 0.0156794425087108,
+    "f_casos_std26": 0.05749128919860627,
+    "f_casos_std4": 0.01916376306620209,
+    "f_casos_std8": 0.02613240418118467,
+    "f_cosseno_semana": 0.0,
+    "f_densidade": 0.0,
+    "f_historia_ausente": 0.0,
+    "f_incidencia_recente": 0.013937282229965157,
+    "f_latitude": 1.0,
+    "f_log_area": 0.0,
+    "f_log_populacao": 0.0,
+    "f_longitude": 1.0,
+    "f_populacao_ausente": 0.0,
+    "f_populacao_idade": 0.0,
+    "f_seno_semana": 0.0,
+    "f_tendencia4": 0.020905923344947737,
+    "f_vizinhos_cobertura": 0.0,
+    "f_vizinhos_quantidade": 0.0,
+    "f_vizinhos_soma": 1.0,
+    "f_vizinhos_soma_lag1": 1.0,
+    "f_vizinhos_soma_lag3": 1.0
+  },
+  "cenario": "retrospectivo_base_revisada; sem snapshots as-of",
+  "atraso_casos_semanas": 8,
+  "config_preparo": {
+    "entrada": "/Users/fabinho/Projetos/denguinhos/notebooks/dengue-analitico.parquet",
+    "ano_inicio": 2015,
+    "ano_fim": 2025,
+    "data_corte": "2026-11-05",
+    "ufs": [
+      "26"
+    ],
+    "municipios": [],
+    "painel": {
+      "classificacoes": [
+        "10",
+        "11",
+        "12"
+      ],
+      "id_alvo": "confirmados_classi_fin_10_11_12_inicio_sintomas_v1",
+      "maturacao_dias": 90,
+      "zeros": "snapshot_anual",
+      "cobertura_csv": null,
+      "mapa_municipios_csv": null,
+      "excluir_duplicidade_marcada": true,
+      "max_fracao_quarentena": 0.05
+    },
+    "geografia": {
+      "periodo": 2022,
+      "qualidade": "intermediaria"
+    },
+    "populacao": {
+      "defasagem_publicacao_dias": 366,
+      "censo2022_disponivel_em": "2023-06-28",
+      "max_idade_anos": 3,
+      "ano_ancora_inicio": 2013
+    },
+    "clima": {
+      "provedor": "nenhum",
+      "workers": 3,
+      "lat_grade": 0.5,
+      "lon_grade": 0.625,
+      "min_dias": 6,
+      "atraso_semanas": 1,
+      "ffill_semanas": 2,
+      "max_fracao_ausente": 0.6,
+      "inmet_zips": [],
+      "inmet_workers": 2,
+      "inmet_raio_km": 150,
+      "inmet_estacoes": 3,
+      "inmet_min_cobertura": 0.8
+    },
+    "fontes_opcionais": [],
+    "atributos": {
+      "atraso_casos_semanas": 8,
+      "lags": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        8,
+        13,
+        26,
+        52
+      ],
+      "janelas": [
+        2,
+        4,
+        8,
+        13,
+        26
+      ],
+      "clima_lags": [
+        0,
+        1,
+        2,
+        4,
+        8,
+        12
+      ],
+      "clima_janelas": [
+        2,
+        4,
+        8,
+        12
+      ]
+    },
+    "semente": 42,
+    "reserva_espacial": {
+      "fracao": 0.1,
+      "ano_estratificacao": 2024
+    },
+    "horizontes": [
+      1,
+      2
+    ]
+  }
+}

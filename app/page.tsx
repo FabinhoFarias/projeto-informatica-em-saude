@@ -163,7 +163,7 @@ export default function HomePage() {
             </Link>
           </div>
           <p className="home-hero-note">
-            Protótipo acadêmico · dados e mapa ilustrativos
+            Projeto PILOTO · dados e mapa ilustrativos
           </p>
         </div>
         <div className="home-hero-bottom">
@@ -257,9 +257,9 @@ export default function HomePage() {
           <span className="home-brand-mark">V+</span>
           <span>VIGIA+</span>
         </Link>
-        <p>Protótipo acadêmico de apoio à vigilância de arboviroses.</p>
+        <p>Projeto PILOTO de apoio à vigilância de arboviroses.</p>
         <Link href="/painel">
-          Entrar na demonstração <Arrow diagonal />
+          Acessar Projeto PILOTO <Arrow diagonal />
         </Link>
       </footer>
     </main>

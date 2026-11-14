@@ -19,7 +19,9 @@ const territoryOptions = [
   "Secretaria Municipal de Saúde",
   "Vigilância Epidemiológica",
   ...mappedTerritories.map((territory) => territory.name),
-  ...mappedTerritories.slice(0, 3).map((territory) => `${territory.name} · Microárea 01`),
+  ...mappedTerritories
+    .slice(0, 3)
+    .map((territory) => `${territory.name} · Microárea 01`),
   ...mappedTerritories.slice(0, 3).map((territory) => `UBS ${territory.name}`),
 ];
 
@@ -200,7 +202,9 @@ export function UsersDashboard() {
       return;
     }
     if (!territoryOptions.includes(form.territory)) {
-      setFormError(`Selecione uma unidade ou território de ${municipality.name}.`);
+      setFormError(
+        `Selecione uma unidade ou território de ${municipality.name}.`,
+      );
       return;
     }
 

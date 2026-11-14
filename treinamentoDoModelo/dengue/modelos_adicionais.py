@@ -1,7 +1,7 @@
-"""Candidatos interpretáveis para comparação no mesmo corte temporal.
+"""Candidatos adicionais para comparação no mesmo corte temporal.
 
-Cada objeto recebe o DataFrame já imputado pelo pipeline. A codificação é
-ajustada exclusivamente no treino e persistida junto do estimador.
+Modelos tabulares recebem atributos imputados pelo pipeline. ARIMA recebe as
+datas e contagens para ajustar uma série temporal agregada por UF.
 """
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ from .base import LOG
 
 
 TIPOS = {'logistica_poisson', 'ebm', 'xgboost', 'lightgbm', 'random_forest',
-         'extra_trees', 'bayes_hierarquico', 'nb_misto'}
+         'extra_trees', 'bayes_hierarquico', 'nb_misto', 'arima'}
 
 
 def _amostra(y, limite, semente):
@@ -40,7 +40,7 @@ def _amostra(y, limite, semente):
 
 
 class ModeloAdicional:
-    """Hurdle ou modelo de contagem; API homogênea para calibração e inferência."""
+    """Modelo tabular ou temporal com API comum de calibração e inferência."""
 
     def __init__(self, tipo, cfg):
         if tipo not in TIPOS:
@@ -74,9 +74,15 @@ class ModeloAdicional:
             return x[self.colunas_ebm].copy()
         return self.codificador.transform(x)
 
-    def fit(self, x, y, numericas, categoricas):
+    def fit(self, x, y, numericas, categoricas, datas=None):
         y = np.asarray(y, float)
         self.numericas, self.categoricas = list(numericas), list(categoricas)
+        if self.tipo == 'arima':
+            if datas is None:
+                raise ValueError('ARIMA precisa da data de cada observação.')
+            self._fit_arima(x, y, datas)
+            self.smote = {'habilitado': False, 'motivo': 'modelo_temporal'}
+            return self
         limite = int(self.cfg['treino'].get('max_linhas_modelos_adicionais', 120000))
         indices, pesos = _amostra(y, limite, self.cfg['semente'])
         x_fit = x.iloc[indices].reset_index(drop=True)
@@ -146,6 +152,44 @@ class ModeloAdicional:
         self.regressor.fit(xx[positivos], y_fit[positivos], sample_weight=pesos[positivos])
         return self
 
+    def _fit_arima(self, x, y, datas):
+        try:
+            from statsmodels.tsa.arima.model import ARIMA
+        except ImportError as erro:
+            raise ImportError('Instale statsmodels com requirements.txt para usar ARIMA.') from erro
+        datas = pd.DatetimeIndex(pd.to_datetime(datas, errors='raise'))
+        if datas.isna().any() or not np.isfinite(y).all() or (y < 0).any():
+            raise ValueError('ARIMA requer datas válidas e contagens finitas não negativas.')
+        if not {'uf', 'populacao'}.issubset(x.columns):
+            raise ValueError('ARIMA requer as colunas uf e populacao.')
+
+        ordem = tuple(self.cfg['treino'].get('arima', {}).get('ordem', [1, 1, 1]))
+        minimo = int(self.cfg['treino'].get('arima', {}).get('min_semanas', 52))
+        dados = pd.DataFrame({
+            'uf': x.uf.astype(str).to_numpy(),
+            'data': datas.to_numpy(),
+            'casos': y,
+            'populacao': pd.to_numeric(x.populacao, errors='raise').to_numpy(float),
+        })
+        if (dados.populacao <= 0).any():
+            raise ValueError('ARIMA requer população positiva.')
+
+        self.arima_por_uf = {}
+        for uf, grupo in dados.groupby('uf', sort=True):
+            semanal = grupo.groupby('data', sort=True).agg(
+                casos=('casos', 'sum'), populacao=('populacao', 'sum'))
+            if len(semanal) < minimo:
+                raise ValueError(f'ARIMA da UF {uf} requer ao menos {minimo} semanas; recebeu {len(semanal)}.')
+            grade = pd.date_range(semanal.index.min(), semanal.index.max(), freq='7D')
+            incidencia = (semanal.casos / semanal.populacao * 100000).reindex(grade)
+            ajustado = ARIMA(incidencia, order=ordem, missing='none').fit()
+            self.arima_por_uf[uf] = {
+                'modelo': ajustado,
+                'ultima_data': grade[-1],
+            }
+        self.arima_ordem = ordem
+        self.arima_semanas_treino = int(len(dados))
+
     def _fit_bayes(self, x, y, pesos):
         # Gamma-Poisson hierárquico empírico: média estadual informa o prior
         # da taxa municipal. É um baseline de contagem, sem efeitos climáticos.
@@ -197,7 +241,27 @@ class ModeloAdicional:
         dummies = np.column_stack([uf == c for c in self.uf_nb[1:]]).astype(float) if len(self.uf_nb) > 1 else np.empty((len(x), 0))
         return np.column_stack([np.ones(len(x)), numerico, dummies])
 
-    def predict(self, x):
+    def predict(self, x, datas=None):
+        if self.tipo == 'arima':
+            if datas is None:
+                raise ValueError('ARIMA precisa da data de cada previsão.')
+            datas = pd.DatetimeIndex(pd.to_datetime(datas, errors='raise'))
+            pred = np.empty(len(x), dtype=float)
+            ufs = x.uf.astype(str).to_numpy()
+            populacao = pd.to_numeric(x.populacao, errors='raise').to_numpy(float)
+            for uf in np.unique(ufs):
+                if uf not in self.arima_por_uf:
+                    raise ValueError(f'ARIMA não foi ajustado para a UF {uf}.')
+                mask = ufs == uf
+                ajuste = self.arima_por_uf[uf]
+                passos = ((datas[mask] - ajuste['ultima_data']).days / 7).astype(int)
+                if (passos < 1).any() or not np.allclose(
+                        (datas[mask] - ajuste['ultima_data']).days / 7, passos):
+                    raise ValueError(f'ARIMA recebeu datas não futuras ou desalinhadas da semana para UF {uf}.')
+                previsoes = ajuste['modelo'].forecast(steps=int(passos.max()))
+                pred[mask] = (np.asarray(previsoes)[passos - 1]
+                              * populacao[mask] / 100000)
+            return np.maximum(pred, 0.)
         if self.tipo == 'bayes_hierarquico':
             uf, cod = x.uf.astype(str).to_numpy(), x.codigo_ibge.astype(str).to_numpy()
             mu = np.array([self.medias_municipio.get(c, self.medias_uf.get(u, self.media_global))
@@ -210,7 +274,9 @@ class ModeloAdicional:
             mu = self.regressor.predict(xx) * self.classificador.predict_proba(xx)[:, 1]
         return np.maximum(np.asarray(mu, float), 0.)
 
-    def predict_ocorrencia(self, x):
+    def predict_ocorrencia(self, x, datas=None):
+        if self.tipo == 'arima':
+            return 1 - np.exp(-self.predict(x, datas))
         if self.tipo == 'bayes_hierarquico':
             return 1 - np.exp(-self.predict(x))
         if self.tipo == 'nb_misto':
@@ -220,6 +286,13 @@ class ModeloAdicional:
 
     def explicacao(self):
         """Resumo global auditável da parte de ocorrência ou da taxa prevista."""
+        if self.tipo == 'arima':
+            return {
+                'metodo': 'ARIMA_por_UF_em_incidencia_semanal; escala_por_populacao_municipal',
+                'ordem': list(self.arima_ordem),
+                'semanas_treino': self.arima_semanas_treino,
+                'ufs': sorted(self.arima_por_uf),
+            }
         if self.tipo == 'bayes_hierarquico':
             return {'metodo': 'posterior_Gamma_Poisson_por_UF_e_municipio',
                     'media_global': self.media_global, 'medias_uf': self.medias_uf,

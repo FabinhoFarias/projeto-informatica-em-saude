@@ -2,6 +2,7 @@
 
 import { useMemo, useState, type ChangeEvent } from "react";
 import { PageHeading } from "@/components/plataforma/dashboard-ui";
+import { MapViewport } from "@/components/operacao/map-viewport";
 import { importAgentLocationCsv } from "@/lib/operacao/import-locations";
 import {
   aggregateHotspots,
@@ -65,10 +66,10 @@ function SchematicMap({
 }) {
   const maxCount = Math.max(1, ...cells.map((cell) => cell.count));
   return (
-    <div className="relative aspect-[4/3] min-h-[430px] w-full overflow-hidden bg-[#e4eee9] sm:aspect-[16/10]">
+    <MapViewport label="Mapa demonstrativo dos hotspots de campo">
       <svg
         viewBox="0 0 800 500"
-        preserveAspectRatio="none"
+        preserveAspectRatio="xMidYMid slice"
         className="absolute inset-0 h-full w-full"
         aria-hidden="true"
       >
@@ -119,7 +120,7 @@ function SchematicMap({
           </text>
         </g>
       </svg>
-      <div className="absolute left-4 top-4 z-20 border border-white/70 bg-white/90 px-3 py-2 text-xs font-semibold text-slate-800 shadow-sm">
+      <div className="absolute left-2 top-2 z-20 max-w-[calc(100%-1rem)] border border-white/70 bg-white/90 px-2 py-1.5 text-[11px] font-semibold text-slate-800 shadow-sm sm:left-4 sm:top-4 sm:px-3 sm:py-2 sm:text-xs">
         Mapa esquemático · Lagoa de Itaenga
       </div>
       {cells.map((cell) => {
@@ -165,7 +166,7 @@ function SchematicMap({
             />
           );
         })}
-      <div className="absolute bottom-4 left-4 z-20 flex flex-wrap gap-3 border border-white/70 bg-white/90 px-3 py-2 text-[11px] font-medium text-slate-700 shadow-sm">
+      <div className="absolute bottom-2 left-2 right-2 z-20 flex flex-wrap gap-x-3 gap-y-1 border border-white/70 bg-white/90 px-2 py-1.5 text-[10px] font-medium text-slate-700 shadow-sm sm:bottom-4 sm:left-4 sm:right-auto sm:px-3 sm:py-2 sm:text-[11px]">
         <span className="flex items-center gap-1.5">
           <i
             className={`h-2.5 w-2.5 rounded-full ${layer === "foco" ? "bg-orange-500" : "bg-emerald-500"}`}
@@ -179,7 +180,7 @@ function SchematicMap({
           </span>
         )}
       </div>
-    </div>
+    </MapViewport>
   );
 }
 
@@ -229,7 +230,7 @@ export function HotspotWorkspace() {
   };
 
   return (
-    <div>
+    <div className="min-w-0">
       <PageHeading
         eyebrow="Operação territorial · mapa de atividade"
         title="Hotspots de campo"
@@ -267,7 +268,7 @@ export function HotspotWorkspace() {
           aria-label="Mapa e camadas de hotspots"
           className="min-w-0 overflow-hidden border border-slate-200 bg-white"
         >
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 p-4">
+          <div className="flex flex-col items-stretch gap-3 border-b border-slate-200 p-3 sm:flex-row sm:items-center sm:justify-between sm:p-4">
             <div>
               <h2 className="font-bold text-slate-950">
                 Concentração por célula
@@ -280,7 +281,7 @@ export function HotspotWorkspace() {
             <div
               role="group"
               aria-label="Escolher camada do mapa"
-              className="flex border border-slate-200 p-1 text-xs font-semibold"
+              className="grid grid-cols-2 border border-slate-200 p-1 text-xs font-semibold sm:flex"
             >
               <button
                 type="button"
