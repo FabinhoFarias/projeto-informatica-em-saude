@@ -14,6 +14,18 @@ export const navigationItems: NavigationItem[] = [
     icon: "✓",
     display: "todos",
   },
+  {
+    href: "/laboratorio",
+    label: "Laboratório",
+    icon: "⌬",
+    display: "todos",
+  },
+  {
+    href: "/digitacao-relatorios",
+    label: "Digitação e relatórios",
+    icon: "▤",
+    display: "todos",
+  },
   { href: "/mapas", label: "Mapas", icon: "◉", display: "todos" },
   {
     href: "/priorizacao-territorial",
@@ -30,4 +42,10 @@ export const navigationItems: NavigationItem[] = [
   { href: "/ingestao", label: "Ingestão de dados", icon: "⇧", display: "pc" },
   { href: "/simulacao", label: "Projeto PILOTO", icon: "⤢", display: "pc" },
   { href: "/usuarios", label: "Gestão de usuários", icon: "◎", display: "pc" },
+  {
+    href: "/configuracao-municipal",
+    label: "Configuração municipal",
+    icon: "⚙",
+    display: "pc",
+  },
 ];

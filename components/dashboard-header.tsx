@@ -180,12 +180,15 @@ export function DashboardHeader({
   const titleByRoute: Record<string, string> = {
     "/painel": "Dashboard",
     "/visitas": "Meu setor · visitas",
+    "/laboratorio": "Laboratório entomológico",
+    "/digitacao-relatorios": "Digitação e relatórios",
     "/hotspots": "Mapa de hotspots",
     "/priorizacao-territorial": "Priorização territorial",
     "/diagnostico": "Diagnóstico situacional",
     "/ingestao": "Ingestão de dados",
     "/simulacao": "Projeto PILOTO",
     "/usuarios": "Gestão de usuários",
+    "/configuracao-municipal": "Configuração municipal",
   };
   const title = titleByRoute[pathname] ?? "Dashboard";
   return (

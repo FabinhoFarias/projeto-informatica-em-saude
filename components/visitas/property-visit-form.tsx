@@ -3,6 +3,10 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 import type { SectorPropertyMock } from "@/lib/visitas/demo-data";
+import {
+  PropertyOperationSupport,
+  type DemoSyncStatus,
+} from "@/components/visitas/property-operation-support";
 
 const fieldClass =
   "mt-1 h-10 w-full border border-slate-300 bg-white px-3 text-sm outline-none focus:border-emerald-700 focus:ring-2 focus:ring-emerald-100";
@@ -121,6 +125,11 @@ export function PropertyVisitForm({
       )
     : 0;
   const [message, setMessage] = useState("");
+  const [syncStatus, setSyncStatus] = useState<DemoSyncStatus>(() =>
+    existingVisit?.operacaoSync.status === "RECEBIDA"
+      ? "SINCRONIZADO"
+      : "PENDENTE",
+  );
   const [liInspected, setLiInspected] = useState(() => {
     if (typeof window === "undefined") return true;
     const raw = sessionStorage.getItem(`vigia:visita:${property.id}:${cycle}`);
@@ -176,6 +185,7 @@ export function PropertyVisitForm({
       `vigia:visita:${property.id}:${cycle}`,
       JSON.stringify(data),
     );
+    setSyncStatus("PENDENTE");
     setMessage(
       "Ficha registrada nesta demonstração e mantida nesta sessão do navegador.",
     );
@@ -209,6 +219,11 @@ export function PropertyVisitForm({
             : "Nova ficha de campo"}
         </span>
       </div>
+      <PropertyOperationSupport
+        property={property}
+        syncStatus={syncStatus}
+        onSyncStatusChange={setSyncStatus}
+      />
       <form ref={formRef} onSubmit={save} className="space-y-4">
         <Section
           title="Atividade e situação da visita"

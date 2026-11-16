@@ -42,9 +42,6 @@ jobs:
       - name: Verificar lint
         run: npm run lint:check
 
-      - name: Verificar tipos
-        run: npm run typecheck
-
       - name: Executar testes unitários
         run: npm run test:unit
 
@@ -74,7 +71,9 @@ jobs:
       - name: Instalar dependências bloqueadas
         run: npm ci
 
-      - name: Gerar build de produção
+      # O Next.js executa a checagem completa do TypeScript durante o build.
+      # Mantê-la aqui evita rodar o mesmo tsc também no job de qualidade.
+      - name: Verificar tipos e gerar build de produção
         run: npm run build
 
   delivery:

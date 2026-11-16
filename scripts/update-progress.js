@@ -3,10 +3,16 @@ const fs = require("node:fs");
 const path = require("node:path");
 /* eslint-enable @typescript-eslint/no-require-imports */
 
-const DOCUMENT_PATH = path.join(
-  __dirname,
-  "../docs/documento_de_requisitos.md",
-);
+const DOCUMENTS = [
+  {
+    path: path.join(__dirname, "../docs/documento_de_requisitos.md"),
+    scope: "sistema integrado",
+  },
+  {
+    path: path.join(__dirname, "../docs/documento_de_requisitos_mock.md"),
+    scope: "protótipo mockado",
+  },
+];
 const START = "<!-- requirements-progress:start -->";
 const END = "<!-- requirements-progress:end -->";
 const STATUSES = [
@@ -75,7 +81,7 @@ function calculateProgress(content) {
   };
 }
 
-function updateDocument(content) {
+function updateDocument(content, scope = "implementação") {
   const progress = calculateProgress(content);
   if (
     content.split(START).length !== 2 ||
@@ -87,16 +93,19 @@ function updateDocument(content) {
   const newline = content.includes("\r\n") ? "\r\n" : "\n";
   const block = [
     START,
-    `![Progresso dos requisitos implementados: ${progress.percentage}%](https://geps.dev/progress/${progress.percentage})`,
     "",
-    `**Progresso de implementação:** ${progress.percentage}% (${progress.implemented} de ${progress.total} requisitos com status Implementado).`,
+    `![Progresso do ${scope}: ${progress.percentage}%](https://geps.dev/progress/${progress.percentage})`,
     "",
-    "| Status | Quantidade |",
-    "| :--- | ---: |",
-    ...STATUSES.map(
-      ({ label, icon }) => `| ${icon} ${label} | ${progress.counts[label]} |`,
-    ),
-    `| **Total** | **${progress.total}** |`,
+    `**Progresso do ${scope}:** ${progress.percentage}% (${progress.implemented} de ${progress.total} requisitos com status Implementado).`,
+    "",
+    "| Status          | Quantidade |",
+    "| :-------------- | ---------: |",
+    `| ✅ Implementado | ${String(progress.counts.Implementado).padStart(10)} |`,
+    `| 🏗 Parcial      | ${String(progress.counts.Parcial).padStart(10)} |`,
+    `| ⏳ Futuro       | ${String(progress.counts.Futuro).padStart(10)} |`,
+    `| 🔎 A verificar  | ${String(progress.counts["A verificar"]).padStart(10)} |`,
+    `| **Total**       | ${`**${progress.total}**`.padStart(10)} |`,
+    "",
     END,
   ].join(newline);
   const updated =
@@ -106,20 +115,38 @@ function updateDocument(content) {
   return { content: updated, progress };
 }
 
+function progressBar(percentage, width = 24) {
+  const filled = Math.round((percentage / 100) * width);
+  return `${"█".repeat(filled)}${"░".repeat(width - filled)}`;
+}
+
+function formatProgress(scope, progress) {
+  const title = scope.toLocaleUpperCase("pt-BR");
+  const count = (label) => String(progress.counts[label]).padStart(2, " ");
+  return [
+    `┌─ ${title}`,
+    `│ ${progressBar(progress.percentage)}  ${String(progress.percentage).padStart(3, " ")}%`,
+    `│ ${progress.implemented} de ${progress.total} requisitos concluídos`,
+    "│",
+    `│ ✅ Implementado  ${count("Implementado")}   🏗  Parcial       ${count("Parcial")}`,
+    `│ ⏳ Futuro       ${count("Futuro")}   🔎 A verificar   ${count("A verificar")}`,
+    "└────────────────────────────────────────────────────────",
+  ].join("\n");
+}
+
 function main() {
   try {
-    const original = fs.readFileSync(DOCUMENT_PATH, "utf8");
-    const result = updateDocument(original);
-    if (result.content !== original)
-      fs.writeFileSync(DOCUMENT_PATH, result.content);
-    console.log(
-      `Progresso: ${result.progress.percentage}% (${result.progress.implemented} de ${result.progress.total} requisitos implementados).`,
-    );
-    console.log(
-      STATUSES.map(
-        ({ label }) => `${label}: ${result.progress.counts[label]}`,
-      ).join(" | "),
-    );
+    const summaries = [];
+    for (const document of DOCUMENTS) {
+      const original = fs.readFileSync(document.path, "utf8");
+      const result = updateDocument(original, document.scope);
+      if (result.content !== original)
+        fs.writeFileSync(document.path, result.content);
+      summaries.push(formatProgress(document.scope, result.progress));
+    }
+    console.log("\nPROGRESSO DOS REQUISITOS — VIGIA+\n");
+    console.log(summaries.join("\n\n"));
+    console.log();
   } catch (error) {
     console.error(`Erro ao atualizar progresso: ${error.message}`);
     process.exitCode = 1;
@@ -127,4 +154,4 @@ function main() {
 }
 
 if (require.main === module) main();
-module.exports = { calculateProgress, updateDocument };
+module.exports = { calculateProgress, updateDocument, formatProgress };

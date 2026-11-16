@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "dotenv -e .env.local -- next dev",
-    "build": "next build",
+    "build": "next build && node scripts/update-progress.js",
     "start": "next start",
     "lint": "node scripts/quality.mjs lint",
     "lint:check": "node scripts/quality.mjs lint",
@@ -17,6 +17,7 @@
     "git:reset-hard": "git fetch origin && git reset --hard origin/main",
     "git:pull-keep": "git stash && git pull && git stash pop",
     "git:config-me": "git config user.name \"Fabinho Farias\" && git config user.email \"fjcff@cin.ufpe.br\"",
+    "git:amend": "git add -A && git commit --amend --no-edit",
     "git:deploy": "npm run build && git add . && git commit -m",
     "git:push": "git push -u origin main",
     "git:push-force": "git push -f origin main",
@@ -34,7 +35,7 @@
     "db:push:prod": "dotenv -e .env.production -- npx prisma db push",
     "db:push:test": "dotenv -e .env.local -- npx prisma db push",
     "count-lines": "rg --files --hidden -0 -g !node_modules -g !.next -g !.git | xargs -0 wc -l",
-    "test": "node testes/main.mjs"
+    "test": "node scripts/quality.mjs test"
   },
   "dependencies": {
     "lucide-react": "0.468.0",

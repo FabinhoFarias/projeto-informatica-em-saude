@@ -1,7 +1,11 @@
 /* eslint-disable @typescript-eslint/no-require-imports -- Entrada CommonJS executada diretamente pelo Node.js. */
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { calculateProgress, updateDocument } = require("./update-progress");
+const {
+  calculateProgress,
+  updateDocument,
+  formatProgress,
+} = require("./update-progress");
 /* eslint-enable @typescript-eslint/no-require-imports */
 
 function requirement(id, status = "⏳ **Futuro**") {
@@ -80,6 +84,28 @@ test("atualiza somente o bloco gerado e é idempotente", () => {
     ),
   );
   assert.equal(updateDocument(result.content).content, result.content);
+});
+
+test("identifica o escopo no bloco de progresso", () => {
+  const result = updateDocument(
+    document(requirement("RF-001", "✅ **Implementado**")),
+    "protótipo mockado",
+  );
+  assert.match(result.content, /Progresso do protótipo mockado:/);
+});
+
+test("formata resumo legível para terminal e CI", () => {
+  const progress = calculateProgress(
+    requirement("RF-001", "✅ **Implementado**") +
+      requirement("RF-002", "🏗 **Parcial**") +
+      requirement("RNF-001", "⏳ **Futuro**") +
+      requirement("RNF-002", "🔎 **A verificar**"),
+  );
+  const output = formatProgress("protótipo mockado", progress);
+  assert.match(output, /PROTÓTIPO MOCKADO/);
+  assert.match(output, /25%/);
+  assert.match(output, /1 de 4 requisitos concluídos/);
+  assert.match(output, /✅ Implementado\s+1/);
 });
 
 test("não atribui crédito fracionário a parcial e preserva CRLF", () => {

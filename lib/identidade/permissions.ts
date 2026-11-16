@@ -3,6 +3,8 @@ export const roles = [
   "GESTOR",
   "EPIDEMIOLOGISTA",
   "AGENTE_CAMPO",
+  "LABORATORISTA",
+  "DIGITADOR",
   "PROFISSIONAL_APS",
 ] as const;
 
@@ -13,6 +15,8 @@ export const roleLabels: Record<Role, string> = {
   GESTOR: "Gestor de Saúde Municipal",
   EPIDEMIOLOGISTA: "Epidemiologista / Pesquisador",
   AGENTE_CAMPO: "Agente de Endemias",
+  LABORATORISTA: "ACE Laboratorista",
+  DIGITADOR: "Digitador / Operador",
   PROFISSIONAL_APS: "Profissional da Atenção Primária",
 };
 
@@ -28,6 +32,8 @@ export const permissions = [
   "reports:export",
   "routes:approve",
   "field:routes",
+  "laboratory:manage",
+  "records:transcribe",
   "aps:alerts",
 ] as const;
 
@@ -43,6 +49,7 @@ const rolePermissions: Record<Role, readonly Permission[]> = {
     "simulation:view",
     "routes:approve",
     "reports:export",
+    "records:transcribe",
     "aps:alerts",
   ],
   EPIDEMIOLOGISTA: [
@@ -54,6 +61,8 @@ const rolePermissions: Record<Role, readonly Permission[]> = {
     "aps:alerts",
   ],
   AGENTE_CAMPO: ["dashboard:view", "field:routes"],
+  LABORATORISTA: ["dashboard:view", "laboratory:manage", "reports:export"],
+  DIGITADOR: ["dashboard:view", "records:transcribe", "reports:export"],
   PROFISSIONAL_APS: ["dashboard:view", "diagnosis:view", "aps:alerts"],
 };
 
@@ -65,6 +74,8 @@ export function canAccessPath(role: Role, pathname: string) {
   const routePermissions: Record<string, Permission> = {
     "/painel": "dashboard:view",
     "/visitas": "field:routes",
+    "/laboratorio": "laboratory:manage",
+    "/digitacao-relatorios": "records:transcribe",
     "/mapas": "dashboard:view",
     "/hotspots": "dashboard:view",
     "/priorizacao-territorial": "dashboard:view",
@@ -72,6 +83,7 @@ export function canAccessPath(role: Role, pathname: string) {
     "/ingestao": "ingestion:manage",
     "/simulacao": "simulation:view",
     "/usuarios": "users:manage",
+    "/configuracao-municipal": "users:manage",
   };
   const path = Object.keys(routePermissions).find(
     (route) => pathname === route || pathname.startsWith(`${route}/`),
