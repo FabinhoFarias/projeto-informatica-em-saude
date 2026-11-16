@@ -6,11 +6,31 @@
     <link rel="stylesheet" href="/relatorios/boletins.css" />
   </head>
   <body>
+    <!--
+      MAPA DE EDIÇÃO DESTE TEMPLATE
+      1. .print-button: botão da interface.
+      2. .daily-brand: marca e título do documento.
+      3. .daily-meta: identificação da atividade.
+      4. .daily-grid: tabela com uma linha por imóvel.
+      5. .daily-total: totais calculados do dia.
+      6. .daily-footer: assinaturas e códigos.
+      7. <script>: busca os dados da API e preenche os campos.
+    -->
+
+    <!-- Botão visível somente na interface; o CSS o oculta na impressão. -->
     <button class="print-button" type="button" onclick="window.print()">
       Imprimir
     </button>
+
+    <!--
+      FOLHA DO RELATÓRIO
+      A classe .sheet controla o papel. A rotação para impressão fica no bloco
+      @media print do arquivo boletins.css.
+    -->
     <main class="sheet">
+      <!-- CABEÇALHO: identificação municipal, data, ciclo e atividade. -->
       <header class="daily-header">
+        <!-- MARCA E TÍTULO PRINCIPAL. -->
         <div class="daily-brand">
           <strong>✚<small>SUS</small></strong>
           <div>
@@ -18,7 +38,14 @@
             <h1>REGISTRO DIÁRIO DO SERVIÇO ANTIVETORIAL</h1>
           </div>
         </div>
+
+        <!--
+          METADADOS DO SERVIÇO
+          Os IDs são preenchidos pela função loadDailyReport() no final.
+          contenteditable permite corrigir manualmente antes de imprimir.
+        -->
         <div class="daily-meta">
+          <!-- Identificação territorial. -->
           <label
             >Município<span id="municipio" contenteditable="true"
               >Lagoa de Itaenga</span
@@ -44,6 +71,7 @@
               >S–sim<br />N–não</span
             ></label
           >
+          <!-- Identificação temporal da atividade. -->
           <label
             >Data da atividade<span id="data-atividade" contenteditable="true"
               >&nbsp;/&nbsp;/&nbsp;</span
@@ -54,6 +82,7 @@
               >&nbsp;/&nbsp;</span
             ></label
           >
+          <!-- Legenda oficial dos tipos de atividade antivetorial. -->
           <div class="activities">
             <b>Atividades</b><span>1–LI · Levantamento de Índice</span
             ><span>2–LI+T · Levantamento de Índice + Tratamento</span
@@ -63,9 +92,21 @@
           </div>
         </div>
       </header>
+
+      <!--
+        TABELA DE IMÓVEIS
+        Cada linha representa uma ficha de visita. As larguras das 31 colunas
+        podem ser ajustadas no colgroup abaixo.
+      -->
       <h2 class="bar">PESQUISA ENTOMOLÓGICA/TRATAMENTO</h2>
+      <!-- As bordas da própria tabela separam os blocos, sem elementos extras. -->
       <table class="daily-grid" aria-label="Pesquisa e tratamento por imóvel">
+        <!--
+          LARGURAS DAS 31 COLUNAS
+          block-start marca o começo visual de depósitos, coleta e tratamento.
+        -->
         <colgroup>
+          <!-- Colunas 1–11: identificação do imóvel e resultado da visita. -->
           <col style="width: 2%" />
           <col style="width: 2%" />
           <col style="width: 2%" />
@@ -77,60 +118,85 @@
           <col style="width: 3%" />
           <col style="width: 2.5%" />
           <col style="width: 2.5%" />
-          <col span="7" style="width: 2%" />
+          <!-- Início do bloco: depósitos inspecionados. -->
+          <col class="block-start" style="width: 2%" />
+          <col span="6" style="width: 2%" />
           <col style="width: 2.5%" />
-          <col span="3" style="width: 2%" />
-          <col span="9" style="width: 2%" />
+          <!-- Início do bloco: coleta de amostras. -->
+          <col class="block-start" style="width: 2%" />
+          <col span="2" style="width: 2%" />
+          <!-- Início do bloco: tratamento. -->
+          <col class="block-start" style="width: 2%" />
+          <col span="8" style="width: 2%" />
         </colgroup>
         <thead>
+          <!-- Títulos superiores dos quatro blocos da ficha. -->
           <tr class="group-row">
-            <th colspan="11"></th>
-            <th colspan="8">Nº de depósitos<br />Inspecionados</th>
-            <th colspan="3">Coleta amostra</th>
-            <th colspan="9">Tratamento</th>
+            <th class="report-header-gray" colspan="11"></th>
+            <th class="report-header-gray" colspan="8">
+              Nº de depósitos<br />Inspecionados
+            </th>
+            <th class="report-header-gray" colspan="3">Coleta amostra</th>
+            <th class="report-header-gray" colspan="9">Tratamento</th>
           </tr>
+          <!-- Rótulo individual de cada uma das 31 colunas. -->
           <tr class="detail-row">
-            <th>Nº Quarteirão</th>
-            <th>Seq.</th>
-            <th>Lado</th>
-            <th>Nome do Logradouro</th>
-            <th>Nº</th>
-            <th>Seq.</th>
-            <th>Complemento</th>
-            <th>Tipo de imóvel</th>
-            <th>Hora da visita</th>
-            <th>Visita N/R</th>
-            <th>Pendência F/R</th>
-            <th>A1</th>
-            <th>A2</th>
-            <th>B</th>
-            <th>C</th>
-            <th>D1</th>
-            <th>D2</th>
-            <th>E</th>
-            <th>Imóvel inspecionado (LI)</th>
-            <th>Nº amostra inicial</th>
-            <th>Nº amostra final</th>
-            <th>Qtd. tubitos</th>
-            <th>Depósitos eliminados</th>
-            <th>Imóveis tratados</th>
-            <th>Larvicida 1 tipo</th>
-            <th>Larvicida 1 qtd.</th>
-            <th>Larvicida 1 depósitos</th>
-            <th>Larvicida 2 tipo</th>
-            <th>Larvicida 2 qtd.</th>
-            <th>Perifocal tipo</th>
-            <th>Perifocal qtd.</th>
+            <th class="detail-label-quarteirao">Nº Quarteirão</th>
+            <th class="detail-label-sequencia-imovel">Seq.</th>
+            <th class="detail-label-lado">Lado</th>
+            <th class="detail-label-logradouro">Nome do Logradouro</th>
+            <th class="detail-label-numero-imovel">Nº</th>
+            <th class="detail-label-sequencia-visita">Seq.</th>
+            <th class="detail-label-complemento">Complemento</th>
+            <th class="detail-label-tipo-imovel">Tipo de imóvel</th>
+            <th class="detail-label-hora-visita">Hora da visita</th>
+            <th class="detail-label-visita">Visita N/R</th>
+            <th class="detail-label-pendencia">Pendência F/R</th>
+            <th class="detail-label-deposito-a1">A1</th>
+            <th class="detail-label-deposito-a2">A2</th>
+            <th class="detail-label-deposito-b">B</th>
+            <th class="detail-label-deposito-c">C</th>
+            <th class="detail-label-deposito-d1">D1</th>
+            <th class="detail-label-deposito-d2">D2</th>
+            <th class="detail-label-deposito-e">E</th>
+            <th class="detail-label-imovel-inspecionado">
+              Imóvel inspecionado<br />(LI)
+            </th>
+            <th class="detail-label-amostra-inicial">Nº amostra inicial</th>
+            <th class="detail-label-amostra-final">Nº amostra final</th>
+            <th class="detail-label-quantidade-tubitos">Qtd. tubitos</th>
+            <th class="detail-label-depositos-eliminados">
+              Depósitos eliminados
+            </th>
+            <th class="detail-label-imoveis-tratados">Imóveis tratados</th>
+            <th class="detail-label-larvicida-1-tipo">Larvicida 1 tipo</th>
+            <th class="detail-label-larvicida-1-quantidade">
+              Larvicida 1 qtd.
+            </th>
+            <th class="detail-label-larvicida-1-depositos">
+              Larvicida 1 dep.
+            </th>
+            <th class="detail-label-larvicida-2-tipo">Larvicida 2 tipo</th>
+            <th class="detail-label-larvicida-2-quantidade">
+              Larvicida 2 qtd.
+            </th>
+            <th class="detail-label-perifocal-tipo">Perifocal tipo</th>
+            <th class="detail-label-perifocal-quantidade">Perifocal qtd.</th>
           </tr>
         </thead>
+        <!-- Linhas dos imóveis: criadas e preenchidas pelo JavaScript. -->
         <tbody id="imoveis"></tbody>
       </table>
+
+      <!-- TOTAIS calculados pela API para a data escolhida. -->
       <div class="daily-total" aria-label="Totais">
         <span id="total-imoveis" contenteditable="true"></span
         ><span id="total-depositos" contenteditable="true"></span
         ><span id="total-amostras" contenteditable="true"></span
         ><span id="total-tratados" contenteditable="true"></span>
       </div>
+
+      <!-- RODAPÉ: assinaturas e legenda dos códigos utilizados na tabela. -->
       <footer class="daily-footer">
         <label
           >Assinatura do Agente<span
@@ -143,21 +209,33 @@
             contenteditable="true"
           ></span
         ></label>
-        <div>
-          <b>Tipo do imóvel</b
-          ><span
-            >R–residência · C–comércio · TB–terreno baldio · PE–ponto
-            estratégico · O–outro</span
-          >
+        <div class="report-code-legend">
+          <b>Tipo do imóvel</b>
+          <p>
+            <span>R–residência</span><span>C–comércio</span
+            ><span>TB–terreno baldio</span><span>PE–ponto estratégico</span
+            ><span>O–outro</span>
+          </p>
         </div>
-        <div><b>Pendência</b><span>R–recusado · F–fechado</span></div>
+        <div class="report-code-legend">
+          <b>Pendência</b>
+          <p><span>R–recusado</span><span>F–fechado</span></p>
+        </div>
       </footer>
     </main>
+
     <script>
+      /*
+       * PREENCHIMENTO AUTOMÁTICO
+       * A API devolve metadados, 31 valores por imóvel e os totais do dia.
+       * Os IDs do HTML acima são usados pela função fill().
+       */
       const body = document.getElementById("imoveis");
 
       function createRows(rows = []) {
+        // Limpa a tabela antes de trocar a data ou exibir uma nova resposta.
         body.replaceChildren();
+        // O formulário oficial reserva 24 linhas, mesmo quando algumas ficam vazias.
         for (let row = 0; row < 24; row++) {
           const values = rows[row] ?? [];
           const tr = document.createElement("tr");
@@ -178,10 +256,12 @@
       }
 
       function fill(id, value) {
+        // Preenche um campo único do cabeçalho, total ou rodapé pelo seu ID.
         document.getElementById(id).textContent = value ?? "";
       }
 
       async function loadDailyReport() {
+        // Exemplo: ?data=2026-11-06. Sem data, a API usa o dia demonstrativo.
         const date = new URLSearchParams(window.location.search).get("data");
         const endpoint = new URL(
           "/api/relatorios/resumo-diario",
@@ -190,10 +270,12 @@
         if (date) endpoint.searchParams.set("data", date);
 
         try {
+          // Busca o relatório consolidado pelo backend da aplicação.
           const response = await fetch(endpoint, { cache: "no-store" });
           if (!response.ok) throw new Error("Relatório indisponível");
           const report = await response.json();
           const metadata = report.metadata;
+          // Cabeçalho e assinaturas.
           fill("municipio", metadata.municipio);
           fill("localidade", metadata.localidade);
           fill("categoria", metadata.categoria);
@@ -204,6 +286,7 @@
           fill("ciclo-ano", metadata.cicloAno);
           fill("agente", metadata.agente);
           fill("supervisor", metadata.supervisor);
+          // Totais posicionados logo abaixo da tabela de imóveis.
           fill(
             "total-imoveis",
             `Imóveis registrados: ${report.totals.properties}`,
@@ -214,8 +297,10 @@
           );
           fill("total-amostras", `Tubitos: ${report.totals.samples}`);
           fill("total-tratados", `Imóveis tratados: ${report.totals.treated}`);
+          // Uma matriz com 31 valores alimenta cada linha de imóvel.
           createRows(report.rows);
         } catch (error) {
+          // Mantém a folha editável e informa a falha sem quebrar o template.
           createRows();
           fill(
             "total-imoveis",

@@ -6,13 +6,31 @@
     <link rel="stylesheet" href="/relatorios/boletins.css" />
   </head>
   <body>
+    <!--
+      MAPA DE EDIÇÃO DESTE TEMPLATE
+      1. Primeiro .summary-block: consolidação do trabalho de campo.
+      2. Segundo .summary-block: dados futuros do laboratório.
+      3. .summary-bottom: datas, laboratorista e assinatura.
+      4. <script>: cria as células e preenche somente o resumo de campo.
+      As grades e tamanhos compartilhados ficam em boletins.css.
+    -->
+
+    <!-- Botão visível somente na interface; não aparece no papel. -->
     <button class="print-button" type="button" onclick="window.print()">
       Imprimir
     </button>
+
+    <!-- Folha completa; tamanho e rotação são controlados por boletins.css. -->
     <main class="sheet summary-page">
+      <!--
+        RESUMO DE CAMPO
+        Todos os valores desta seção vêm das mesmas fichas do relatório diário.
+      -->
       <section class="summary-block">
         <h2>RESUMO DO TRABALHO DE CAMPO</h2>
+        <!-- PRIMEIRA LINHA DO CAMPO: imóveis, amostras e depósitos. -->
         <div class="summary-grid field">
+          <!-- Quantidade de imóveis trabalhados agrupada por tipo. -->
           <section>
             <table>
               <tr>
@@ -29,6 +47,7 @@
               <tr id="imoveis-trabalhados"></tr>
             </table>
           </section>
+          <!-- Tratamentos, inspeções concluídas e pendências. -->
           <section>
             <table>
               <tr>
@@ -43,6 +62,7 @@
               <tr id="imoveis-resumo"></tr>
             </table>
           </section>
+          <!-- Total de tubitos/amostras coletadas no dia. -->
           <section>
             <table>
               <tr>
@@ -51,6 +71,7 @@
               <tr id="amostras"></tr>
             </table>
           </section>
+          <!-- Separação das pendências entre recusa e imóvel fechado. -->
           <section>
             <table>
               <tr>
@@ -63,6 +84,7 @@
               <tr id="pendencias"></tr>
             </table>
           </section>
+          <!-- Soma dos depósitos inspecionados nas categorias A1 até E. -->
           <section>
             <table>
               <tr>
@@ -82,10 +104,12 @@
             </table>
           </section>
         </div>
+        <!-- SEGUNDA LINHA DO CAMPO: produtos, cargas e quarteirões. -->
         <div
           class="summary-grid field"
           style="margin-top: 5px; grid-template-columns: 1.5fr 0.4fr 1.9fr"
         >
+          <!-- Depósitos eliminados e produtos usados nos tratamentos. -->
           <section>
             <table>
               <tr>
@@ -110,6 +134,7 @@
               <tr id="depositos-tratados"></tr>
             </table>
           </section>
+          <!-- Tipo e quantidade de cargas de adulticida. -->
           <section>
             <table>
               <tr>
@@ -122,6 +147,7 @@
               <tr id="adulticida"></tr>
             </table>
           </section>
+          <!-- Quarteirões trabalhados e integralmente concluídos. -->
           <section>
             <table>
               <tr>
@@ -148,11 +174,18 @@
           </section>
         </div>
       </section>
+
+      <!--
+        RESUMO LABORATORIAL
+        Estrutura preservada para integração futura. Por enquanto não recebe
+        valores da API e permanece identificada como não implementada.
+      -->
       <section class="summary-block laboratory-pending">
         <h2>
           RESUMO DO LABORATÓRIO
           <small>Integração laboratorial ainda não implementada</small>
         </h2>
+        <!-- Quarteirões com identificação futura das duas espécies. -->
         <div class="summary-grid" style="grid-template-columns: 1fr 1fr">
           <section>
             <table>
@@ -175,6 +208,7 @@
             </table>
           </section>
         </div>
+        <!-- Contagens laboratoriais futuras por depósito, imóvel e estágio. -->
         <div
           class="summary-grid lab"
           style="margin-top: 5px; grid-template-columns: 1.3fr 1.3fr 0.7fr"
@@ -265,12 +299,14 @@
             </table>
           </section>
         </div>
+        <!-- Legenda das siglas utilizadas nos quadros laboratoriais. -->
         <p class="legend">
           A1 – Caixa d’água · A2 – Outros depósitos de armazenamento · B –
           Pequenos depósitos móveis · C – Depósitos fixos · D1 – Pneus e
           materiais rodantes · D2 – Lixo e sucata · E – Depósitos naturais · TB
           – Terreno baldio · PE – Ponto estratégico
         </p>
+        <!-- Fechamento manual do processamento laboratorial. -->
         <div class="summary-bottom">
           <label>Data de entrada<span contenteditable="true"></span></label
           ><label>Data de conclusão<span contenteditable="true"></span></label
@@ -280,7 +316,9 @@
         </div>
       </section>
     </main>
+
     <script>
+      /* Quantidade de células que deve ser criada em cada linha do resumo. */
       const rowSizes = {
         "imoveis-trabalhados": 6,
         "imoveis-resumo": 4,
@@ -292,7 +330,9 @@
         exemplares: 4,
       };
 
+      /* Aplica as classes que melhoram a leitura de valores numéricos. */
       function decorateNumericCell(cell, value) {
+        // Números recebem fonte maior; quatro ou mais dígitos ganham mais espaço.
         const normalizedValue = String(value ?? "").trim();
         cell.classList.remove("numeric-value", "long-numeric-value");
         if (!/^-?\d+(?:[.,]\d+)?$/.test(normalizedValue)) return;
@@ -302,6 +342,7 @@
         }
       }
 
+      /* Cria as células vazias declaradas no objeto rowSizes. */
       for (const [id, count] of Object.entries(rowSizes)) {
         const row = document.getElementById(id);
         for (let index = 0; index < count; index++) {
@@ -311,6 +352,7 @@
         }
       }
 
+      /* Preenche uma linha já criada com os valores recebidos da API. */
       function fillRow(id, values) {
         const cells = document.getElementById(id).cells;
         values.forEach((value, index) => {
@@ -322,6 +364,7 @@
       }
 
       async function loadFieldSummary() {
+        // A data é compartilhada com o relatório diário por query string.
         const date = new URLSearchParams(window.location.search).get("data");
         const endpoint = new URL(
           "/api/relatorios/resumo-diario",
@@ -330,10 +373,12 @@
         if (date) endpoint.searchParams.set("data", date);
 
         try {
+          // Recupera a mesma consolidação usada pelo registro diário.
           const response = await fetch(endpoint, { cache: "no-store" });
           if (!response.ok) throw new Error("Resumo de campo indisponível");
           const report = await response.json();
           const field = report.fieldSummary;
+          // Primeira e segunda linhas do resumo do trabalho de campo.
           fillRow("imoveis-trabalhados", field.propertiesByType);
           fillRow("imoveis-resumo", field.properties);
           fillRow("amostras", field.samples);
@@ -341,11 +386,13 @@
           fillRow("depositos-inspecionados", field.depositsInspected);
           fillRow("depositos-tratados", field.depositsTreated);
           fillRow("adulticida", field.adulticide);
+          // Listas textuais de quarteirões trabalhados e concluídos.
           document.getElementById("quarteiroes-trabalhados").textContent =
             field.workedBlocks || "—";
           document.getElementById("quarteiroes-concluidos").textContent =
             field.completedBlocks || "—";
         } catch (error) {
+          // Mantém os demais campos editáveis mesmo quando a API falhar.
           document.getElementById("quarteiroes-trabalhados").textContent =
             "Não foi possível carregar os registros de campo.";
           console.error(error);

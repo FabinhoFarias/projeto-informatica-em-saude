@@ -2,6 +2,25 @@
   size: A4 portrait;
   margin: 0;
 }
+
+/*
+ * AJUSTE RÁPIDO DE FONTES
+ * Altere somente estas variáveis para aumentar ou reduzir os textos dos
+ * relatórios. O bloco @media print, no final, possui os tamanhos da impressão.
+ */
+:root {
+  --report-gray: #dedede;
+  --report-header-background: var(--report-gray);
+  --report-field-background: #fff;
+  --report-body-text: 8.5px;
+  --report-label-text: 7.5px;
+  --report-compact-label: 6.5px;
+  --report-table-label: 6.5px;
+  --report-number-text: 9px;
+  --report-summary-label: 7px;
+  --report-legend-text: 7.5px;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -10,7 +29,7 @@ body {
   background: #eef0f2;
   color: #111;
   font:
-    7.5px Arial,
+    var(--report-body-text) Arial,
     sans-serif;
 }
 .sheet {
@@ -37,7 +56,7 @@ body {
   align-items: center;
   gap: 8px;
   min-height: 16mm;
-  font-size: 8px;
+  font-size: 9px;
 }
 .daily-brand > strong {
   display: grid;
@@ -52,7 +71,7 @@ body {
 }
 h1 {
   margin: 4px 0 0;
-  font-size: 10px;
+  font-size: 11px;
 }
 .daily-meta {
   display: grid;
@@ -66,8 +85,11 @@ h1 {
   border: 1px solid #444;
   background: #e6e6e6;
   text-align: center;
-  font-size: 6.5px;
+  font-size: var(--report-label-text);
   font-weight: bold;
+}
+.daily-footer label {
+  line-height: 5mm;
 }
 .daily-meta label span,
 .daily-footer label span {
@@ -75,8 +97,15 @@ h1 {
   min-height: 9mm;
   padding: 3px;
   border-top: 1px solid #444;
-  background: #fff;
+  background: var(--report-field-background);
   font-weight: normal;
+}
+.daily-footer label span {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.25;
 }
 .daily-meta .choices {
   min-height: 9mm;
@@ -97,7 +126,7 @@ h1 {
   border: 1px solid #444;
   background: #e6e6e6;
   text-align: center;
-  font-size: 5.5px;
+  font-size: var(--report-compact-label);
 }
 .activities b {
   grid-column: 1 / -1;
@@ -108,18 +137,26 @@ h1 {
   border-right: 1px solid #555;
   border-bottom: 1px solid #555;
 }
+.activities span:nth-of-type(3n) {
+  border-right: 0;
+}
+.activities span:nth-last-child(-n + 3) {
+  border-bottom: 0;
+}
 .bar {
   margin: 4px 0;
   padding: 3px;
   border: 1px solid #444;
   background: #e6e6e6;
   text-align: center;
-  font-size: 7.5px;
+  font-size: var(--report-label-text);
 }
 table {
   width: 100%;
   table-layout: fixed;
+  border: 1px solid #444;
   border-collapse: collapse;
+  border-spacing: 0;
 }
 th,
 td {
@@ -128,33 +165,90 @@ td {
   text-align: center;
 }
 th {
-  background: #dedede;
-  font-size: 5.5px;
+  background: transparent;
+  font-size: var(--report-table-label);
+}
+.daily-grid {
+  background: var(--report-field-background);
+  border-collapse: collapse;
+  border-spacing: 0;
 }
 .daily-grid .group-row {
   height: 6mm;
 }
+.report-header-gray {
+  /* O preenchimento interno evita que o cinza avance sob as bordas colapsadas. */
+  background: transparent;
+  box-shadow: inset 0 0 0 100vmax var(--report-header-background);
+}
 .daily-grid .detail-row {
-  height: 19mm;
+  height: 20mm;
 }
 .daily-grid .detail-row th {
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
+  background: transparent;
+  box-shadow: inset 0 0 0 100vmax var(--report-header-background);
+  padding: 2px 1px;
+  line-height: 1;
+  vertical-align: middle;
+  /* Mantém somente o texto vertical; girar o th também girava fundo e bordas. */
+  writing-mode: sideways-lr;
+  transform: none;
   white-space: nowrap;
 }
 .daily-grid .detail-row th:nth-child(4) {
   writing-mode: horizontal-tb;
   transform: none;
 }
+/*
+ * TAMANHO DAS 31 LEGENDAS DA TABELA
+ * Altere apenas --report-detail-label-font-size no :root para modificar todas.
+ * Como cada coluna continua com classe própria, uma delas ainda pode receber
+ * uma regra específica abaixo desta lista quando necessário. Para alterar
+ * todas de uma vez, edite diretamente o font-size no fim desta regra.
+ */
+.detail-label-quarteirao,
+.detail-label-sequencia-imovel,
+.detail-label-lado,
+.detail-label-logradouro,
+.detail-label-numero-imovel,
+.detail-label-sequencia-visita,
+.detail-label-complemento,
+.detail-label-tipo-imovel,
+.detail-label-hora-visita,
+.detail-label-visita,
+.detail-label-pendencia,
+.detail-label-deposito-a1,
+.detail-label-deposito-a2,
+.detail-label-deposito-b,
+.detail-label-deposito-c,
+.detail-label-deposito-d1,
+.detail-label-deposito-d2,
+.detail-label-deposito-e,
+.detail-label-imovel-inspecionado,
+.detail-label-amostra-inicial,
+.detail-label-amostra-final,
+.detail-label-quantidade-tubitos,
+.detail-label-depositos-eliminados,
+.detail-label-imoveis-tratados,
+.detail-label-larvicida-1-tipo,
+.detail-label-larvicida-1-quantidade,
+.detail-label-larvicida-1-depositos,
+.detail-label-larvicida-2-tipo,
+.detail-label-larvicida-2-quantidade,
+.detail-label-perifocal-tipo,
+.detail-label-perifocal-quantidade {
+  font-size: 8px;
+}
 .daily-grid tbody td {
   height: 3.3mm;
-  font-size: 8px;
+  background: var(--report-field-background);
+  font-size: var(--report-body-text);
 }
 .daily-grid tbody td.numeric-value,
 .summary-grid tbody td.numeric-value {
   padding-right: 1.5px;
   padding-left: 1.5px;
-  font-size: 8.5px;
+  font-size: var(--report-number-text);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
@@ -164,17 +258,18 @@ th {
   padding-left: 3px;
   letter-spacing: 0.1px;
 }
-.daily-grid tr > :nth-child(12),
-.daily-grid tr > :nth-child(20),
-.daily-grid tr > :nth-child(23) {
-  border-left: 3px solid #fff;
-}
+/*
+ * Separadores contínuos entre imóvel, depósitos, coleta e tratamento.
+ * As classes ficam no colgroup para não repetir bordas em cada célula.
+ */
+.daily-grid col.block-start,
 .daily-grid .group-row th + th {
-  border-left: 3px solid #fff;
+  border-left: 4px double #444;
 }
 .daily-total {
   display: grid;
-  grid-template-columns: 44% 19% 9% 28%;
+  /* Frações preservam as proporções sem somar os gaps aos 100% da largura. */
+  grid-template-columns: 44fr 19fr 9fr 28fr;
   gap: 3px;
   margin-top: 4px;
 }
@@ -182,8 +277,8 @@ th {
   min-height: 5mm;
   padding: 2px;
   border: 1px solid #444;
-  background: #e6e6e6;
-  font-size: 7px;
+  background: var(--report-field-background);
+  font-size: var(--report-label-text);
   font-weight: 600;
 }
 .daily-footer {
@@ -196,16 +291,44 @@ th {
   display: flex;
   flex-direction: column;
   border: 1px solid #444;
+  text-align: center;
+  font-size: var(--report-label-text);
 }
 .daily-footer div b {
-  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 5mm;
+  padding: 0;
+  border-bottom: 1px solid #444;
   background: #e6e6e6;
   text-align: center;
+  font-size: var(--report-label-text);
+  line-height: 1;
 }
 .daily-footer div span {
   padding: 3px;
-  font-size: 7px;
+  font-size: var(--report-label-text);
   line-height: 1.25;
+}
+.daily-footer .report-code-legend p {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: center;
+  gap: 1px 5px;
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: 3px;
+  font-size: var(--report-label-text);
+  font-weight: normal;
+  line-height: 1.25;
+  text-align: center;
+}
+.daily-footer .report-code-legend p span {
+  padding: 0;
+  white-space: nowrap;
 }
 .summary-page {
   width: 330mm;
@@ -217,12 +340,12 @@ th {
   border: 1px solid #444;
   background: #e6e6e6;
   text-align: center;
-  font-size: 8px;
+  font-size: 9px;
 }
 .summary-page h2 small {
   margin-left: 8px;
   color: #555;
-  font-size: 6px;
+  font-size: var(--report-compact-label);
   font-weight: normal;
   text-transform: none;
 }
@@ -247,14 +370,14 @@ th {
   height: 7mm;
 }
 .summary-grid td {
-  font-size: 8px;
+  font-size: var(--report-body-text);
   font-variant-numeric: tabular-nums;
 }
 .summary-grid th {
-  font-size: 6px;
+  font-size: var(--report-summary-label);
 }
 .summary-grid td {
-  background: #fff;
+  background: var(--report-field-background);
 }
 .summary-block {
   margin-top: 9px;
@@ -270,18 +393,30 @@ th {
   background: #e6e6e6;
   text-align: center;
   font-weight: bold;
+  font-size: var(--report-label-text);
 }
 .summary-bottom span {
   display: block;
   height: 8mm;
   border-top: 1px solid #444;
-  background: white;
+  background: var(--report-field-background);
 }
 .legend {
   margin-top: 8px;
-  font-size: 6.5px;
+  font-size: var(--report-legend-text);
 }
 @media print {
+  /* Fontes específicas do PDF/papel. Aumente aqui se a impressora reduzir. */
+  :root {
+    --report-body-text: 9px;
+    --report-label-text: 8px;
+    --report-compact-label: 7px;
+    --report-table-label: 7px;
+    --report-number-text: 9.5px;
+    --report-summary-label: 7.5px;
+    --report-legend-text: 8px;
+  }
+
   html,
   body {
     width: 210mm;
@@ -307,5 +442,8 @@ th {
   }
   .print-button {
     display: none;
+  }
+  .daily-grid .detail-row {
+    height: 30mm;
   }
 }
