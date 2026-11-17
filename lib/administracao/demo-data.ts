@@ -133,7 +133,7 @@ export const municipalClientsDemo: MunicipalClientMock[] = [
       digitacao: true,
       mapas: true,
       hotspots: true,
-      laboratorio: false,
+      laboratorio: true,
       priorizacao: true,
       diagnostico: true,
       ingestao: true,
