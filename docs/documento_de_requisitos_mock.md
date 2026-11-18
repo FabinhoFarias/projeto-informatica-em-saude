@@ -19,17 +19,17 @@ Um item marcado como implementado aqui pode continuar futuro no documento integr
 
 <!-- requirements-progress:start -->
 
-![Progresso do protótipo mockado: 53%](https://geps.dev/progress/53)
+![Progresso do protótipo mockado: 58%](https://geps.dev/progress/58)
 
-**Progresso do protótipo mockado:** 53% (34 de 64 requisitos com status Implementado).
+**Progresso do protótipo mockado:** 58% (38 de 65 requisitos com status Implementado).
 
 | Status          | Quantidade |
 | :-------------- | ---------: |
-| ✅ Implementado |         34 |
-| 🏗 Parcial      |          9 |
-| ⏳ Futuro       |         18 |
+| ✅ Implementado |         38 |
+| 🏗 Parcial      |          8 |
+| ⏳ Futuro       |         16 |
 | 🔎 A verificar  |          3 |
-| **Total**       |     **64** |
+| **Total**       |     **65** |
 
 <!-- requirements-progress:end -->
 
@@ -147,9 +147,9 @@ Um item marcado como implementado aqui pode continuar futuro no documento integr
 
 ### RF-002 — Geocodificação e Tratamento Territorial
 
-**Status:** 🏗 **Parcial**
+**Status:** ✅ **Implementado**
 
-**Evidência e lacunas:** Há coordenadas e mapas fictícios; falta uma tela para conferir endereço, geocodificação, divergência e correção.
+**Evidência e lacunas:** `/territorio-conferencia` apresenta endereços, bairros, setores, quarteirões, divergências e ações para validar ou reabrir o cadastro. Os dados permanecem mockados.
 
 ### RF-018 — Cadastro territorial e atribuição de área
 
@@ -169,6 +169,12 @@ Um item marcado como implementado aqui pode continuar futuro no documento integr
 
 **Evidência e lacunas:** A produção diária fictícia é calculada e exibida nos relatórios; faltam filtros e consolidados específicos semanal e por ciclo.
 
+### RF-042 — Cobertura de visitas por bairro e setor
+
+**Status:** ✅ **Implementado**
+
+**Evidência e lacunas:** A visão do gestor em `/painel` apresenta cobertura municipal, bairros concluídos, setores acompanhados, imóveis visitados e pendências. A tabela alterna entre bairros e setores, permite busca territorial e mostra imóveis visitados sobre previstos, percentual e pendências de recuperação. Os indicadores são fictícios e permanecem sem integração com o modelo preditivo ou banco real.
+
 ### RF-026 — Conferência, fechamento e correção
 
 **Status:** 🏗 **Parcial**
@@ -177,15 +183,15 @@ Um item marcado como implementado aqui pode continuar futuro no documento integr
 
 ### RF-030 — Consumo de insumos e limite do estoque
 
-**Status:** ⏳ **Futuro**
+**Status:** ✅ **Implementado**
 
-**Evidência e lacunas:** Os formulários registram quantidades, mas falta interface de estoque, saldo, alerta e reconciliação.
+**Evidência e lacunas:** `/estoque` mostra produtos, unidade, saldo, mínimo, consumo acumulado e alerta de reposição, com ajuste de saldo para demonstração.
 
 ### RF-037 — Cadastro e acompanhamento de depósitos públicos e problemas de saneamento
 
-**Status:** ⏳ **Futuro**
+**Status:** ✅ **Implementado**
 
-**Evidência e lacunas:** Falta cadastro demonstrativo, mapa, responsável, prazo e histórico de resolução.
+**Evidência e lacunas:** `/saneamento` lista ocorrências ambientais com endereço, bairro, responsável, prazo, histórico e estados aberto, em tratativa e resolvido. O cadastro e as atualizações são mockados.
 
 ### RF-040 — Tarefas, preparação de retornos e acompanhamento da ação
 

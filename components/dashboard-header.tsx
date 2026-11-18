@@ -182,6 +182,9 @@ export function DashboardHeader({
     "/visitas": "Meu setor · visitas",
     "/laboratorio": "Laboratório entomológico",
     "/digitacao-relatorios": "Digitação e relatórios",
+    "/territorio-conferencia": "Conferência territorial",
+    "/estoque": "Estoque e insumos",
+    "/saneamento": "Saneamento e ocorrências",
     "/hotspots": "Mapa de hotspots",
     "/priorizacao-territorial": "Priorização territorial",
     "/diagnostico": "Diagnóstico situacional",
@@ -201,6 +204,7 @@ export function DashboardHeader({
             width={44}
             height={44}
             className="h-full w-full rounded-full object-contain"
+            style={{ width: "100%", height: "100%" }}
           />
         </div>
         <h1 className="min-w-0 truncate text-base font-bold text-slate-800 sm:text-[20px] md:text-[24px]">

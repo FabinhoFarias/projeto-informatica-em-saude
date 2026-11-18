@@ -15,6 +15,7 @@ import { formatNumber } from "@/lib/plataforma/format";
 import { recommendationsFor } from "@/lib/priorizacao/recommendations";
 import { riskColors } from "@/lib/territorios/risk";
 import type { Neighborhood } from "@/lib/territorios/types";
+import { ManagerOperationsDashboard } from "@/components/vigilancia/manager-operations-dashboard";
 import { sectorPropertiesDemo } from "@/lib/visitas/demo-data";
 import {
   availableDailyReportDates,
@@ -99,6 +100,7 @@ export function OverviewDashboard() {
 
   if (role === "AGENTE_CAMPO") return <FieldPortal />;
   if (role === "PROFISSIONAL_APS") return <ApsPortal />;
+  if (role === "GESTOR") return <ManagerOperationsDashboard />;
 
   return (
     <div>

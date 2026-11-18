@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent, type ReactNode } from "react";
 import { Panel } from "@/components/plataforma/dashboard-ui";
+import { FieldHelp } from "@/components/plataforma/field-help";
 import { sectorPropertiesDemo } from "@/lib/visitas/demo-data";
 
 export interface ManualEntry {
@@ -175,7 +176,7 @@ export function ManualEntryForm({
           </Field>
         </fieldset>
         <label className="text-xs font-semibold text-slate-700 sm:col-span-2 lg:col-span-3">
-          Observações transcritas da ficha
+          <FieldHelp label="Observações transcritas da ficha" />
           <textarea name="notes" rows={3} className={`${fieldClass} py-2`} />
         </label>
         <label className="flex items-start gap-3 border border-amber-300 bg-amber-50 p-3 text-xs leading-5 text-amber-950 sm:col-span-2 lg:col-span-3">
@@ -209,7 +210,7 @@ export function ManualEntryForm({
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <label className="text-xs font-semibold text-slate-700">
-      {label}
+      <FieldHelp label={label} />
       {children}
     </label>
   );

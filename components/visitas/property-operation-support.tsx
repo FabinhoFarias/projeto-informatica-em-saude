@@ -22,7 +22,7 @@ export function PropertyOperationSupport({
   return (
     <div className="mb-4 space-y-4">
       <div className="grid items-start gap-4 xl:grid-cols-2">
-        <TimelinePanel property={property} />
+        {property.ultimaVisita && <TimelinePanel property={property} />}
         <SyncPanel status={syncStatus} onStatusChange={onSyncStatusChange} />
       </div>
       <StrategicPointPanel property={property} />

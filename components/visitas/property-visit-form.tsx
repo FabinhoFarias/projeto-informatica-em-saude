@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
+import { FieldHelp } from "@/components/plataforma/field-help";
 import type { SectorPropertyMock } from "@/lib/visitas/demo-data";
 import {
   PropertyOperationSupport,
@@ -72,7 +73,7 @@ function Field({
 }) {
   return (
     <label className="text-xs font-semibold text-slate-700">
-      {label}
+      <FieldHelp label={label} />
       <input
         name={name}
         type={type}
@@ -118,12 +119,6 @@ export function PropertyVisitForm({
       ? property.ultimaVisita
       : null;
   const existingForm = existingVisit?.formulario;
-  const inspectedDeposits = existingForm
-    ? Object.values(existingForm.depositos).reduce(
-        (total, value) => total + value,
-        0,
-      )
-    : 0;
   const [message, setMessage] = useState("");
   const [syncStatus, setSyncStatus] = useState<DemoSyncStatus>(() =>
     existingVisit?.operacaoSync.status === "RECEBIDA"
@@ -213,11 +208,6 @@ export function PropertyVisitForm({
             {property.complemento || "Sem complemento"}
           </p>
         </div>
-        <span className="border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700">
-          {existingVisit
-            ? `${inspectedDeposits} depósitos inspecionados nesta visita`
-            : "Nova ficha de campo"}
-        </span>
       </div>
       <PropertyOperationSupport
         property={property}
@@ -231,7 +221,7 @@ export function PropertyVisitForm({
         >
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <label className="text-xs font-semibold text-slate-700">
-              Atividade
+              <FieldHelp label="Atividade" />
               <select
                 name="atividade"
                 className={fieldClass}
@@ -259,7 +249,7 @@ export function PropertyVisitForm({
               defaultValue={existingForm?.horaEntrada}
             />
             <label className="text-xs font-semibold text-slate-700">
-              Acesso ao imóvel
+              <FieldHelp label="Acesso ao imóvel" />
               <select
                 name="acesso"
                 className={fieldClass}
@@ -271,7 +261,7 @@ export function PropertyVisitForm({
               </select>
             </label>
             <label className="text-xs font-semibold text-slate-700">
-              Tipo da visita
+              <FieldHelp label="Tipo da visita" />
               <select
                 name="tipoVisita"
                 className={fieldClass}
@@ -337,7 +327,7 @@ export function PropertyVisitForm({
                 className="flex flex-col text-center text-xs font-semibold text-slate-700"
               >
                 <span className="flex h-4 items-center justify-center">
-                  {type}
+                  <FieldHelp label={type} />
                 </span>
                 <input
                   name={`deposito_${type}`}
@@ -354,7 +344,7 @@ export function PropertyVisitForm({
             ))}
             <div className="flex flex-col text-xs font-semibold text-slate-700">
               <span className="flex h-4 items-center justify-center text-center">
-                Imóvel LI
+                <FieldHelp label="Imóvel LI" />
               </span>
               <input
                 type="hidden"
@@ -413,7 +403,7 @@ export function PropertyVisitForm({
               defaultValue={existingForm?.depositosEliminados}
             />
             <label className="text-xs font-semibold text-slate-700">
-              Imóvel tratado
+              <FieldHelp label="Imóvel tratado" />
               <select
                 name="imovelTratado"
                 className={fieldClass}
@@ -472,7 +462,7 @@ export function PropertyVisitForm({
         </Section>
         <Section title="Observações">
           <label className="text-xs font-semibold text-slate-700">
-            Anotações da visita
+            <FieldHelp label="Anotações da visita" />
             <textarea
               name="observacoes"
               rows={4}

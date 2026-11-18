@@ -33,15 +33,15 @@ Os IDs existentes foram preservados. Requisitos novos usam IDs posteriores aos j
 
 ![Progresso do sistema integrado: 0%](https://geps.dev/progress/0)
 
-**Progresso do sistema integrado:** 0% (0 de 64 requisitos com status Implementado).
+**Progresso do sistema integrado:** 0% (0 de 65 requisitos com status Implementado).
 
 | Status          | Quantidade |
 | :-------------- | ---------: |
 | ✅ Implementado |          0 |
 | 🏗 Parcial      |          0 |
-| ⏳ Futuro       |         61 |
+| ⏳ Futuro       |         62 |
 | 🔎 A verificar  |          3 |
-| **Total**       |     **64** |
+| **Total**       |     **65** |
 
 <!-- requirements-progress:end -->
 
@@ -671,6 +671,23 @@ diferenciar zero, desconhecido, não se aplica, não sincronizado e pendente de 
 - Gerar quadros de produção e laboratório aplicáveis ao período/modalidade, com contagens distintas recalculadas da origem e indicadores claramente definidos. Consolidação mensal não é soma cega de imóveis únicos ou quarteirões distintos semanais.
 - Emitir versão preliminar/aprovada/retificada com leiaute e destino validados; disponibilizar exportação CSV/XLSX/JSON conforme permissão e contrato de campos, além do PDF previsto em RF-027. Exportar não comprova transmissão/aceite no sistema oficial.
 - **Aceite:** atividade na transição de mês/semana/ciclo pertence à competência configurada; o mesmo imóvel em dois dias não duplica métrica de imóvel único do mês; correção tardia gera versão auditável.
+
+### RF-042 — Cobertura de visitas por bairro e setor
+
+**Status:** ⏳ **Futuro**
+
+**Evidência e lacunas:** A visão operacional ainda depende de mocks; falta calcular a cobertura a partir de visitas persistidas, ciclos publicados, atribuição de setores e imóveis válidos.
+
+O sistema deve apresentar, para a coordenação e gestão da Vigilância Ambiental, a cobertura do ciclo por bairro, setor, quarteirão e imóvel. O indicador deve separar imóveis previstos, visitados, inspecionados, fechados, recusados, não visitados e em recuperação, sempre informando período, ciclo, modalidade e universo utilizado no cálculo.
+
+- Permitir alternar a leitura entre bairros e setores, preservando a referência territorial oficial e os códigos locais.
+- Exibir imóveis visitados sobre imóveis previstos, percentual de cobertura, pendências e meta operacional configurada pelo município.
+- Distinguir cobertura de visita, cobertura de inspeção, cobertura de tratamento e cobertura de amostras.
+- Permitir filtrar por ciclo, data, equipe, ACE, bairro, setor, quarteirão, modalidade e situação da tentativa.
+- Destacar territórios abaixo da meta e encaminhar a fila de recuperação sem transformar imóvel fechado ou recusado em imóvel visitado.
+- Recalcular os consolidados a partir dos eventos de visita, sem duplicar imóvel por múltiplas tentativas.
+
+**Aceite:** para um ciclo publicado, a gestão consegue selecionar bairro ou setor, ver previstos/visitados/pendentes, abrir a lista de imóveis que compõem o total e identificar a origem de cada número.
 
 **Qualidade e restrições deste módulo:**
 

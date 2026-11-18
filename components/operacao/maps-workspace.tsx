@@ -2,9 +2,12 @@
 
 import { useState } from "react";
 import { HotspotWorkspace } from "@/components/operacao/hotspot-workspace";
+import { GoogleMapViewport } from "@/components/operacao/google-map-viewport";
 import { MapViewport } from "@/components/operacao/map-viewport";
 import { PageHeading } from "@/components/plataforma/dashboard-ui";
 import { sectorPropertiesDemo } from "@/lib/visitas/demo-data";
+
+const hasGoogleMapsKey = Boolean(process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY);
 
 export function MapsWorkspace() {
   const [layer, setLayer] = useState<"imoveis" | "hotspots">("imoveis");
@@ -18,7 +21,7 @@ export function MapsWorkspace() {
       <PageHeading
         eyebrow="Território · mapas"
         title="Mapas da operação"
-        description="Consulte os imóveis do setor e os hotspots informados pelos agentes. As posições exibidas são fictícias."
+        description="Consulte os imóveis, os setores censitários oficiais do IBGE e os hotspots informados pelos agentes. Os imóveis e hotspots são fictícios."
       />
       <div
         role="tablist"
@@ -49,11 +52,17 @@ export function MapsWorkspace() {
       ) : (
         <section className="min-w-0 overflow-hidden border border-slate-200 bg-white p-2 sm:p-4">
           <MapViewport
-            label="Mapa demonstrativo dos imóveis do setor"
+            label="Mapa integrado dos imóveis e bairros"
             className="bg-[#e8f0eb] sm:aspect-[16/9]"
           >
+            {hasGoogleMapsKey ? (
+              <GoogleMapViewport
+                properties={sectorPropertiesDemo}
+                onSelectProperty={(property) => setSelectedId(property.id)}
+              />
+            ) : null}
             <svg
-              className="absolute inset-0 h-full w-full"
+              className={`${hasGoogleMapsKey ? "hidden" : "absolute"} inset-0 h-full w-full`}
               viewBox="0 0 800 500"
               preserveAspectRatio="xMidYMid slice"
               aria-hidden="true"
@@ -70,22 +79,23 @@ export function MapsWorkspace() {
                 strokeWidth="2"
               />
             </svg>
-            {sectorPropertiesDemo.map((property) => (
-              <button
-                key={property.id}
-                type="button"
-                title={`${property.logradouro}, ${property.numero}`}
-                aria-label={`Imóvel ${property.codigoLocal}: ${property.logradouro}, ${property.numero}`}
-                onClick={() => setSelectedId(property.id)}
-                style={{
-                  left: `${property.pontoMapa.x}%`,
-                  top: `${property.pontoMapa.y}%`,
-                }}
-                className={`absolute grid h-8 w-8 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-2 border-white text-xs font-bold text-white shadow ${selectedId === property.id ? "bg-blue-700 ring-2 ring-blue-900" : "bg-emerald-700"}`}
-              >
-                {property.sequenciaPercurso}
-              </button>
-            ))}
+            {!hasGoogleMapsKey &&
+              sectorPropertiesDemo.map((property) => (
+                <button
+                  key={property.id}
+                  type="button"
+                  title={`${property.logradouro}, ${property.numero}`}
+                  aria-label={`Imóvel ${property.codigoLocal}: ${property.logradouro}, ${property.numero}`}
+                  onClick={() => setSelectedId(property.id)}
+                  style={{
+                    left: `${property.pontoMapa.x}%`,
+                    top: `${property.pontoMapa.y}%`,
+                  }}
+                  className={`absolute grid h-8 w-8 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-2 border-white text-xs font-bold text-white shadow ${selectedId === property.id ? "bg-blue-700 ring-2 ring-blue-900" : "bg-emerald-700"}`}
+                >
+                  {property.sequenciaPercurso}
+                </button>
+              ))}
           </MapViewport>
           {selected && (
             <p className="mt-3 text-sm text-slate-800">

@@ -4,26 +4,36 @@ import Image from "next/image";
 import type { NavigationItem } from "@/lib/plataforma/navigation";
 import {
   BarChart3,
+  Activity,
   ClipboardCheck,
   Database,
-  FileChartColumn,
-  Gauge,
-  House,
-  MapPinned,
+  FilePenLine,
+  FlaskConical,
+  LayoutDashboard,
+  ListChecks,
+  LocateFixed,
+  Map,
+  Package,
   Settings2,
   Users,
+  Waves,
 } from "lucide-react";
 
 const navigationIcons = {
-  "◫": House,
-  "✓": ClipboardCheck,
-  "◉": MapPinned,
-  "◇": Gauge,
-  "⌁": FileChartColumn,
-  "⇧": Database,
-  "⤢": BarChart3,
-  "◎": Users,
-  "⚙": Settings2,
+  dashboard: LayoutDashboard,
+  visitas: ClipboardCheck,
+  laboratorio: FlaskConical,
+  digitacao: FilePenLine,
+  territorio: LocateFixed,
+  estoque: Package,
+  saneamento: Waves,
+  mapas: Map,
+  priorizacao: ListChecks,
+  diagnostico: Activity,
+  ingestao: Database,
+  simulacao: BarChart3,
+  usuarios: Users,
+  configuracao: Settings2,
 } as const;
 
 export function DashboardSidebar({
@@ -62,6 +72,7 @@ export function DashboardSidebar({
               width={expanded ? 190 : 62}
               height={52}
               className={`object-contain ${expanded ? "h-[7vh] w-full" : "h-[7.5vh]"}`}
+              style={{ width: expanded ? "100%" : "auto", height: "auto" }}
             />
           </div>
         </div>
@@ -86,7 +97,7 @@ export function DashboardSidebar({
               pathname === item.href || pathname.startsWith(`${item.href}/`);
             const Icon =
               navigationIcons[item.icon as keyof typeof navigationIcons] ??
-              Gauge;
+              LayoutDashboard;
             return (
               <Link
                 key={item.href}
@@ -115,7 +126,8 @@ export function DashboardSidebar({
           const active =
             pathname === item.href || pathname.startsWith(`${item.href}/`);
           const Icon =
-            navigationIcons[item.icon as keyof typeof navigationIcons] ?? Gauge;
+            navigationIcons[item.icon as keyof typeof navigationIcons] ??
+            LayoutDashboard;
           return (
             <Link
               key={item.href}
