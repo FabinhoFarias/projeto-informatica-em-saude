@@ -39,8 +39,8 @@ Os IDs existentes foram preservados. Requisitos novos usam IDs posteriores aos j
 | :-------------- | ---------: |
 | ✅ Implementado |          0 |
 | 🏗 Parcial      |          0 |
-| ⏳ Futuro       |         62 |
-| 🔎 A verificar  |          3 |
+| ⏳ Futuro       |         63 |
+| 🔎 A verificar  |          2 |
 | **Total**       |     **65** |
 
 <!-- requirements-progress:end -->
@@ -320,6 +320,8 @@ UUID idempotente por operação, confirmação por item, reenvio após falha, pe
 **Evidência e lacunas:** Não foram identificados mecanismos e evidências verificáveis suficientes deste comportamento no repositório; a previsão documental não comprova implementação. Implementar e validar pelos critérios do requisito.
 
 confirmar titularidade e disponibilidade antes da implantação. Suportar isolamento de contas e encerramento de sessão sem revelar dados de outro agente; acesso local protegido, retenção mínima, procedimento para perda/troca do aparelho e recuperação dos dados já sincronizados. Trabalho não sincronizado em aparelho perdido não tem recuperação garantida: orientar sincronização e contingência. Não exigir equipamento pessoal ou conectividade móvel contínua para adesão.
+
+A gestão municipal deve configurar a janela de uso da plataforma pelos ACEs, com horário inicial e final, dias autorizados, fuso do município e exceções justificadas. Fora da janela, o acesso deve ser bloqueado ou colocado em modo restrito, sem exibir dados territoriais ou nominativos. O gestor deve poder consultar e alterar a política, registrar vigência e motivo, e a aplicação deve informar ao ACE que o acesso está fora do horário autorizado. A política existe para reduzir o risco de exposição de dados em aparelhos pessoais ou compartilhados; não deve apagar registros já sincronizados nem impedir uma rotina de encerramento seguro.
 
 ### RNF-023 — Familiaridade, implantação gradual e adesão do ACE
 
@@ -689,6 +691,21 @@ O sistema deve apresentar, para a coordenação e gestão da Vigilância Ambient
 
 **Aceite:** para um ciclo publicado, a gestão consegue selecionar bairro ou setor, ver previstos/visitados/pendentes, abrir a lista de imóveis que compõem o total e identificar a origem de cada número.
 
+### RF-043 — Acompanhamento de cobertura por ACE
+
+**Status:** ⏳ **Futuro**
+
+**Evidência e lacunas:** A gestão ainda não possui uma visão integrada com usuários, atribuições e visitas persistidas por ACE.
+
+O sistema deve permitir ao gestor visualizar a lista de ACEs subordinados, suas áreas atribuídas e o percentual de cobertura individual no ciclo selecionado. Cada cartão ou linha deve apresentar imóveis previstos, visitados, pendentes, recusados/fechados em recuperação, última sincronização e a origem dos números.
+
+- Restringir a visualização aos ACEs vinculados à unidade, equipe ou território do gestor.
+- Permitir abrir a composição da cobertura por bairro, setor, quarteirão e imóvel.
+- Separar cobertura individual da cobertura municipal para evitar dupla contagem.
+- Informar ciclo, modalidade, período, denominador e data da última atualização.
+
+**Aceite:** o gestor seleciona um ciclo, identifica todos os ACEs sob sua responsabilidade, compara os percentuais de cobertura e abre a lista de imóveis visitados e pendentes de cada agente.
+
 **Qualidade e restrições deste módulo:**
 
 ### RNF-018 — Reprodutibilidade documental
@@ -821,14 +838,6 @@ O sistema deve permitir ao gestor simular o quantitativo de agentes (ACS/ACE) e 
 **Aceite:** configurar, por exemplo, 08h e 14h no fuso municipal e verificar próxima ocorrência e uma entrega por horário/destinatário; repetir execução do agendador sem duplicação. No modo restrito, ACE não acessa predições por tela, API ou exportação e continua registrando visitas; recebe apenas a orientação explicitamente encaminhada pelo gestor. No modo compartilhado, somente equipe/território autorizados acessam o snapshot. Ausência de previsão válida gera aviso, e histórico permite distinguir disponibilização, leitura e comunicação.
 
 **Qualidade e restrições deste módulo:**
-
-### RNF-001 — Tempo de Resposta do Dashboard
-
-**Status:** 🔎 **A verificar**
-
-**Evidência e lacunas:** Não há medição de carregamento em carga/dispositivo/rede representativos. Código de interface não comprova o limite de 3 segundos.
-
-O dashboard web deve carregar os mapas interativos e painéis analíticos em no máximo 3 segundos sob condições normais de navegação.
 
 ### 7.1 Painel de fechamento e decisão gerencial
 
@@ -1110,8 +1119,6 @@ A plataforma na nuvem deve apresentar disponibilidade (SLA) de no mínimo 99.5% 
 **Evidência e lacunas:** Não foram identificados mecanismos e evidências verificáveis suficientes deste comportamento no repositório; a previsão documental não comprova implementação. Implementar e validar pelos critérios do requisito.
 
 definir com o município prazo de retenção por classe documental, cópias de segurança do ambiente local e da nuvem, responsáveis e objetivos de recuperação antes do piloto. Realizar teste de restauração; nuvem disponível não garante disponibilidade da borda municipal. Não apagar registros ao encerrar ciclo.
-
-RNF-001 e RNF-011 continuam como metas de dashboard e nuvem, respectivamente. Seu cenário de medição deve registrar rede, dispositivo, quantidade de usuários, volume e janela de observação antes do aceite; não são prova de desempenho já alcançado.
 
 ## 11. Modelo compartilhado de dados e fluxos entre papéis
 
@@ -1627,7 +1634,7 @@ Este índice aponta a definição principal. Todos os detalhamentos, critérios 
 | Coordenação/supervisão     | RF-002, RF-018, RF-019, RF-025, RF-026, RF-030, RF-037, RF-040                                 | RNF-022                                                                |
 | Digitador/operador         | RF-029, RF-027, RF-028, RF-039                                                                 | RNF-018, RNF-013, RNF-009                                              |
 | Laboratório                | RF-023                                                                                         | Compartilhados referenciados no módulo                                 |
-| Direção/gestor             | RF-008, RF-017, RF-009, RF-011, RF-033                                                         | RNF-001                                                                |
+| Direção/gestor             | RF-008, RF-017, RF-009, RF-011, RF-033                                                         | RNF-017                                                                |
 | Epidemiologista            | RF-010, RF-007, RF-005, RF-006, RF-016                                                         | RNF-012, RNF-014                                                       |
 | Integrações/APS e destinos | RF-001, RF-015, RF-003, RF-004, RF-038                                                         | RNF-010, RNF-006                                                       |
 | Administração/plataforma   | RF-041                                                                                         | RNF-008, RNF-002, RNF-007, RNF-019, RNF-020, RNF-003, RNF-011, RNF-021 |

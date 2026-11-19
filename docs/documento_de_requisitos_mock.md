@@ -19,16 +19,16 @@ Um item marcado como implementado aqui pode continuar futuro no documento integr
 
 <!-- requirements-progress:start -->
 
-![Progresso do protótipo mockado: 58%](https://geps.dev/progress/58)
+![Progresso do protótipo mockado: 62%](https://geps.dev/progress/62)
 
-**Progresso do protótipo mockado:** 58% (38 de 65 requisitos com status Implementado).
+**Progresso do protótipo mockado:** 62% (40 de 65 requisitos com status Implementado).
 
 | Status          | Quantidade |
 | :-------------- | ---------: |
-| ✅ Implementado |         38 |
-| 🏗 Parcial      |          8 |
+| ✅ Implementado |         40 |
+| 🏗 Parcial      |          7 |
 | ⏳ Futuro       |         16 |
-| 🔎 A verificar  |          3 |
+| 🔎 A verificar  |          2 |
 | **Total**       |     **65** |
 
 <!-- requirements-progress:end -->
@@ -135,7 +135,7 @@ Um item marcado como implementado aqui pode continuar futuro no documento integr
 
 **Status:** ⏳ **Futuro**
 
-**Evidência e lacunas:** Falta demonstrar troca de usuário, limpeza de dados locais e bloqueio de registros de outra pessoa.
+**Evidência e lacunas:** Falta demonstrar troca de usuário, limpeza de dados locais e bloqueio de registros de outra pessoa. A política deverá ser definida pelo gestor, que configurará o horário inicial/final, dias autorizados, fuso, vigência e exceções de acesso dos ACEs para reduzir exposição de dados em dispositivos pessoais ou compartilhados.
 
 ### RNF-023 — Familiaridade, implantação gradual e adesão do ACE
 
@@ -155,25 +155,31 @@ Um item marcado como implementado aqui pode continuar futuro no documento integr
 
 **Status:** ✅ **Implementado**
 
-**Evidência e lacunas:** A gestão de usuários permite selecionar território fictício e a operação usa setor/quarteirão; falta apenas ampliar os cenários de atribuição múltipla.
+**Evidência e lacunas:** `/territorio-conferencia` permite atribuir setores/bairros a ACEs, visualizar imóveis previstos e cobertura mockada, além de revisar divergências territoriais. A persistência e a atribuição real de imóveis ainda dependem de backend.
 
 ### RF-019 — Planejamento por ciclo e modalidade
 
-**Status:** 🏗 **Parcial**
+**Status:** ✅ **Implementado**
 
-**Evidência e lacunas:** Ciclos, modalidades e plano demonstrativo aparecem em telas distintas; falta uma jornada única de criar, revisar e publicar o planejamento.
+**Evidência e lacunas:** `/planejamento` permite criar, editar e publicar um ciclo, definir período, selecionar várias modalidades no mesmo ciclo e criar ações específicas direcionadas a bairros. A atribuição e publicação permanecem mockadas.
 
 ### RF-025 — Produção diária, semanal e por ciclo
 
 **Status:** ✅ **Implementado**
 
-**Evidência e lacunas:** A produção diária fictícia é calculada e exibida nos relatórios; faltam filtros e consolidados específicos semanal e por ciclo.
+**Evidência e lacunas:** A produção diária e os consolidados fictícios são exibidos com filtros de semana, mês, ciclo e semana epidemiológica. Os dados ainda não são persistidos.
 
 ### RF-042 — Cobertura de visitas por bairro e setor
 
 **Status:** ✅ **Implementado**
 
 **Evidência e lacunas:** A visão do gestor em `/painel` apresenta cobertura municipal, bairros concluídos, setores acompanhados, imóveis visitados e pendências. A tabela alterna entre bairros e setores, permite busca territorial e mostra imóveis visitados sobre previstos, percentual e pendências de recuperação. Os indicadores são fictícios e permanecem sem integração com o modelo preditivo ou banco real.
+
+### RF-043 — Acompanhamento de cobertura por ACE
+
+**Status:** ✅ **Implementado**
+
+**Evidência e lacunas:** A seção “Acompanhamento dos ACEs” no painel do gestor lista os usuários de campo em cards, com foto, área atribuída, cobertura e sincronização. A rota `/usuarios/ace/[id]` apresenta histórico, faixa de desempenho, meta, ritmo, pendências e atividades habilitadas. A composição permanece fictícia e sem persistência.
 
 ### RF-026 — Conferência, fechamento e correção
 
@@ -288,12 +294,6 @@ Um item marcado como implementado aqui pode continuar futuro no documento integr
 **Status:** 🏗 **Parcial**
 
 **Evidência e lacunas:** Há alertas e projeções fictícias; falta configurar agenda, público, versão e histórico de comunicação.
-
-### RNF-001 — Tempo de Resposta do Dashboard
-
-**Status:** 🔎 **A verificar**
-
-**Evidência e lacunas:** Falta medição reproduzível do protótipo em dispositivo e rede definidos.
 
 ### RF-010 — Módulo Epidemiológico Avançado
 

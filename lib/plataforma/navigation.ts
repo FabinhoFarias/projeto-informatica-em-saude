@@ -20,6 +20,12 @@ export const navigationItems: NavigationItem[] = [
     display: "todos",
   },
   {
+    href: "/planejamento",
+    label: "Planejamento por ciclo",
+    icon: "planejamento",
+    display: "pc",
+  },
+  {
     href: "/laboratorio",
     label: "Laboratório",
     icon: "laboratorio",

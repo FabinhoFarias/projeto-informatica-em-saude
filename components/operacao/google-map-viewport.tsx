@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { SectorPropertyMock } from "@/lib/visitas/demo-data";
 
 declare global {
   // O script oficial injeta este namespace em runtime.
@@ -51,19 +50,32 @@ declare global {
   }
   interface Window {
     google?: typeof google;
+    gm_authFailure?: () => void;
   }
 }
-
-type GoogleMapViewportProps = {
-  properties: SectorPropertyMock[];
-  onSelectProperty: (property: SectorPropertyMock) => void;
-};
 
 const CENTER = { lat: -7.936, lng: -35.293 };
 const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
-function loadGoogleMaps() {
-  if (window.google?.maps) return Promise.resolve();
+export function loadGoogleMaps() {
+  const waitUntilReady = () =>
+    new Promise<void>((resolve, reject) => {
+      const started = Date.now();
+      const check = () => {
+        if (window.google?.maps?.Map) return resolve();
+        if (Date.now() - started > 15000) {
+          return reject(
+            new Error(
+              "Google Maps carregou sem disponibilizar o construtor Map.",
+            ),
+          );
+        }
+        window.setTimeout(check, 50);
+      };
+      check();
+    });
+  if (window.google?.maps?.Map) return Promise.resolve();
+  if (window.google?.maps) return waitUntilReady();
   const existing = document.querySelector<HTMLScriptElement>(
     'script[data-vigia-google-maps="true"]',
   );
@@ -75,9 +87,14 @@ function loadGoogleMaps() {
         () => reject(new Error("Falha ao carregar o Google Maps.")),
         { once: true },
       );
-    });
+    }).then(waitUntilReady);
   }
   return new Promise<void>((resolve, reject) => {
+    window.gm_authFailure = () => {
+      console.error(
+        "[Vigia+] Google Maps rejeitou a chave. Verifique HTTP referrers, API habilitada e faturamento.",
+      );
+    };
     const script = document.createElement("script");
     script.dataset.vigiaGoogleMaps = "true";
     script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(API_KEY ?? "")}&libraries=geometry,marker&loading=async`;
@@ -87,17 +104,19 @@ function loadGoogleMaps() {
     script.onerror = () =>
       reject(new Error("Falha ao carregar o Google Maps."));
     document.head.appendChild(script);
-  });
+  }).then(waitUntilReady);
 }
 
-export function GoogleMapViewport({
-  properties,
-  onSelectProperty,
-}: GoogleMapViewportProps) {
+export function GoogleMapViewport() {
   const elementRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">(
     API_KEY ? "loading" : "error",
+  );
+  const [errorMessage, setErrorMessage] = useState(
+    API_KEY
+      ? ""
+      : "NEXT_PUBLIC_GOOGLE_MAPS_API_KEY não foi encontrada no build.",
   );
 
   useEffect(() => {
@@ -139,28 +158,22 @@ export function GoogleMapViewport({
           info.open({ map });
         });
         map.data.addListener("mouseout", () => info.close());
-        properties.forEach((property) => {
-          const marker = new maps.marker.AdvancedMarkerElement({
-            map,
-            position: {
-              lat: property.coordenadas.latitude,
-              lng: property.coordenadas.longitude,
-            },
-            title: `${property.logradouro}, ${property.numero}`,
-            label: String(property.sequenciaPercurso),
-          });
-          marker.addListener("click", () => onSelectProperty(property));
-        });
         setStatus("ready");
       })
-      .catch(() => {
-        if (!cancelled) setStatus("error");
+      .catch((error: unknown) => {
+        if (!cancelled) {
+          const detail = error instanceof Error ? ` ${error.message}` : "";
+          const message = `A API do Google Maps não carregou.${detail} Verifique o domínio autorizado, a Maps JavaScript API e o faturamento.`;
+          console.error("[Vigia+] Google Maps:", message);
+          setErrorMessage(message);
+          setStatus("error");
+        }
       });
     return () => {
       cancelled = true;
       mapRef.current = null;
     };
-  }, [onSelectProperty, properties]);
+  }, []);
 
   if (status === "error") {
     return (
@@ -168,8 +181,8 @@ export function GoogleMapViewport({
         <div>
           <p className="font-semibold">Mapa integrado ao Google Maps</p>
           <p className="mt-1 max-w-md">
-            Configure <code>NEXT_PUBLIC_GOOGLE_MAPS_API_KEY</code> no ambiente
-            para carregar o mapa e os limites dos bairros.
+            {errorMessage ||
+              "Configure NEXT_PUBLIC_GOOGLE_MAPS_API_KEY no ambiente para carregar o mapa."}
           </p>
         </div>
       </div>

@@ -11,7 +11,7 @@ import { PageHeading, Panel } from "@/components/plataforma/dashboard-ui";
 export function DigitizationWorkspace() {
   const [entries, setEntries] = useState<ManualEntry[]>([]);
   return (
-    <div className="mx-auto max-w-[1600px]">
+    <div className="min-w-0">
       <PageHeading
         eyebrow="Operação assistida"
         title="Digitação e relatórios"

@@ -3,6 +3,7 @@
 import { useMemo, useState, type ChangeEvent } from "react";
 import { PageHeading } from "@/components/plataforma/dashboard-ui";
 import { MapViewport } from "@/components/operacao/map-viewport";
+import { GoogleHotspotMap } from "@/components/operacao/google-hotspot-map";
 import { importAgentLocationCsv } from "@/lib/operacao/import-locations";
 import {
   aggregateHotspots,
@@ -15,6 +16,7 @@ import {
 } from "@/lib/operacao/hotspots";
 
 const sampleCsv = `agente_id,latitude,longitude,data_hora,tipo\nACE-01,-8.075,-34.932,2026-11-07T08:30:00,posicao\nACE-01,-8.080,-34.924,2026-11-07T10:12:00,foco\nACE-02,-8.085,-34.919,2026-11-07T10:28:00,foco\n`;
+const hasGoogleMapsKey = Boolean(process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY);
 
 function downloadSample() {
   const url = URL.createObjectURL(
@@ -307,14 +309,20 @@ export function HotspotWorkspace() {
               </button>
             </div>
           </div>
-          <SchematicMap
-            cells={cells}
-            agents={agents}
-            selected={selectedCell?.id ?? null}
-            onSelect={setSelected}
-            showAgents={showAgents}
-            layer={layer}
-          />
+          {hasGoogleMapsKey ? (
+            <MapViewport label="Mapa integrado de hotspots e posições dos agentes">
+              <GoogleHotspotMap events={events} showAgents={showAgents} />
+            </MapViewport>
+          ) : (
+            <SchematicMap
+              cells={cells}
+              agents={agents}
+              selected={selectedCell?.id ?? null}
+              onSelect={setSelected}
+              showAgents={showAgents}
+              layer={layer}
+            />
+          )}
           <div className="flex flex-wrap items-center justify-between gap-3 p-4 text-sm text-slate-700">
             <label className="inline-flex cursor-pointer items-center gap-2">
               <input

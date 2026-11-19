@@ -15,11 +15,15 @@ const references: Record<ConsolidationPeriod, string> = {
   CICLO: "6/2026",
   SEMANA_EPIDEMIOLOGICA: "2026-SE45",
 };
+const INITIAL_GENERATION = {
+  id: "DOC-MOCK-20261107-001",
+  generatedAt: "2026-11-07T12:00:00-03:00",
+};
 
 export function ConsolidatedReports() {
   const [period, setPeriod] = useState<ConsolidationPeriod>("SEMANA");
   const [reference, setReference] = useState(references.SEMANA);
-  const [generation, setGeneration] = useState(() => createGeneration());
+  const [generation, setGeneration] = useState(INITIAL_GENERATION);
   const totals = useMemo(
     () => buildPeriodConsolidated({ period, reference }),
     [period, reference],

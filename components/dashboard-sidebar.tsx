@@ -5,6 +5,7 @@ import type { NavigationItem } from "@/lib/plataforma/navigation";
 import {
   BarChart3,
   Activity,
+  CalendarRange,
   ClipboardCheck,
   Database,
   FilePenLine,
@@ -32,6 +33,7 @@ const navigationIcons = {
   diagnostico: Activity,
   ingestao: Database,
   simulacao: BarChart3,
+  planejamento: CalendarRange,
   usuarios: Users,
   configuracao: Settings2,
 } as const;
@@ -72,7 +74,7 @@ export function DashboardSidebar({
               width={expanded ? 190 : 62}
               height={52}
               className={`object-contain ${expanded ? "h-[7vh] w-full" : "h-[7.5vh]"}`}
-              style={{ width: expanded ? "100%" : "auto", height: "auto" }}
+              style={{ width: expanded ? "100%" : "auto", height: "7dvh" }}
             />
           </div>
         </div>

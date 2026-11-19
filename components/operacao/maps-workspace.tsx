@@ -55,12 +55,7 @@ export function MapsWorkspace() {
             label="Mapa integrado dos imóveis e bairros"
             className="bg-[#e8f0eb] sm:aspect-[16/9]"
           >
-            {hasGoogleMapsKey ? (
-              <GoogleMapViewport
-                properties={sectorPropertiesDemo}
-                onSelectProperty={(property) => setSelectedId(property.id)}
-              />
-            ) : null}
+            {hasGoogleMapsKey ? <GoogleMapViewport /> : null}
             <svg
               className={`${hasGoogleMapsKey ? "hidden" : "absolute"} inset-0 h-full w-full`}
               viewBox="0 0 800 500"

@@ -50,6 +50,7 @@ export const initialUsers: UserAccount[] = [
     status: "Ativo",
     lastAccess: "07/07/2026, 16:20",
     lastSync: "07/10/2026, 07:48",
+    avatarUrl: "https://randomuser.me/api/portraits/men/32.jpg",
   },
   {
     id: "u-5",
@@ -63,6 +64,7 @@ export const initialUsers: UserAccount[] = [
     status: "Ativo",
     lastAccess: "05/10/2026, 17:05",
     lastSync: "06/10/2026, 18:16",
+    avatarUrl: "https://randomuser.me/api/portraits/women/44.jpg",
   },
   {
     id: "u-8",
@@ -76,6 +78,7 @@ export const initialUsers: UserAccount[] = [
     status: "Inativo",
     lastAccess: "12/08/2026, 11:02",
     lastSync: "12/08/2026, 10:57",
+    avatarUrl: "https://randomuser.me/api/portraits/men/67.jpg",
   },
   {
     id: "u-9",
@@ -88,5 +91,19 @@ export const initialUsers: UserAccount[] = [
     mfa: true,
     status: "Ativo",
     lastAccess: "07/10/2026, 07:56",
+  },
+  {
+    id: "u-10",
+    name: "Rafael Gomes da Silva",
+    email: "rafael.gomes@saude.itaenga.pe.gov.br",
+    cpf: "10384756291",
+    role: "AGENTE_CAMPO",
+    territory: `${mappedTerritories[4].name} · Microárea 03`,
+    municipality: municipality.name,
+    mfa: true,
+    status: "Ativo",
+    lastAccess: "07/10/2026, 08:06",
+    lastSync: "07/10/2026, 07:55",
+    avatarUrl: "https://randomuser.me/api/portraits/men/52.jpg",
   },
 ];

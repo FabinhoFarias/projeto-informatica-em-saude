@@ -76,8 +76,10 @@ export function canAccessPath(role: Role, pathname: string) {
     "/diagnostico": "ai:manage",
     "/ingestao": "ingestion:manage",
     "/simulacao": "ai:manage",
-    "/usuarios": "users:manage",
+    "/planejamento": "dashboard:view",
     "/configuracao-municipal": "users:manage",
+    "/usuarios/ace": "dashboard:view",
+    "/usuarios": "users:manage",
   };
   const path = Object.keys(routePermissions).find(
     (route) => pathname === route || pathname.startsWith(`${route}/`),

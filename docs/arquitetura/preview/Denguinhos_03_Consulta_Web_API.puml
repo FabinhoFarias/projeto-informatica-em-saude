@@ -44,7 +44,6 @@
     end note
     note over API,DB
     Leitura usa previsões previamente publicadas, sem treinar ML na requisição.
-    Meta RNF-001: mapas/painéis <= 3 s em condições normais;
     verificar com volume real, payload limitado e métricas de latência.
     end note
     @enduml

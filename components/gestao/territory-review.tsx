@@ -9,6 +9,8 @@ import {
   territoryReviewDemo,
   type TerritoryReviewStatus,
 } from "@/lib/gestao/operations-data";
+import { initialUsers } from "@/lib/identidade/demo-users";
+import { mappedTerritories } from "@/lib/territorios/demo-data";
 
 const labels: Record<TerritoryReviewStatus, string> = {
   VALIDADO: "Validado",
@@ -18,6 +20,15 @@ const labels: Record<TerritoryReviewStatus, string> = {
 export function TerritoryReview() {
   const [items, setItems] = useState(territoryReviewDemo);
   const [search, setSearch] = useState("");
+  const aces = initialUsers.filter((user) => user.role === "AGENTE_CAMPO");
+  const [assignments, setAssignments] = useState<Record<string, string>>(() =>
+    mappedTerritories
+      .slice(0, 8)
+      .reduce<Record<string, string>>((result, territory, index) => {
+        result[territory.id] = aces[index % aces.length]?.id ?? "";
+        return result;
+      }, {}),
+  );
   const filtered = useMemo(
     () =>
       items.filter((item) =>
@@ -121,6 +132,87 @@ export function TerritoryReview() {
             </tbody>
           </table>
         </div>
+      </Panel>
+      <Panel
+        className="mt-5"
+        title="Atribuição de setores aos ACEs"
+        description="Distribua bairros e setores do ciclo entre os agentes responsáveis. A cobertura exibida é demonstrativa."
+      >
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[760px] text-left text-sm">
+            <thead className="border-b border-slate-200 text-xs uppercase text-slate-500">
+              <tr>
+                <th className="p-3">Bairro / setor</th>
+                <th className="p-3">Zona</th>
+                <th className="p-3">Imóveis previstos</th>
+                <th className="p-3">ACE responsável</th>
+                <th className="p-3">Cobertura</th>
+              </tr>
+            </thead>
+            <tbody>
+              {mappedTerritories.slice(0, 8).map((territory, index) => {
+                const aceId = assignments[territory.id] ?? "";
+                const assignedAce = aces.find((ace) => ace.id === aceId);
+                const assigned = 70 + index * 9;
+                const visited = Math.round(
+                  assigned * (0.55 + (index % 4) * 0.08),
+                );
+                const coverage = Math.round((visited / assigned) * 100);
+                return (
+                  <tr key={territory.id} className="border-b border-slate-100">
+                    <td className="p-3 font-semibold text-slate-900">
+                      {territory.name}
+                    </td>
+                    <td className="p-3 text-slate-600">{territory.zone}</td>
+                    <td className="p-3 text-slate-600">{assigned}</td>
+                    <td className="p-3">
+                      <select
+                        value={aceId}
+                        onChange={(event) =>
+                          setAssignments((current) => ({
+                            ...current,
+                            [territory.id]: event.target.value,
+                          }))
+                        }
+                        className="min-h-9 border border-slate-300 bg-white px-2 text-xs"
+                      >
+                        <option value="">Sem atribuição</option>
+                        {aces.map((ace) => (
+                          <option key={ace.id} value={ace.id}>
+                            {ace.name}
+                          </option>
+                        ))}
+                      </select>
+                      {assignedAce && (
+                        <span className="mt-1 block text-[11px] text-slate-500">
+                          {assignedAce.lastSync
+                            ? `Sincronizado ${assignedAce.lastSync}`
+                            : "Sem sincronização"}
+                        </span>
+                      )}
+                    </td>
+                    <td className="p-3">
+                      <div className="flex items-center gap-2">
+                        <div className="h-2 w-20 overflow-hidden rounded-full bg-slate-200">
+                          <div
+                            className={`h-full ${coverage >= 80 ? "bg-emerald-700" : "bg-amber-500"}`}
+                            style={{ width: `${coverage}%` }}
+                          />
+                        </div>
+                        <span className="text-xs font-bold">{coverage}%</span>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+        <p className="mt-4 border-l-4 border-blue-600 bg-blue-50 p-3 text-xs leading-5 text-blue-900">
+          Ao alterar o ACE responsável, a área atribuída será refletida no
+          painel de cobertura individual e na lista de imóveis do agente quando
+          houver persistência real.
+        </p>
       </Panel>
     </div>
   );

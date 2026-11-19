@@ -1,0 +1,221 @@
+"use client";
+
+import Link from "next/link";
+import Image from "next/image";
+import {
+  PageHeading,
+  Panel,
+  MetricCard,
+} from "@/components/plataforma/dashboard-ui";
+import { initialUsers } from "@/lib/identidade/demo-users";
+
+export function AceProfile({ id }: { id: string }) {
+  const ace = initialUsers.find(
+    (user) => user.id === id && user.role === "AGENTE_CAMPO",
+  );
+  if (!ace)
+    return (
+      <div className="border border-red-200 bg-red-50 p-5 text-sm text-red-800">
+        ACE não encontrado.
+      </div>
+    );
+  const stats = { assigned: 126, visited: 91, coverage: 72, pending: 35 };
+  const target = 80;
+  const coverageBand =
+    stats.coverage >= target
+      ? "Dentro da meta"
+      : stats.coverage >= 60
+        ? "Em atenção"
+        : "Crítica";
+  const bandStyle =
+    stats.coverage >= target
+      ? "bg-emerald-100 text-emerald-800"
+      : stats.coverage >= 60
+        ? "bg-amber-100 text-amber-800"
+        : "bg-red-100 text-red-800";
+  const history = [
+    ["07/10/2026", "Quarteirão 04", "18 imóveis visitados", "Sincronizado"],
+    ["06/10/2026", "Quarteirão 02", "3 retornos agendados", "Conferido"],
+    [
+      "05/10/2026",
+      "Setor Centro",
+      "22 imóveis visitados · 2 tratados",
+      "Sincronizado",
+    ],
+    [
+      "04/10/2026",
+      "Quarteirão 01",
+      "1 recusa e 4 imóveis fechados",
+      "Aguardando retorno",
+    ],
+  ];
+  return (
+    <div>
+      <PageHeading
+        eyebrow="Gestão de campo · perfil do ACE"
+        title={ace.name}
+        description="Histórico operacional, cobertura territorial e registros do ciclo selecionado."
+        action={
+          <Link
+            href="/painel"
+            className="border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700"
+          >
+            Voltar ao painel
+          </Link>
+        }
+      />
+      <section className="mb-5 flex flex-wrap items-center gap-4 border border-slate-200 bg-white p-5">
+        <Image
+          src={
+            ace.avatarUrl ?? "https://randomuser.me/api/portraits/men/32.jpg"
+          }
+          alt={`Foto de ${ace.name}`}
+          width={72}
+          height={72}
+          className="h-[72px] w-[72px] rounded-full object-cover"
+        />
+        <div>
+          <h2 className="text-xl font-bold text-slate-950">{ace.name}</h2>
+          <p className="text-sm text-slate-600">
+            {ace.territory} · {ace.municipality}
+          </p>
+          <p className="mt-1 text-xs text-slate-500">
+            Última sincronização: {ace.lastSync ?? "sem registro"} · Status:{" "}
+            {ace.status}
+          </p>
+        </div>
+      </section>
+      <div className="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <MetricCard
+          label="Imóveis atribuídos"
+          value={String(stats.assigned)}
+          detail="No ciclo atual"
+        />
+        <MetricCard
+          label="Imóveis visitados"
+          value={String(stats.visited)}
+          detail="Registros concluídos"
+        />
+        <MetricCard
+          label="Cobertura"
+          value={`${stats.coverage}%`}
+          detail="Da área atribuída"
+        />
+        <MetricCard
+          label="Pendências"
+          value={String(stats.pending)}
+          detail="Retornos ou não visitados"
+        />
+      </div>
+      <Panel
+        className="mb-5"
+        title="Indicador de cobertura do ciclo"
+        description="Cobertura calculada sobre os imóveis válidos atribuídos ao ACE no ciclo atual."
+      >
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-4xl font-bold text-slate-950">
+              {stats.coverage}%
+            </p>
+            <p className="mt-1 text-sm text-slate-600">
+              {stats.visited} de {stats.assigned} imóveis visitados
+            </p>
+          </div>
+          <span className={`px-3 py-1 text-xs font-bold ${bandStyle}`}>
+            {coverageBand}
+          </span>
+        </div>
+        <div className="mt-4 h-4 overflow-hidden rounded-full bg-slate-200">
+          <div
+            className={`h-full ${stats.coverage >= target ? "bg-emerald-700" : stats.coverage >= 60 ? "bg-amber-500" : "bg-red-500"}`}
+            style={{ width: `${stats.coverage}%` }}
+          />
+        </div>
+        <div className="mt-2 flex justify-between text-xs text-slate-500">
+          <span>0%</span>
+          <span>Meta municipal: {target}%</span>
+          <span>100%</span>
+        </div>
+        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+          <div className="border border-slate-200 p-3">
+            <p className="text-xs text-slate-500">Diferença para meta</p>
+            <p className="mt-1 font-bold text-slate-900">
+              {Math.max(0, target - stats.coverage)} p.p.
+            </p>
+          </div>
+          <div className="border border-slate-200 p-3">
+            <p className="text-xs text-slate-500">Retornos/recusas</p>
+            <p className="mt-1 font-bold text-slate-900">12</p>
+          </div>
+          <div className="border border-slate-200 p-3">
+            <p className="text-xs text-slate-500">Ritmo médio</p>
+            <p className="mt-1 font-bold text-slate-900">18/dia</p>
+          </div>
+        </div>
+      </Panel>
+      <div className="grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
+        <Panel
+          title="Histórico de registros"
+          description="Atividades lançadas pelo ACE e recebidas pela gestão."
+        >
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[620px] text-left text-sm">
+              <thead className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
+                <tr>
+                  <th className="px-3 py-3">Data</th>
+                  <th className="px-3 py-3">Território</th>
+                  <th className="px-3 py-3">Registro</th>
+                  <th className="px-3 py-3">Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                {history.map((item) => (
+                  <tr
+                    key={`${item[0]}-${item[1]}`}
+                    className="border-b border-slate-100"
+                  >
+                    <td className="px-3 py-3 font-semibold text-slate-800">
+                      {item[0]}
+                    </td>
+                    <td className="px-3 py-3 text-slate-600">{item[1]}</td>
+                    <td className="px-3 py-3 text-slate-700">{item[2]}</td>
+                    <td className="px-3 py-3 text-xs font-semibold text-emerald-700">
+                      {item[3]}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Panel>
+        <Panel
+          title="Atividades habilitadas"
+          description="Funções operacionais atribuídas ao usuário."
+        >
+          <div className="space-y-2">
+            {(ace.operationalFunctions ?? ["CAMPO"]).map((item) => (
+              <div
+                key={item}
+                className="border border-slate-200 bg-slate-50 p-3 text-sm font-medium text-slate-700"
+              >
+                {item === "CAMPO"
+                  ? "Operação de campo"
+                  : item === "LARVICIDA"
+                    ? "Aplicação de larvicida"
+                    : item === "LABORATORIO"
+                      ? "Laboratório / amostras"
+                      : item === "DIGITACAO"
+                        ? "Digitação de fichas"
+                        : "Pontos estratégicos"}
+              </div>
+            ))}
+          </div>
+          <div className="mt-5 border-l-4 border-amber-500 bg-amber-50 p-3 text-xs leading-5 text-amber-900">
+            A gestão pode conferir os registros, solicitar retorno e
+            redistribuir atividades. Os dados desta demonstração são mockados.
+          </div>
+        </Panel>
+      </div>
+    </div>
+  );
+}

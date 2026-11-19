@@ -14,6 +14,18 @@ import type {
   UserAccount,
   UserForm,
 } from "@/lib/identidade/types";
+import {
+  operationalFunctions,
+  type OperationalFunction,
+} from "@/lib/identidade/types";
+
+const functionLabels: Record<OperationalFunction, string> = {
+  CAMPO: "Operação de campo",
+  DIGITACAO: "Digitação de fichas",
+  LABORATORIO: "Laboratório / amostras",
+  LARVICIDA: "Aplicação de larvicida",
+  PONTO_ESTRATEGICO: "Pontos estratégicos",
+};
 
 const territoryOptions = [
   "Secretaria Municipal de Saúde",
@@ -32,6 +44,7 @@ const blankForm: UserForm = {
   role: "PROFISSIONAL_APS",
   territory: "",
   mfa: true,
+  operationalFunctions: [],
 };
 
 function maskCpf(cpf: string) {
@@ -164,6 +177,7 @@ export function UsersDashboard() {
       role: user.role,
       territory: user.territory,
       mfa: user.mfa,
+      operationalFunctions: user.operationalFunctions ?? [],
     });
     setFormError("");
     setIsEditorOpen(true);
@@ -449,6 +463,14 @@ export function UsersDashboard() {
                       >
                         {roleLabels[user.role]}
                       </span>
+                      {user.operationalFunctions &&
+                        user.operationalFunctions.length > 0 && (
+                          <span className="mt-1 block max-w-[220px] text-[11px] leading-4 text-slate-500">
+                            {user.operationalFunctions
+                              .map((item) => functionLabels[item])
+                              .join(" · ")}
+                          </span>
+                        )}
                     </td>
                     <td className="py-4 pr-4">
                       <span className="block max-w-[190px] text-slate-700">
@@ -719,6 +741,39 @@ function UserEditor({
                 ))}
               </select>
             </div>
+            <fieldset className="sm:col-span-2 border border-slate-200 p-3">
+              <legend className="px-1 text-sm font-medium text-slate-700">
+                Funções operacionais
+              </legend>
+              <p className="mb-3 text-xs text-slate-500">
+                Um ACE pode acumular funções diferentes na operação municipal.
+              </p>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {operationalFunctions.map((operation) => (
+                  <label
+                    key={operation}
+                    className="flex items-center gap-2 text-sm text-slate-700"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={form.operationalFunctions.includes(operation)}
+                      onChange={(event) =>
+                        onChange({
+                          ...form,
+                          operationalFunctions: event.target.checked
+                            ? [...form.operationalFunctions, operation]
+                            : form.operationalFunctions.filter(
+                                (item) => item !== operation,
+                              ),
+                        })
+                      }
+                      className="h-4 w-4 accent-blue-700"
+                    />
+                    {functionLabels[operation]}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
           </div>
 
           <label className="flex cursor-pointer items-start gap-3 border border-slate-200 p-3">

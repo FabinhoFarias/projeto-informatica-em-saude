@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
 import {
   MetricCard,
   PageHeading,
@@ -9,6 +11,7 @@ import {
 import { municipality, neighborhoods } from "@/lib/territorios/demo-data";
 import { municipalClientsDemo } from "@/lib/administracao/demo-data";
 import { sectorPropertiesDemo } from "@/lib/visitas/demo-data";
+import { initialUsers } from "@/lib/identidade/demo-users";
 
 function getCoverageRows() {
   return neighborhoods.map((neighborhood, index) => {
@@ -26,13 +29,30 @@ function getCoverageRows() {
   });
 }
 
+function getAceCoverageRows() {
+  return initialUsers
+    .filter((user) => user.role === "AGENTE_CAMPO")
+    .map((user, index) => ({
+      ...user,
+      avatarUrl:
+        user.avatarUrl ??
+        `https://randomuser.me/api/portraits/men/${20 + index}.jpg`,
+      assigned: 78 + index * 16,
+      visited: 54 + index * 19,
+      coverage: 62 + index * 11,
+      pending: 24 - index * 3,
+    }));
+}
+
 export function ManagerOperationsDashboard() {
   const institutionPrimary =
     municipalClientsDemo.find((client) => client.id === "lagoa-de-itaenga")
       ?.branding.primaryColor ?? "#006b4f";
   const [search, setSearch] = useState("");
   const [mode, setMode] = useState<"BAIRROS" | "SETORES">("BAIRROS");
+  const [selectedAceId, setSelectedAceId] = useState<string | null>(null);
   const rows = useMemo(() => getCoverageRows(), []);
+  const aceRows = useMemo(() => getAceCoverageRows(), []);
   const filtered = rows.filter((row) =>
     row.name
       .toLocaleLowerCase("pt-BR")
@@ -43,6 +63,7 @@ export function ManagerOperationsDashboard() {
   const sectors = rows.reduce((sum, row) => sum + row.sectors, 0);
   const coverage = Math.round((visited / properties) * 100);
   const completed = rows.filter((row) => row.coverage >= 80).length;
+  const selectedAce = aceRows.find((ace) => ace.id === selectedAceId);
 
   return (
     <div>
@@ -77,6 +98,155 @@ export function ManagerOperationsDashboard() {
           detail="Visitas ou retornos necessários"
         />
       </section>
+      <Panel
+        title="Acompanhamento dos ACEs"
+        description="Usuários de campo vinculados à gestão e cobertura das áreas atribuídas no ciclo atual."
+        className="mb-5"
+      >
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {aceRows.map((ace) => (
+            <article
+              key={ace.id}
+              className="border border-slate-200 bg-slate-50 p-4"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-3">
+                  <Image
+                    src={ace.avatarUrl}
+                    alt={`Foto de perfil de ${ace.name}`}
+                    width={44}
+                    height={44}
+                    className="h-11 w-11 shrink-0 rounded-full object-cover ring-2 ring-white"
+                  />
+                  <div className="min-w-0">
+                    <h3 className="font-semibold text-slate-950">{ace.name}</h3>
+                    <p className="mt-1 text-xs text-slate-500">
+                      {ace.territory}
+                    </p>
+                  </div>
+                </div>
+                <span
+                  className={`rounded-full px-2 py-1 text-[11px] font-semibold ${ace.status === "Ativo" ? "bg-emerald-100 text-emerald-800" : "bg-slate-200 text-slate-600"}`}
+                >
+                  {ace.status}
+                </span>
+              </div>
+              <div className="mt-5 flex items-end justify-between gap-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    Cobertura da área
+                  </p>
+                  <p className="mt-1 text-3xl font-bold text-slate-950">
+                    {ace.coverage}%
+                  </p>
+                </div>
+                <p className="text-right text-xs text-slate-600">
+                  {ace.visited}/{ace.assigned} imóveis
+                  <br />
+                  {ace.pending} pendentes
+                </p>
+              </div>
+              <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-200">
+                <div
+                  className={`h-full ${ace.coverage >= 80 ? "bg-emerald-700" : ace.coverage >= 60 ? "bg-amber-500" : "bg-red-500"}`}
+                  style={{ width: `${ace.coverage}%` }}
+                />
+              </div>
+              <p className="mt-3 text-xs text-slate-500">
+                Última sincronização: {ace.lastSync ?? "sem registro"}
+              </p>
+              <button
+                type="button"
+                onClick={() => setSelectedAceId(ace.id)}
+                className="mt-4 min-h-9 w-full border border-slate-300 bg-white px-3 text-xs font-semibold text-slate-700 hover:border-emerald-700 hover:text-emerald-800"
+              >
+                Ver trabalho
+              </button>
+              <Link
+                href={`/usuarios/ace/${ace.id}`}
+                className="mt-2 block text-center text-xs font-semibold text-emerald-800 hover:underline"
+              >
+                Abrir perfil completo
+              </Link>
+            </article>
+          ))}
+        </div>
+        {selectedAce && (
+          <div className="mt-4 border border-emerald-200 bg-emerald-50 p-4">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-emerald-800">
+                  Histórico de trabalho
+                </p>
+                <h3 className="mt-1 text-lg font-bold text-slate-950">
+                  {selectedAce.name}
+                </h3>
+                <p className="text-sm text-slate-600">
+                  {selectedAce.territory}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedAceId(null)}
+                className="text-xs font-semibold text-slate-600 hover:text-slate-950"
+              >
+                Fechar
+              </button>
+            </div>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              {[
+                [
+                  "Visitas registradas",
+                  String(selectedAce.visited),
+                  "No ciclo atual",
+                ],
+                ["Cobertura", `${selectedAce.coverage}%`, "Área atribuída"],
+                [
+                  "Pendências",
+                  String(selectedAce.pending),
+                  "Retornos necessários",
+                ],
+                [
+                  "Atividades",
+                  "LI · Tratamento · Retorno",
+                  "Registradas no ciclo",
+                ],
+              ].map(([label, value, detail]) => (
+                <div
+                  key={label}
+                  className="border border-emerald-100 bg-white p-3"
+                >
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                    {label}
+                  </p>
+                  <p className="mt-1 text-lg font-bold text-slate-950">
+                    {value}
+                  </p>
+                  <p className="mt-1 text-xs text-slate-500">{detail}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 grid gap-3 md:grid-cols-2">
+              <div className="border border-emerald-100 bg-white p-3 text-sm text-slate-700">
+                <strong>Últimos registros:</strong>
+                <ul className="mt-2 space-y-1 text-xs">
+                  <li>07/10 · Quarteirão 04 · 18 imóveis visitados</li>
+                  <li>06/10 · Quarteirão 02 · 3 retornos agendados</li>
+                  <li>05/10 · Setor atribuído · sincronização concluída</li>
+                </ul>
+              </div>
+              <div className="border border-emerald-100 bg-white p-3 text-sm text-slate-700">
+                <strong>Situação operacional:</strong>
+                <p className="mt-2 text-xs leading-5">
+                  O gestor pode revisar os imóveis pendentes, acompanhar
+                  retornos e conferir a última sincronização antes de
+                  redistribuir a área.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+      </Panel>
       <Panel
         title="Cobertura territorial"
         description="A leitura operacional usa registros de visitas, sem projeção de casos ou probabilidade de surto."

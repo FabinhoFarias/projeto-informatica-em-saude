@@ -1,6 +1,14 @@
 import type { Role } from "./permissions";
 
 export type AccountStatus = "Ativo" | "Inativo";
+export const operationalFunctions = [
+  "CAMPO",
+  "DIGITACAO",
+  "LABORATORIO",
+  "LARVICIDA",
+  "PONTO_ESTRATEGICO",
+] as const;
+export type OperationalFunction = (typeof operationalFunctions)[number];
 
 export interface TerritorialAssignment {
   sectorCode?: string;
@@ -28,10 +36,12 @@ export interface UserAccount {
   status: AccountStatus;
   lastAccess: string;
   lastSync?: string;
+  avatarUrl?: string;
+  operationalFunctions?: OperationalFunction[];
   territorialAssignments?: TerritorialAssignment[];
 }
 
 export type UserForm = Pick<
   UserAccount,
   "name" | "email" | "cpf" | "role" | "territory" | "mfa"
->;
+> & { operationalFunctions: OperationalFunction[] };
