@@ -2,6 +2,9 @@ import { notFound } from "next/navigation";
 import { PropertyVisitForm } from "@/components/visitas/property-visit-form";
 import { sectorPropertiesDemo } from "@/lib/visitas/demo-data";
 
+// A ficha depende do imóvel e do ciclo definidos na URL.
+export const instant = false;
+
 export default async function PropertyVisitPage({
   params,
   searchParams,

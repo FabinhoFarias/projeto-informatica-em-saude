@@ -6,6 +6,7 @@ import { Bell, Camera, ChevronDown, LogOut, Mail } from "lucide-react";
 import Image from "next/image";
 import { riskColors } from "@/lib/territorios/risk";
 import { roleLabels, roles, type Role } from "@/lib/identidade/permissions";
+import { getRouteLabel } from "@/lib/plataforma/route-labels";
 
 function ProfileActions({
   role,
@@ -177,23 +178,7 @@ export function DashboardHeader({
 }) {
   const [showNotifications, setShowNotifications] = useState(false);
   const pathname = usePathname();
-  const titleByRoute: Record<string, string> = {
-    "/painel": "Dashboard",
-    "/visitas": "Meu setor · visitas",
-    "/laboratorio": "Laboratório entomológico",
-    "/digitacao-relatorios": "Digitação e relatórios",
-    "/territorio-conferencia": "Conferência territorial",
-    "/estoque": "Estoque e insumos",
-    "/saneamento": "Saneamento e ocorrências",
-    "/hotspots": "Mapa de hotspots",
-    "/priorizacao-territorial": "Priorização territorial",
-    "/diagnostico": "Diagnóstico situacional",
-    "/ingestao": "Ingestão de dados",
-    "/simulacao": "Projeto PILOTO",
-    "/usuarios": "Gestão de usuários",
-    "/configuracao-municipal": "Configuração municipal",
-  };
-  const title = titleByRoute[pathname] ?? "Dashboard";
+  const title = getRouteLabel(pathname);
   return (
     <header className="sticky top-0 z-[300] flex h-16 items-center justify-between gap-3 border-b border-color-border bg-white px-3 sm:z-[100] sm:h-[8vh] sm:px-6">
       <div className="flex min-w-0 items-center gap-3">
@@ -227,7 +212,7 @@ export function DashboardHeader({
             />
           </button>
           {showNotifications && (
-            <section className="absolute right-0 top-12 z-[200] w-[min(22rem,calc(100vw-2rem))] rounded-xl border border-slate-200 bg-white p-4 shadow-xl">
+            <section className="fixed left-3 right-3 top-[4.5rem] z-[200] max-h-[calc(100dvh-6rem)] overflow-y-auto rounded-xl border border-slate-200 bg-white p-4 shadow-xl sm:absolute sm:left-auto sm:right-0 sm:top-12 sm:w-[22rem] sm:max-h-none sm:overflow-visible">
               <h2 className="text-sm font-semibold text-slate-950">
                 {role === "AGENTE_CAMPO"
                   ? "Alerta da microárea"

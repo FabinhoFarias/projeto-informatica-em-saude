@@ -52,9 +52,7 @@ export function DashboardSidebar({
   onMouseLeave: () => void;
 }) {
   const desktopItems = items;
-  const mobileItems = items
-    .filter((item) => item.display === "todos")
-    .slice(0, 5);
+  const mobileItems = items.filter((item) => item.display === "todos");
   return (
     <>
       <aside
@@ -122,7 +120,7 @@ export function DashboardSidebar({
 
       <nav
         aria-label="Navegação rápida móvel"
-        className="fixed inset-x-3 bottom-3 z-[120] flex items-center justify-around rounded-[1.35rem] border border-slate-200 bg-white/95 p-2 shadow-[0_12px_35px_rgba(15,23,42,0.18)] backdrop-blur md:hidden"
+        className="fixed inset-x-3 bottom-3 z-[120] flex max-w-[calc(100vw-1.5rem)] items-center justify-around gap-1 overflow-x-auto rounded-[1.35rem] border border-slate-200 bg-white/95 p-2 shadow-[0_12px_35px_rgba(15,23,42,0.18)] backdrop-blur md:hidden"
       >
         {mobileItems.map((item) => {
           const active =
@@ -136,7 +134,7 @@ export function DashboardSidebar({
               href={item.href}
               aria-current={active ? "page" : undefined}
               aria-label={item.label}
-              className={`grid h-11 w-11 place-items-center rounded-xl transition-colors ${active ? "bg-verde-escuro text-white shadow-sm" : "text-slate-500 hover:bg-verde-claro hover:text-verde-escuro"}`}
+              className={`grid h-11 min-w-[2.75rem] flex-1 shrink-0 place-items-center rounded-xl transition-colors ${active ? "bg-verde-escuro text-white shadow-sm" : "text-slate-500 hover:bg-verde-claro hover:text-verde-escuro"}`}
             >
               <Icon className="h-5 w-5" aria-hidden="true" />
               <span className="sr-only">{item.label}</span>

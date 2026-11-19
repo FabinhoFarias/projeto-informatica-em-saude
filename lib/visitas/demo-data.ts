@@ -113,7 +113,7 @@ function makeVisit(
       atividade: treated ? "LI_T" : "LI",
       horaEntrada: `09:${String(propertyNumber % 60).padStart(2, "0")}`,
       tipoVisita: propertyNumber % 6 === 0 ? "R" : "N",
-      supervisor: "Supervisão de Endemias",
+      supervisor: "Gestor ACE",
       sequenciaNumero: propertyNumber % 3,
       depositos: {
         A1: completed ? propertyNumber % 2 : 0,
@@ -130,7 +130,7 @@ function makeVisit(
       quantidadeTubitos: collectedSamples ? 2 : 0,
       depositosEliminados: completed ? propertyNumber % 3 : 0,
       imovelTratado: treated,
-      larvicida1Tipo: treated ? "Bti" : "",
+      larvicida1Tipo: treated ? "Larvicida biológico Bti" : "",
       larvicida1Quantidade: treated ? 5 + (propertyNumber % 4) : 0,
       larvicida1Depositos: treated ? 1 + (propertyNumber % 2) : 0,
       larvicida2Tipo: propertyNumber % 12 === 0 ? "Diflubenzuron" : "",
@@ -215,13 +215,15 @@ export const sectorPropertiesDemo: SectorPropertyMock[] =
       const tipo =
         typeSequence[(sequence + blockIndex * 3) % typeSequence.length];
       const acesso =
-        blockIndex === 0
-          ? "REALIZADO"
-          : sequence % 9 === 0
-            ? "RECUSA"
-            : sequence % 7 === 0
-              ? "FECHADO"
-              : "REALIZADO";
+        sequence === 32
+          ? "RECUSA"
+          : blockIndex === 0
+            ? "REALIZADO"
+            : sequence % 9 === 0
+              ? "RECUSA"
+              : sequence % 7 === 0
+                ? "FECHADO"
+                : "REALIZADO";
       const visited = blockIndex === 0 || sequence % 3 !== 0;
       const day = String(1 + (sequence % 13)).padStart(2, "0");
       return {

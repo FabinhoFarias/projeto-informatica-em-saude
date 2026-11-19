@@ -154,7 +154,7 @@ export function buildDailyReport(date: string) {
       dataAtividade: dateInBrazil(date),
       cicloAno: reportCycle(date),
       agente: "Mariana Santos",
-      supervisor: "Supervisão de Endemias",
+      supervisor: "Gestor ACE",
     },
     rows,
     totals: {

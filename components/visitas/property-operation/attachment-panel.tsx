@@ -26,14 +26,15 @@ export function AttachmentPanel({ propertyId }: { propertyId: string }) {
           <label className="flex min-h-28 cursor-pointer flex-col items-center justify-center border border-dashed border-slate-300 bg-slate-50 p-4 text-center hover:border-emerald-600 hover:bg-emerald-50/40">
             <Camera className="h-6 w-6 text-emerald-800" aria-hidden="true" />
             <span className="mt-2 text-sm font-semibold text-slate-800">
-              Selecionar foto autorizada
+              Tirar foto do imóvel
             </span>
             <span className="mt-1 text-xs text-slate-500">
-              JPG, PNG ou WEBP · demonstração local
+              A câmera será aberta no celular · demonstração local
             </span>
             <input
               type="file"
-              accept="image/jpeg,image/png,image/webp"
+              accept="image/*"
+              capture="environment"
               className="sr-only"
               onChange={(event) => {
                 setFile(event.target.files?.[0] ?? null);

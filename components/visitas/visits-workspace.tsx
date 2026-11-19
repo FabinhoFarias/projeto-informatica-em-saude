@@ -2,14 +2,27 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Search } from "lucide-react";
+import {
+  Building2,
+  Church,
+  Factory,
+  House,
+  Hospital,
+  MapPinHouse,
+  Search,
+  School,
+  Store,
+  TreePine,
+  Warehouse,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { PageHeading } from "@/components/plataforma/dashboard-ui";
 import {
   sectorPropertiesDemo,
   type SectorPropertyMock,
 } from "@/lib/visitas/demo-data";
 
-type Outcome = "VISITADO" | "PENDENCIA" | "NAO_VISITADO";
+type Outcome = "VISITADO" | "RECUSA" | "FECHADO" | "NAO_VISITADO";
 type Grouping = "quarteirao" | "rua";
 
 function cycleKey(date: Date) {
@@ -45,27 +58,31 @@ function visitInCycle(property: SectorPropertyMock, cycle: string) {
 function outcome(property: SectorPropertyMock, cycle: string): Outcome {
   const visit = visitInCycle(property, cycle);
   if (!visit) return "NAO_VISITADO";
-  return visit.acesso === "REALIZADO" ? "VISITADO" : "PENDENCIA";
+  if (visit.acesso === "REALIZADO") return "VISITADO";
+  return visit.acesso === "RECUSA" ? "RECUSA" : "FECHADO";
 }
 
 const outcomeLabels: Record<Outcome, string> = {
   VISITADO: "Visitado no ciclo",
-  PENDENCIA: "Recusa ou imóvel fechado",
+  RECUSA: "Entrada recusada",
+  FECHADO: "Ninguém em casa ou imóvel fechado",
   NAO_VISITADO: "Não visitado no ciclo",
 };
 
 const outcomeStyles: Record<Outcome, string> = {
   VISITADO:
     "border-emerald-600 bg-emerald-100 text-emerald-950 hover:bg-emerald-200",
-  PENDENCIA: "border-amber-500 bg-amber-100 text-amber-950 hover:bg-amber-200",
+  RECUSA: "border-orange-500 bg-orange-100 text-orange-950 hover:bg-orange-200",
+  FECHADO: "border-amber-500 bg-amber-100 text-amber-950 hover:bg-amber-200",
   NAO_VISITADO:
     "border-color-border bg-white text-slate-900 hover:border-red-300 hover:bg-slate-50",
 };
 
 const outcomePriority: Record<Outcome, number> = {
   NAO_VISITADO: 0,
-  PENDENCIA: 1,
-  VISITADO: 2,
+  RECUSA: 1,
+  FECHADO: 2,
+  VISITADO: 3,
 };
 
 function propertyType(type: SectorPropertyMock["tipo"]) {
@@ -84,6 +101,22 @@ function propertyType(type: SectorPropertyMock["tipo"]) {
   return labels[type];
 }
 
+function propertyTypeIcon(type: SectorPropertyMock["tipo"]): LucideIcon {
+  const icons: Record<SectorPropertyMock["tipo"], LucideIcon> = {
+    RESIDENCIAL: House,
+    PREDIO: Building2,
+    COMERCIAL: Store,
+    TERRENO: TreePine,
+    ESCOLA: School,
+    UBS: Hospital,
+    IGREJA: Church,
+    INDUSTRIAL: Factory,
+    PONTO_ESTRATEGICO: MapPinHouse,
+    OUTRO: Warehouse,
+  };
+  return icons[type];
+}
+
 function loadSessionOutcomes(cycle: string) {
   const loaded: Record<string, Outcome> = {};
   if (typeof window === "undefined") return loaded;
@@ -93,7 +126,12 @@ function loadSessionOutcomes(cycle: string) {
     if (!raw) continue;
     try {
       const access = JSON.parse(raw).acesso;
-      loaded[property.id] = access === "REALIZADO" ? "VISITADO" : "PENDENCIA";
+      loaded[property.id] =
+        access === "REALIZADO"
+          ? "VISITADO"
+          : access === "RECUSA"
+            ? "RECUSA"
+            : "FECHADO";
     } catch {
       sessionStorage.removeItem(key);
     }
@@ -150,7 +188,7 @@ export function VisitsWorkspace() {
       result[sessionOutcomes[property.id] ?? outcome(property, cycle)]++;
       return result;
     },
-    { VISITADO: 0, PENDENCIA: 0, NAO_VISITADO: 0 },
+    { VISITADO: 0, RECUSA: 0, FECHADO: 0, NAO_VISITADO: 0 },
   );
 
   return (
@@ -223,8 +261,9 @@ export function VisitsWorkspace() {
           <span className="text-emerald-900">
             ● Visitados: {counts.VISITADO}
           </span>
+          <span className="text-orange-800">● Recusas: {counts.RECUSA}</span>
           <span className="text-amber-800">
-            ● Recusa ou fechado: {counts.PENDENCIA}
+            ● Ninguém em casa/fechados: {counts.FECHADO}
           </span>
           <span className="text-red-800">
             ● Não visitados: {counts.NAO_VISITADO}
@@ -250,7 +289,11 @@ export function VisitsWorkspace() {
                     ...new Set(items.map((property) => property.quarteirao)),
                   ].join(" · ")}
             </p>
-            <div className="mt-4 grid grid-cols-4 gap-2 md:flex md:flex-wrap">
+            <div
+              className={`mt-4 grid grid-cols-4 gap-2 sm:grid-cols-6 ${
+                grouping === "quarteirao" ? "lg:grid-cols-10" : "lg:grid-cols-8"
+              }`}
+            >
               {items.map((property) => {
                 const state =
                   sessionOutcomes[property.id] ?? outcome(property, cycle);
@@ -261,16 +304,24 @@ export function VisitsWorkspace() {
                       0,
                     )
                   : 0;
+                const PropertyIcon = propertyTypeIcon(property.tipo);
                 return (
                   <Link
                     key={property.id}
                     href={`/visitas/${property.id}?ciclo=${cycle}`}
                     aria-label={`${propertyType(property.tipo)}, número ${property.numero}, ${outcomeLabels[state]}`}
-                    className={`relative flex aspect-square min-w-0 flex-col rounded-lg border-2 p-1.5 text-left shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 md:h-28 md:w-28 md:p-2 ${outcomeStyles[state]}`}
+                    className={`relative flex aspect-square min-w-0 flex-col rounded-lg border-2 p-1.5 text-left shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 md:p-2 ${outcomeStyles[state]}`}
                   >
                     <span className="flex min-w-0 items-start justify-between gap-1">
-                      <span className="min-w-0 truncate text-[clamp(0.55rem,2.6vw,0.75rem)] font-medium leading-tight md:text-xs">
-                        {propertyType(property.tipo)}
+                      <span className="flex min-w-0 items-center gap-1 truncate text-[clamp(0.55rem,2.6vw,0.75rem)] font-medium leading-tight md:text-xs">
+                        <PropertyIcon
+                          className="h-3.5 w-3.5 shrink-0 md:h-4 md:w-4"
+                          strokeWidth={2}
+                          aria-hidden="true"
+                        />
+                        <span className="truncate">
+                          {propertyType(property.tipo)}
+                        </span>
                       </span>
                       {state === "NAO_VISITADO" ? (
                         <span

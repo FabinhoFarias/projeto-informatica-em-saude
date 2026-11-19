@@ -155,11 +155,12 @@ export function AceProfile({ id }: { id: string }) {
       </Panel>
       <div className="grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
         <Panel
+          className="min-w-0 overflow-hidden"
           title="Histórico de registros"
           description="Atividades lançadas pelo ACE e recebidas pela gestão."
         >
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[620px] text-left text-sm">
+          <div className="w-full overflow-x-auto overscroll-x-contain">
+            <table className="w-[720px] min-w-[720px] text-left text-sm">
               <thead className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
                 <tr>
                   <th className="px-3 py-3">Data</th>
@@ -189,26 +190,29 @@ export function AceProfile({ id }: { id: string }) {
           </div>
         </Panel>
         <Panel
+          className="min-w-0 overflow-hidden"
           title="Atividades habilitadas"
           description="Funções operacionais atribuídas ao usuário."
         >
-          <div className="space-y-2">
-            {(ace.operationalFunctions ?? ["CAMPO"]).map((item) => (
-              <div
-                key={item}
-                className="border border-slate-200 bg-slate-50 p-3 text-sm font-medium text-slate-700"
-              >
-                {item === "CAMPO"
-                  ? "Operação de campo"
-                  : item === "LARVICIDA"
-                    ? "Aplicação de larvicida"
-                    : item === "LABORATORIO"
-                      ? "Laboratório / amostras"
-                      : item === "DIGITACAO"
-                        ? "Digitação de fichas"
-                        : "Pontos estratégicos"}
-              </div>
-            ))}
+          <div className="w-full overflow-x-auto overscroll-x-contain">
+            <div className="min-w-[280px] space-y-2">
+              {(ace.operationalFunctions ?? ["CAMPO"]).map((item) => (
+                <div
+                  key={item}
+                  className="break-words border border-slate-200 bg-slate-50 p-3 text-sm font-medium text-slate-700"
+                >
+                  {item === "CAMPO"
+                    ? "Operação de campo"
+                    : item === "LARVICIDA"
+                      ? "Aplicação de larvicida"
+                      : item === "LABORATORIO"
+                        ? "Laboratório / amostras"
+                        : item === "DIGITACAO"
+                          ? "Digitação de fichas"
+                          : "Pontos estratégicos"}
+                </div>
+              ))}
+            </div>
           </div>
           <div className="mt-5 border-l-4 border-amber-500 bg-amber-50 p-3 text-xs leading-5 text-amber-900">
             A gestão pode conferir os registros, solicitar retorno e

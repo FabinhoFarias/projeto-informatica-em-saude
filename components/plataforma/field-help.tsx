@@ -17,6 +17,8 @@ const descriptions: Record<string, string> = {
   "Hora de entrada": "Horário em que o agente iniciou a visita ao imóvel.",
   "Imóvel LI":
     "Indique se o imóvel foi inspecionado para levantamento de índice.",
+  "Levantamento de índice":
+    "Indique se o imóvel foi inspecionado para o levantamento de índice.",
   "Nº da amostra inicial":
     "Primeiro código de identificação da coleta; não representa a quantidade de exemplares.",
   "Nº da amostra final": "Último código de identificação informado na coleta.",

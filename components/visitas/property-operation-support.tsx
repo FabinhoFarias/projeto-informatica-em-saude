@@ -14,20 +14,24 @@ export function PropertyOperationSupport({
   property,
   syncStatus,
   onSyncStatusChange,
+  readOnly = false,
 }: {
   property: SectorPropertyMock;
   syncStatus: DemoSyncStatus;
   onSyncStatusChange: (status: DemoSyncStatus) => void;
+  readOnly?: boolean;
 }) {
   return (
     <div className="mb-4 space-y-4">
-      <div className="grid items-start gap-4 xl:grid-cols-2">
-        {property.ultimaVisita && <TimelinePanel property={property} />}
-        <SyncPanel status={syncStatus} onStatusChange={onSyncStatusChange} />
-      </div>
-      <StrategicPointPanel property={property} />
-      <OccurrencePanel />
-      <AttachmentPanel propertyId={property.codigoLocal} />
+      <fieldset disabled={readOnly} className="contents">
+        <div className="grid items-start gap-4 xl:grid-cols-2">
+          {property.ultimaVisita && <TimelinePanel property={property} />}
+          <SyncPanel status={syncStatus} onStatusChange={onSyncStatusChange} />
+        </div>
+        <StrategicPointPanel property={property} />
+        <OccurrencePanel />
+        <AttachmentPanel propertyId={property.codigoLocal} />
+      </fieldset>
     </div>
   );
 }
