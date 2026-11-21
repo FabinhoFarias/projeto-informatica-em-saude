@@ -21,13 +21,36 @@ export function TerritoryReview() {
   const [items, setItems] = useState(territoryReviewDemo);
   const [search, setSearch] = useState("");
   const aces = initialUsers.filter((user) => user.role === "AGENTE_CAMPO");
+  const blocks = useMemo(
+    () =>
+      Array.from({ length: 30 }, (_, index) => {
+        const territory = mappedTerritories[index % mappedTerritories.length];
+        return {
+          id: `quarteirao-${index + 1}`,
+          number: index + 1,
+          neighborhood: territory.name,
+          territoryId: territory.id,
+          zone: territory.zone,
+          properties: 42 + ((index * 13) % 56),
+        };
+      }),
+    [],
+  );
   const [assignments, setAssignments] = useState<Record<string, string>>(() =>
-    mappedTerritories
-      .slice(0, 8)
-      .reduce<Record<string, string>>((result, territory, index) => {
-        result[territory.id] = aces[index % aces.length]?.id ?? "";
-        return result;
-      }, {}),
+    Array.from({ length: 30 }, (_, index) => index + 1).reduce<
+      Record<string, string>
+    >((result, number, index) => {
+      result[`quarteirao-${number}`] = aces[index % aces.length]?.id ?? "";
+      return result;
+    }, {}),
+  );
+  const [blockSearch, setBlockSearch] = useState("");
+  const [savingBlockId, setSavingBlockId] = useState<string | null>(null);
+  const [syncLabels, setSyncLabels] = useState<Record<string, string>>({});
+  const filteredBlocks = blocks.filter((block) =>
+    `${block.number} ${block.neighborhood}`
+      .toLocaleLowerCase("pt-BR")
+      .includes(blockSearch.toLocaleLowerCase("pt-BR")),
   );
   const filtered = useMemo(
     () =>
@@ -135,14 +158,21 @@ export function TerritoryReview() {
       </Panel>
       <Panel
         className="mt-5"
-        title="Atribuição de setores aos ACEs"
-        description="Distribua bairros e setores do ciclo entre os agentes responsáveis. A cobertura exibida é demonstrativa."
+        title="Atribuição de quarteirões aos ACEs"
+        description="Distribua cada quarteirão do ciclo entre os agentes responsáveis. O mesmo bairro pode ter mais de um ACE; a unidade de atribuição é o quarteirão. A cobertura exibida é demonstrativa."
       >
+        <input
+          value={blockSearch}
+          onChange={(event) => setBlockSearch(event.target.value)}
+          placeholder="Buscar número do quarteirão ou bairro"
+          className="mb-4 min-h-10 w-full border border-slate-300 px-3 text-sm outline-none focus:border-emerald-700"
+        />
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[760px] text-left text-sm">
+          <table className="w-full min-w-[900px] text-left text-sm">
             <thead className="border-b border-slate-200 text-xs uppercase text-slate-500">
               <tr>
-                <th className="p-3">Bairro / setor</th>
+                <th className="p-3">Quarteirão</th>
+                <th className="p-3">Bairro</th>
                 <th className="p-3">Zona</th>
                 <th className="p-3">Imóveis previstos</th>
                 <th className="p-3">ACE responsável</th>
@@ -150,31 +180,50 @@ export function TerritoryReview() {
               </tr>
             </thead>
             <tbody>
-              {mappedTerritories.slice(0, 8).map((territory, index) => {
-                const aceId = assignments[territory.id] ?? "";
+              {filteredBlocks.map((block, index) => {
+                const aceId = assignments[block.id] ?? "";
                 const assignedAce = aces.find((ace) => ace.id === aceId);
-                const assigned = 70 + index * 9;
+                const isSaving = savingBlockId === block.id;
+                const assigned = block.properties;
                 const visited = Math.round(
                   assigned * (0.55 + (index % 4) * 0.08),
                 );
                 const coverage = Math.round((visited / assigned) * 100);
                 return (
-                  <tr key={territory.id} className="border-b border-slate-100">
+                  <tr key={block.id} className="border-b border-slate-100">
                     <td className="p-3 font-semibold text-slate-900">
-                      {territory.name}
+                      Quarteirão {block.number}
                     </td>
-                    <td className="p-3 text-slate-600">{territory.zone}</td>
+                    <td className="p-3 text-slate-600">{block.neighborhood}</td>
+                    <td className="p-3 text-slate-600">{block.zone}</td>
                     <td className="p-3 text-slate-600">{assigned}</td>
                     <td className="p-3">
                       <select
                         value={aceId}
-                        onChange={(event) =>
+                        aria-label={`Selecionar ACE do quarteirão ${block.number}`}
+                        disabled={isSaving}
+                        onChange={(event) => {
+                          const nextAceId = event.target.value;
                           setAssignments((current) => ({
                             ...current,
-                            [territory.id]: event.target.value,
-                          }))
-                        }
-                        className="min-h-9 border border-slate-300 bg-white px-2 text-xs"
+                            [block.id]: nextAceId,
+                          }));
+                          setSavingBlockId(block.id);
+                          setSyncLabels((current) => ({
+                            ...current,
+                            [block.id]: "Salvando atribuição…",
+                          }));
+                          window.setTimeout(() => {
+                            setSavingBlockId((current) =>
+                              current === block.id ? null : current,
+                            );
+                            setSyncLabels((current) => ({
+                              ...current,
+                              [block.id]: "Sincronizado agora",
+                            }));
+                          }, 900);
+                        }}
+                        className={`min-h-10 min-w-56 cursor-pointer border border-emerald-700 bg-white px-2 text-xs font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-emerald-200 disabled:cursor-wait disabled:opacity-70`}
                       >
                         <option value="">Sem atribuição</option>
                         {aces.map((ace) => (
@@ -183,13 +232,15 @@ export function TerritoryReview() {
                           </option>
                         ))}
                       </select>
-                      {assignedAce && (
-                        <span className="mt-1 block text-[11px] text-slate-500">
-                          {assignedAce.lastSync
+                      <span
+                        aria-live="polite"
+                        className={`mt-1 block text-[11px] text-slate-500 ${isSaving ? "animate-pulse text-emerald-700" : ""}`}
+                      >
+                        {syncLabels[block.id] ??
+                          (assignedAce?.lastSync
                             ? `Sincronizado ${assignedAce.lastSync}`
-                            : "Sem sincronização"}
-                        </span>
-                      )}
+                            : "Sem sincronização")}
+                      </span>
                     </td>
                     <td className="p-3">
                       <div className="flex items-center gap-2">

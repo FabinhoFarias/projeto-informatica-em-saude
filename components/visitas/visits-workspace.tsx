@@ -117,6 +117,14 @@ function propertyTypeIcon(type: SectorPropertyMock["tipo"]): LucideIcon {
   return icons[type];
 }
 
+function normalizeSearch(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase("pt-BR")
+    .trim();
+}
+
 function loadSessionOutcomes(cycle: string) {
   const loaded: Record<string, Outcome> = {};
   if (typeof window === "undefined") return loaded;
@@ -139,7 +147,15 @@ function loadSessionOutcomes(cycle: string) {
   return loaded;
 }
 
-export function VisitsWorkspace() {
+export function VisitsWorkspace({
+  title = "Imóveis do meu setor",
+  description = "Organize por quarteirão ou rua e acompanhe a situação de cada imóvel no ciclo de dois meses.",
+  eyebrow = "Operação de campo · ACE",
+}: {
+  title?: string;
+  description?: string;
+  eyebrow?: string;
+} = {}) {
   const cycles = useMemo(() => cycleOptions(), []);
   const [cycle, setCycle] = useState(cycles[0].key);
   const [grouping, setGrouping] = useState<Grouping>("quarteirao");
@@ -149,17 +165,24 @@ export function VisitsWorkspace() {
   >(() => loadSessionOutcomes(cycles[0].key));
 
   const filtered = useMemo(() => {
-    const term = search.trim().toLocaleLowerCase("pt-BR");
+    const term = normalizeSearch(search);
     return sectorPropertiesDemo
-      .filter((property) =>
-        [
-          property.codigoLocal,
-          property.logradouro,
-          property.numero,
-          property.quarteirao,
-          property.complemento ?? "",
-        ].some((value) => value.toLocaleLowerCase("pt-BR").includes(term)),
-      )
+      .filter((property) => {
+        const propertyNumber = normalizeSearch(property.numero);
+        const street = normalizeSearch(property.logradouro);
+        const block = normalizeSearch(property.quarteirao);
+        const numericSearch = /^\d+$/.test(term);
+
+        if (numericSearch) {
+          return (
+            propertyNumber === term ||
+            street.includes(term) ||
+            block.includes(term)
+          );
+        }
+
+        return street.includes(term) || block.includes(term);
+      })
       .sort((a, b) => a.sequenciaPercurso - b.sequenciaPercurso);
   }, [search]);
 
@@ -193,11 +216,7 @@ export function VisitsWorkspace() {
 
   return (
     <div>
-      <PageHeading
-        eyebrow="Operação de campo · ACE"
-        title="Imóveis do meu setor"
-        description="Organize por quarteirão ou rua e acompanhe a situação de cada imóvel no ciclo de dois meses."
-      />
+      <PageHeading eyebrow={eyebrow} title={title} description={description} />
       <section className="border border-slate-200 bg-white p-4 sm:p-5">
         <div className="flex flex-wrap items-end gap-3">
           <label className="min-w-48 flex-1 text-xs font-semibold text-slate-700">

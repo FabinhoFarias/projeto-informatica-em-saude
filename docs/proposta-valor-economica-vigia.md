@@ -8,6 +8,118 @@ Este documento fornece uma base para apresentar o possível impacto econômico d
 
 > O VIGIA+ organiza dados territoriais e epidemiológicos, reduz trabalho manual de consolidação e ajuda a coordenação a direcionar visitas e ações para áreas prioritárias. O possível retorno econômico vem de tempo operacional poupado, menor retrabalho, melhor direcionamento de deslocamentos e redução de atrasos na resposta — sempre com decisão humana e validação da vigilância.
 
+## Resumo executivo para o prefeito
+
+### A decisão em uma frase
+
+O VIGIA+ transforma registros dispersos de campo em uma operação municipal acompanhável: a prefeitura sabe **onde estão os imóveis, quem é responsável, o que já foi visitado, o que ficou pendente e qual ação deve ser priorizada**.
+
+### O problema público que a plataforma enfrenta
+
+Na rotina atual, parte do trabalho depende de fichas em papel, planilhas, conferência manual e comunicação entre ACEs, digitadores, laboratoristas e gestores. Isso gera quatro custos de processo:
+
+1. **Tempo administrativo:** consolidar fichas, somar resultados e preparar relatórios.
+2. **Retrabalho:** corrigir campos, duplicidades, somas e divergências territoriais.
+3. **Baixa visibilidade:** o gestor descobre tarde quais imóveis, setores ou agentes estão pendentes.
+4. **Resposta fragmentada:** coleta, tratamento, ocorrência ambiental, estoque e relatório ficam separados.
+
+### O ganho que pode ser demonstrado
+
+O ganho inicial não deve ser apresentado como “menos casos de dengue” sem avaliação. Ele deve ser demonstrado por indicadores que a prefeitura controla diretamente:
+
+- horas poupadas na digitação e consolidação;
+- relatórios gerados com menos etapas;
+- cobertura de visitas por ACE, setor, bairro e quarteirão;
+- redução de registros devolvidos para correção;
+- tempo entre uma ocorrência e sua distribuição para tratamento;
+- rastreabilidade de amostras, tratamentos, anexos e sincronização;
+- estoque e consumo vinculados às ações de campo;
+- capacidade de comparar ciclos e tomar decisão com dados atuais.
+
+## O que o VIGIA+ faz e onde está o ganho
+
+Esta tabela é a base para os slides e para a conversa com cada secretaria. “Ganho” significa melhoria de processo que deve ser medida no piloto; não é promessa automática de economia.
+
+| Capacidade do VIGIA+ | Como funciona na operação | Ganho para a prefeitura | Indicador para provar o ganho |
+|---|---|---|---|
+| Cadastro territorial | Organiza município, bairro, setor, quarteirão, microárea, imóvel e ACE responsável | Menos ambiguidade sobre quem atende cada área | Imóveis atribuídos; divergências resolvidas; imóveis sem responsável |
+| Planejamento por ciclo | Cria ciclos bimestrais, combina levantamento, tratamento, recuperação e pontos estratégicos | Evita planejamento em planilhas paralelas e deixa responsáveis explícitos | Tempo para publicar ciclo; ações sem responsável; alterações após publicação |
+| Lista de imóveis do ACE | Exibe imóveis por quarteirão ou rua, com situação da visita e tipo de imóvel | O agente encontra rapidamente a próxima tarefa | Tempo para localizar imóvel; imóveis pendentes; cobertura por ciclo |
+| Registro da visita | Registra acesso, depósitos, levantamento de índice, tratamento, amostras, hora e observações | Reduz transcrição e preserva o contexto do imóvel | Tempo por ficha; campos incompletos; registros corrigidos |
+| Recusa, fechado e retorno | Mantém estados diferentes e histórico de tentativas | Evita apagar pendências e melhora o planejamento de recuperação | Recusas; imóveis fechados; retornos concluídos |
+| Captura de evidência | Permite foto feita no momento da visita e anexa a ocorrência | Melhora a comprovação da situação encontrada | Anexos vinculados; ocorrências com evidência; tempo de conferência |
+| Ocorrências e riscos | Registra água parada, lixo, terreno e outros riscos com prioridade | Encaminha problemas que não terminam na visita do ACE | Tempo até tratativa; ocorrências abertas, em tratamento e resolvidas |
+| Laboratório | Vincula coleta, tubitos, imóvel, recebimento, análise e resultado | Evita perder a origem da amostra e reduz busca manual | Amostras sem vínculo; prazo coleta–resultado; resultados pendentes |
+| Digitação assistida | Mantém a alternativa de transcrever ficha de papel e registra a origem | Permite adoção gradual sem excluir equipes que ainda trabalham em papel | Tempo de transcrição; fichas conferidas; erros de digitação |
+| Relatórios e consolidados | Resume dia, semana, mês, ciclo e semana epidemiológica | Reduz montagem manual para envio e reuniões | Tempo para emitir relatório; relatórios no prazo; versões rastreáveis |
+| Cobertura por ACE | Compara atribuídos, visitados, pendentes, retornos e recusas | Permite ao gestor agir antes do fim do ciclo | Cobertura por ACE; diferença para meta; última sincronização |
+| Painel territorial | Mostra bairros, setores, quarteirões e mapas com limites territoriais | Direciona equipe e recurso para o território correto | Cobertura por território; deslocamento; setores prioritários atendidos |
+| Estoque e insumos | Registra produtos, saldo mínimo, consumo e alerta de reposição | Reduz risco de falta ou compra emergencial | Rupturas; consumo por ação; dias de estoque |
+| Gestão de perfis | Diferencia gestor, ACE de campo, laboratorista, digitador e funções de larvicida | Exibe apenas o que cada pessoa precisa e protege dados | Usuários ativos; acessos indevidos; tempo de treinamento |
+| Sincronização e rastreabilidade | Exibe pendente, enviando, sincronizado, rejeitado e conflito | Dá visibilidade ao que chegou à gestão e ao que ainda está no aparelho | Registros pendentes; conflitos; tempo até sincronização |
+| Configuração municipal | Permite adaptar marca, territórios, catálogos, módulos e regras | Evita criar um produto diferente para cada prefeitura | Tempo de configuração; módulos habilitados; alterações auditadas |
+
+## Antes e depois: narrativa para a apresentação
+
+| Antes | Com o VIGIA+ |
+|---|---|
+| Ficha manual e soma em planilha | Registro estruturado com consolidação automática |
+| Gestor pergunta quem visitou o setor | Painel mostra cobertura, pendências e responsável |
+| Recusa e imóvel fechado misturados | Estados separados e retorno rastreável |
+| Amostra sem contexto ou em planilha separada | Amostra vinculada ao imóvel, ACE e resultado |
+| Relatório montado ao final do dia | Resumo diário e consolidados por período |
+| Estoque conferido separadamente | Consumo associado ao tratamento e saldo disponível |
+| Mapa sem atribuição operacional | Território, equipe, imóvel e ação no mesmo fluxo |
+
+## Roteiro de apresentação ao prefeito
+
+Uma apresentação de 10 a 15 minutos pode seguir esta ordem:
+
+1. **O custo do processo atual — 1 min:** fichas, planilhas, retrabalho e baixa visibilidade.
+2. **A solução — 2 min:** mostrar o ciclo, o território e a lista de imóveis.
+3. **Demonstração de campo — 3 min:** abrir um imóvel, registrar visita, recusa, tratamento e foto.
+4. **Visão do gestor — 2 min:** mostrar cobertura por ACE, setor e bairro e abrir o histórico de um agente.
+5. **Laboratório e relatórios — 2 min:** acompanhar amostra e gerar resumo diário/consolidado.
+6. **Retorno para a prefeitura — 2 min:** apresentar indicadores que serão medidos no piloto.
+7. **Próximo passo — 1 min:** escolher um ciclo, uma equipe e uma linha de base.
+
+### Mensagem recomendada
+
+> Prefeito, o VIGIA+ não vende apenas um mapa. Ele conecta território, equipe, imóvel, visita, amostra, tratamento, ocorrência, estoque e relatório. O primeiro resultado é dar à gestão controle diário da execução. O retorno financeiro será calculado com os dados reais do município, comparando o processo atual com o processo apoiado pela plataforma.
+
+### O que mostrar na tela
+
+- **ACE:** próximo imóvel, situação do ciclo e ficha de campo;
+- **Gestor:** cobertura por ACE, bairro, setor e quarteirão;
+- **Laboratório:** fila de amostras e vínculo com o imóvel;
+- **Digitador:** origem papel e conferência da transcrição;
+- **Coordenação:** relatório diário, semanal, ciclo e semana epidemiológica;
+- **Administração:** usuários, funções, módulos e configuração municipal.
+
+## Benefícios por área da prefeitura
+
+| Área | Benefício operacional | Pergunta que o prefeito pode fazer |
+|---|---|---|
+| Vigilância ambiental | Mais controle sobre cobertura, pendências e retornos | “Quais setores ainda não foram cobertos neste ciclo?” |
+| Atenção e vigilância epidemiológica | Melhor conexão entre sinal territorial e ação de campo | “Onde a equipe precisa atuar primeiro e por quê?” |
+| Laboratório | Rastreabilidade da coleta ao resultado | “Qual amostra está atrasada e de qual imóvel veio?” |
+| Administração | Visibilidade de equipes, funções e horários de acesso | “Quem pode registrar, revisar e acompanhar cada dado?” |
+| Finanças e compras | Consumo e estoque relacionados às atividades | “Quanto foi consumido e qual insumo precisa ser reposto?” |
+| Controle interno | Histórico, origem, versão e estado dos registros | “É possível auditar quem registrou e quando?” |
+| Secretaria de governo | Indicadores resumidos para decisão | “Qual é a cobertura real da cidade hoje?” |
+
+## Modelo de implantação para reduzir risco
+
+1. Escolher uma equipe, setor ou ciclo-piloto.
+2. Medir de 8 a 12 semanas do processo atual.
+3. Configurar territórios, funções, catálogos e relatórios do município.
+4. Treinar ACE, digitador, laboratorista e gestor conforme a função.
+5. Operar um ciclo com suporte e registrar ocorrências.
+6. Comparar tempo, cobertura, retrabalho, pendências e custos.
+7. Apresentar ao prefeito um relatório observado, com limitações e próximos passos.
+
+O município pode começar pela operação de endemias e ampliar depois para outras linhas de cuidado. A implantação deve preservar protocolos oficiais, LGPD, decisão humana e validação da Secretaria de Saúde.
+
 ## Onde pode haver economia pública
 
 | Fonte potencial | Como o VIGIA+ pode contribuir | Como medir |

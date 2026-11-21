@@ -58,9 +58,9 @@ export function DashboardSidebar({
       <aside
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
-        className={`hidden flex-col border-r border-color-border bg-white transition-[width] duration-300 md:sticky md:top-0 md:flex md:h-[100dvh] md:shrink-0 ${expanded ? "md:w-64" : "md:w-20"}`}
+        className={`hidden h-[100dvh] max-h-[100dvh] flex-col overflow-hidden border-r border-color-border bg-white transition-[width] duration-300 md:sticky md:top-0 md:flex md:shrink-0 ${expanded ? "md:w-64" : "md:w-20"}`}
       >
-        <div className="flex h-[8vh] w-full items-center justify-center border-b border-color-border px-3 py-3">
+        <div className="flex h-[clamp(4rem,8vh,5.5rem)] max-h-[5.5rem] w-full shrink-0 items-center justify-center border-b border-color-border px-3 py-3">
           <div className="flex h-full w-full items-center justify-center">
             <Image
               src={
@@ -71,8 +71,11 @@ export function DashboardSidebar({
               alt="Prefeitura de Lagoa de Itaenga"
               width={expanded ? 190 : 62}
               height={52}
-              className={`object-contain ${expanded ? "h-[7vh] w-full" : "h-[7.5vh]"}`}
-              style={{ width: expanded ? "100%" : "auto", height: "7dvh" }}
+              className="h-[clamp(3.5rem,7vh,4.75rem)] object-contain"
+              style={{
+                width: expanded ? "100%" : "auto",
+                height: "clamp(3.5rem, 7vh, 4.75rem)",
+              }}
             />
           </div>
         </div>
@@ -90,7 +93,7 @@ export function DashboardSidebar({
 
         <nav
           aria-label="Navegação principal"
-          className={`flex gap-3 overflow-x-auto px-3 py-3  md:flex-col md:overflow-visible ${expanded ? "" : "md:items-center"}`}
+          className={`min-h-0 flex-1 gap-3 overflow-x-auto px-3 py-3 md:flex md:flex-col md:overflow-y-auto md:overflow-x-hidden ${expanded ? "" : "md:items-center"}`}
         >
           {desktopItems.map((item) => {
             const active =

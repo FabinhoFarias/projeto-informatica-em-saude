@@ -96,12 +96,12 @@ function ProfileActions({
             type="button"
             aria-label="Fechar opções do perfil"
             onClick={() => setMenuOpen(false)}
-            className="fixed inset-0 z-[300] bg-slate-950/20 sm:hidden"
+            className="fixed inset-0 z-300 bg-slate-950/20 sm:hidden"
           />
           <section
             role="menu"
             aria-label="Opções do perfil"
-            className="fixed right-3 top-[4.5rem] z-[310] w-[min(19rem,calc(100vw-1.5rem))] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xl sm:absolute sm:right-0 sm:top-12 sm:z-[210] sm:shadow-xl"
+            className="fixed right-3 top-18 z-310 w-[min(19rem,calc(100vw-1.5rem))] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xl sm:absolute sm:right-0 sm:top-12 sm:z-210 sm:shadow-xl"
           >
             <div className="border-b border-slate-200 p-4">
               <p className="font-semibold text-slate-950">Mariana Santos</p>
@@ -180,7 +180,7 @@ export function DashboardHeader({
   const pathname = usePathname();
   const title = getRouteLabel(pathname);
   return (
-    <header className="sticky top-0 z-[300] flex h-16 items-center justify-between gap-3 border-b border-color-border bg-white px-3 sm:z-[100] sm:h-[8vh] sm:px-6">
+    <header className="sticky top-0 z-[300] flex h-16 items-center justify-between gap-3 border-b border-color-border bg-white px-3 sm:z-[100] sm:h-[clamp(4rem,8vh,5.5rem)] sm:max-h-[5.5rem] sm:px-6">
       <div className="flex min-w-0 items-center gap-3">
         <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-slate-200 bg-white p-1 md:hidden">
           <Image
@@ -212,7 +212,7 @@ export function DashboardHeader({
             />
           </button>
           {showNotifications && (
-            <section className="fixed left-3 right-3 top-[4.5rem] z-[200] max-h-[calc(100dvh-6rem)] overflow-y-auto rounded-xl border border-slate-200 bg-white p-4 shadow-xl sm:absolute sm:left-auto sm:right-0 sm:top-12 sm:w-[22rem] sm:max-h-none sm:overflow-visible">
+            <section className="fixed left-3 right-3 top-18 z-200 max-h-[calc(100dvh-6rem)] overflow-y-auto rounded-xl border border-slate-200 bg-white p-4 shadow-xl sm:absolute sm:left-auto sm:right-0 sm:top-12 sm:w-88 sm:max-h-none sm:overflow-visible">
               <h2 className="text-sm font-semibold text-slate-950">
                 {role === "AGENTE_CAMPO"
                   ? "Alerta da microárea"

@@ -8,6 +8,7 @@ import {
   MetricCard,
 } from "@/components/plataforma/dashboard-ui";
 import { initialUsers } from "@/lib/identidade/demo-users";
+import { VisitsWorkspace } from "@/components/visitas/visits-workspace";
 
 export function AceProfile({ id }: { id: string }) {
   const ace = initialUsers.find(
@@ -33,22 +34,6 @@ export function AceProfile({ id }: { id: string }) {
       : stats.coverage >= 60
         ? "bg-amber-100 text-amber-800"
         : "bg-red-100 text-red-800";
-  const history = [
-    ["07/10/2026", "Quarteirão 04", "18 imóveis visitados", "Sincronizado"],
-    ["06/10/2026", "Quarteirão 02", "3 retornos agendados", "Conferido"],
-    [
-      "05/10/2026",
-      "Setor Centro",
-      "22 imóveis visitados · 2 tratados",
-      "Sincronizado",
-    ],
-    [
-      "04/10/2026",
-      "Quarteirão 01",
-      "1 recusa e 4 imóveis fechados",
-      "Aguardando retorno",
-    ],
-  ];
   return (
     <div>
       <PageHeading
@@ -153,42 +138,14 @@ export function AceProfile({ id }: { id: string }) {
           </div>
         </div>
       </Panel>
-      <div className="grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
-        <Panel
-          className="min-w-0 overflow-hidden"
-          title="Histórico de registros"
-          description="Atividades lançadas pelo ACE e recebidas pela gestão."
-        >
-          <div className="w-full overflow-x-auto overscroll-x-contain">
-            <table className="w-[720px] min-w-[720px] text-left text-sm">
-              <thead className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
-                <tr>
-                  <th className="px-3 py-3">Data</th>
-                  <th className="px-3 py-3">Território</th>
-                  <th className="px-3 py-3">Registro</th>
-                  <th className="px-3 py-3">Estado</th>
-                </tr>
-              </thead>
-              <tbody>
-                {history.map((item) => (
-                  <tr
-                    key={`${item[0]}-${item[1]}`}
-                    className="border-b border-slate-100"
-                  >
-                    <td className="px-3 py-3 font-semibold text-slate-800">
-                      {item[0]}
-                    </td>
-                    <td className="px-3 py-3 text-slate-600">{item[1]}</td>
-                    <td className="px-3 py-3 text-slate-700">{item[2]}</td>
-                    <td className="px-3 py-3 text-xs font-semibold text-emerald-700">
-                      {item[3]}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Panel>
+      <section className="mb-5 border-t border-slate-300 pt-5">
+        <VisitsWorkspace
+          eyebrow={`Operação acompanhada · ${ace.name}`}
+          title="Imóveis e visitas do ACE"
+          description="A mesma visão operacional usada pelo ACE: ciclo, quarteirão, rua, situação da visita e acesso à ficha do imóvel."
+        />
+      </section>
+      <div className="max-w-2xl">
         <Panel
           className="min-w-0 overflow-hidden"
           title="Atividades habilitadas"

@@ -166,7 +166,11 @@ function makeVisit(
 
 const sectorId = "80000000-0000-4000-8000-000000000002";
 const sectorVersionId = "80000000-0000-4000-8000-000000000102";
-const propertiesPerBlock = [12, 11, 14, 10, 13, 15, 12, 11, 14, 10];
+// Cenário demonstrativo próximo da operação real: 996 imóveis em 30 quarteirões.
+// Os seis primeiros quarteirões têm 34 imóveis e os demais têm 33.
+const propertiesPerBlock = Array.from({ length: 30 }, (_, index) =>
+  index < 6 ? 34 : 33,
+);
 const streets = [
   ["Rua das Palmeiras", "Travessa do Sol"],
   ["Rua do Açude", "Rua da Estação"],
@@ -199,7 +203,7 @@ const typeSequence: PropertyType[] = [
   "OUTRO",
 ];
 
-/** Cenário fictício com dez quarteirões; não representa endereços ou imóveis reais. */
+/** Cenário fictício com 996 imóveis; não representa endereços reais. */
 export const sectorPropertiesDemo: SectorPropertyMock[] =
   propertiesPerBlock.flatMap((count, blockIndex) =>
     Array.from({ length: count }, (_, propertyIndex) => {
@@ -211,7 +215,9 @@ export const sectorPropertiesDemo: SectorPropertyMock[] =
       const blockNumber = blockIndex + 1;
       const quarteirao = String(blockNumber);
       const logradouro =
-        streets[blockIndex][propertyIndex < Math.ceil(count / 2) ? 0 : 1];
+        streets[blockIndex % streets.length][
+          propertyIndex < Math.ceil(count / 2) ? 0 : 1
+        ];
       const tipo =
         typeSequence[(sequence + blockIndex * 3) % typeSequence.length];
       const acesso =
