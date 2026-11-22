@@ -26,6 +26,7 @@
     "next-env.d.ts",
     "app/**/*.ts",
     "app/**/*.tsx",
+    "backend/**/*.ts",
     "components/**/*.ts",
     "components/**/*.tsx",
     "lib/**/*.ts",

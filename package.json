@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "api:dev": "tsx app/api/server/main.ts",
+    "api:start": "tsx app/api/server/main.ts",
     "build": "next build && node scripts/update-progress.js",
     "start": "next start",
     "lint": "node scripts/quality.mjs lint",
@@ -38,14 +40,23 @@
     "test": "node scripts/quality.mjs test"
   },
   "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.3.0",
+    "express-rate-limit": "^8.7.5",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.3",
     "lucide-react": "0.468.0",
     "next": "16.4.5",
     "react": "19.3.0",
     "react-dom": "19.3.0",
-    "read-excel-file": "^9.3.12"
+    "read-excel-file": "^9.3.12",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -54,6 +65,7 @@
     "eslint-config-next": "16.4.5",
     "prettier": "3.4.2",
     "tailwindcss": "^4",
+    "tsx": "^4.23.15",
     "typescript": "^5"
   }
 }
