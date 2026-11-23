@@ -1,4 +1,4 @@
-export const mockTerritories = [
+const legacyTerritories = [
   {
     id: "centro",
     nome: "Centro",
@@ -68,3 +68,83 @@ export const mockCycles = [
   { id: "ciclo-2026-6", nome: "novembro–dezembro / 2026", status: "ATIVO" },
   { id: "ciclo-2026-5", nome: "setembro–outubro / 2026", status: "ENCERRADO" },
 ];
+
+const territoryNames = [
+  "Centro",
+  "Nova Itaenga",
+  "Vila Boa Esperança",
+  "Bom Jesus",
+  "Saudade",
+  "Salinas",
+  "São Sebastião",
+  "Independência",
+  "Campo",
+  "Irmãos Oliveira",
+  "Moinho",
+  "Baixa Fria",
+  "Jacaré I",
+  "Jacaré II",
+  "Sítio Camboa",
+  "Sítio Imbé",
+  "Sítio Açude de Pedra",
+  "Sítio Quatis",
+  "Sítio Arrombados",
+  "Sítio Cai Cai",
+  "Sítio Marrecos",
+  "Sítio Amarelado",
+  "Sítio Angicos",
+];
+const territoryZones: Record<string, "Urbana" | "Rural"> = {
+  Centro: "Urbana",
+  "Nova Itaenga": "Urbana",
+  "Vila Boa Esperança": "Urbana",
+  "Bom Jesus": "Urbana",
+  Saudade: "Urbana",
+  Salinas: "Urbana",
+  "São Sebastião": "Urbana",
+  Independência: "Urbana",
+  Campo: "Urbana",
+  "Irmãos Oliveira": "Urbana",
+  Moinho: "Urbana",
+  "Baixa Fria": "Urbana",
+  "Jacaré I": "Urbana",
+  "Jacaré II": "Urbana",
+  "Sítio Camboa": "Rural",
+  "Sítio Imbé": "Rural",
+  "Sítio Açude de Pedra": "Rural",
+  "Sítio Quatis": "Rural",
+  "Sítio Arrombados": "Rural",
+  "Sítio Cai Cai": "Rural",
+  "Sítio Marrecos": "Rural",
+  "Sítio Amarelado": "Rural",
+  "Sítio Angicos": "Rural",
+};
+
+export const mockTerritories = territoryNames.map((nome, index) => {
+  const population = 1800 + index * 175;
+  const suspectedCases = 4 + ((index * 7) % 38);
+  const vectorFoci = Number((1.2 + ((index * 1.1) % 8)).toFixed(1));
+  return {
+    id: nome.toLocaleLowerCase("pt-BR").replaceAll(" ", "-"),
+    nome,
+    zona: territoryZones[nome] ?? "Urbana",
+    population,
+    suspectedCases,
+    forecastCases: suspectedCases + 4 + (index % 9),
+    ratePer100k: Math.round((suspectedCases / population) * 100000),
+    incidenceProbability: 18 + ((index * 9) % 72),
+    risk:
+      index % 7 === 0
+        ? "Crítico"
+        : index % 3 === 0
+          ? "Alto"
+          : index % 2 === 0
+            ? "Médio"
+            : "Baixo",
+    vectorFoci,
+    apsVisits: 65 + index * 11,
+    apsCases: 6 + ((index * 3) % 24),
+    apsStatus: index % 4 === 0 ? "Atenção" : "Em observação",
+    trigger: index % 5 === 0,
+  };
+});

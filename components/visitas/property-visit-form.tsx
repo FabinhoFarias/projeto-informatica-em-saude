@@ -366,7 +366,7 @@ export function PropertyVisitForm({
                     type="number"
                     min="0"
                     defaultValue={
-                      existingForm?.depositos[
+                      existingForm?.depositos?.[
                         type as keyof typeof existingForm.depositos
                       ] ?? 0
                     }

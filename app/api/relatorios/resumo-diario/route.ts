@@ -1,28 +1,13 @@
 import { NextResponse } from "next/server";
-import {
-  availableDailyReportDates,
-  buildDailyReport,
-  defaultDailyReportDate,
-} from "@/lib/visitas/daily-report";
+import { apiServerFetch } from "@/app/api/client";
 
 export async function GET(request: Request) {
   const requestedDate = new URL(request.url).searchParams.get("data");
-  const dates = availableDailyReportDates();
-  const date =
-    requestedDate && dates.includes(requestedDate)
-      ? requestedDate
-      : dates.includes(defaultDailyReportDate)
-        ? defaultDailyReportDate
-        : dates[0];
-
-  if (!date) {
-    return NextResponse.json(
-      { error: "Nenhuma visita disponível para o relatório." },
-      { status: 404 },
-    );
-  }
-
-  return NextResponse.json(buildDailyReport(date), {
+  const date = requestedDate ?? new Date().toISOString().slice(0, 10);
+  const report = await apiServerFetch<Record<string, unknown>>(
+    `/v1/relatorios/diario?data=${encodeURIComponent(date)}`,
+  );
+  return NextResponse.json(report, {
     headers: { "Cache-Control": "no-store" },
   });
 }

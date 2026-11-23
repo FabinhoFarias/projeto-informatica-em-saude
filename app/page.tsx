@@ -130,7 +130,7 @@ export default function HomePage() {
           <a href="#para-prefeituras">Para prefeituras</a>
         </nav>
         <Link className="home-nav-action" href="/login">
-          Explorar plataforma <Arrow diagonal />
+          Entrar <Arrow diagonal />
         </Link>
       </header>
 

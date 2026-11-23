@@ -1,15 +1,34 @@
 import crypto from "node:crypto";
+import { properties } from "../mock-data/properties";
 
 export type StoredRecord = Record<string, unknown> & { id: string };
 
-const seededVisitCount = 240;
 const demoAceIds = ["u-4", "u-5", "u-8", "u-10"];
-const visits: StoredRecord[] = Array.from(
-  { length: seededVisitCount },
-  (_, index) => ({
+const assignedProperties = properties.filter(
+  (property) => property.assignedAceId,
+);
+const territoryNames = [
+  ...new Set(assignedProperties.map((property) => property.neighborhood)),
+];
+const seededVisitProperties = territoryNames.flatMap(
+  (territory, territoryIndex) => {
+    const territoryProperties = assignedProperties.filter(
+      (property) => property.neighborhood === territory,
+    );
+    const targetCoverage =
+      30 + (territoryIndex * 40) / Math.max(1, territoryNames.length - 1);
+    return territoryProperties.slice(
+      0,
+      Math.round((territoryProperties.length * targetCoverage) / 100),
+    );
+  },
+);
+const visits: StoredRecord[] = seededVisitProperties.map((property, index) => {
+  const aceId = property.assignedAceId ?? demoAceIds[index % demoAceIds.length];
+  return {
     id: `visita-seed-${index + 1}`,
-    imovelId: `property-${index + 1}`,
-    aceId: demoAceIds[index % demoAceIds.length],
+    imovelId: property.id,
+    aceId,
     cicloId: "ciclo-2026-6",
     acesso:
       index % 19 === 0 ? "RECUSA" : index % 17 === 0 ? "FECHADO" : "REALIZADO",
@@ -17,8 +36,8 @@ const visits: StoredRecord[] = Array.from(
     status: "SINCRONIZADO",
     origem: "MOCK_SEED",
     createdAt: `2026-11-${String((index % 22) + 1).padStart(2, "0")}T08:00:00-03:00`,
-  }),
-);
+  };
+});
 const occurrences: StoredRecord[] = [];
 const attachments: StoredRecord[] = [];
 const returns: StoredRecord[] = visits
@@ -32,10 +51,17 @@ const returns: StoredRecord[] = visits
     status: "PENDENTE",
     createdAt: visit.createdAt,
   }));
-const assignments: StoredRecord[] = Array.from({ length: 12 }, (_, index) => ({
+const assignments: StoredRecord[] = Array.from({ length: 60 }, (_, index) => ({
   id: `atribuicao-${index + 1}`,
   quarteiraoId: `quarteirao-${index + 1}`,
-  aceId: demoAceIds[index % demoAceIds.length],
+  aceId:
+    index < 12
+      ? demoAceIds[0]
+      : index < 27
+        ? demoAceIds[1]
+        : index < 44
+          ? demoAceIds[2]
+          : demoAceIds[3],
   cicloId: "ciclo-2026-6",
   origem: "MOCK",
   createdAt: "2026-11-01T08:00:00-03:00",

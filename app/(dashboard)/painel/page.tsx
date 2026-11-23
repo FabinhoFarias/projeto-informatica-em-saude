@@ -35,7 +35,9 @@ export default async function OverviewPage({
       `/v1/cobertura/aces?cicloId=${cicloId}`,
     ),
     apiServerFetch<ManagerDashboardData["blocks"]>("/v1/quarteiroes"),
-    apiServerFetch<Array<Record<string, unknown>>>("/v1/imoveis"),
+    // O ciclo atual usa os primeiros 60 quarteirões (até 1.980 imóveis).
+    // Limitar esta leitura evita transferir imóveis ainda não atribuídos ao painel.
+    apiServerFetch<Array<Record<string, unknown>>>("/v1/imoveis?limit=2000"),
     apiServerFetch<ManagerDashboardData["neighborhoods"]>("/v1/territorios"),
     apiServerFetch<Record<string, unknown>>(
       `/v1/relatorios/diario?cicloId=${cicloId}`,

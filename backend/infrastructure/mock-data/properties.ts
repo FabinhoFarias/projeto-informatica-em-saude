@@ -10,9 +10,34 @@ const types: Property["type"][] = [
   "IGREJA",
 ];
 const aceIds = ["u-4", "u-5", "u-8", "u-10"];
+const neighborhoods = [
+  "Centro",
+  "Nova Itaenga",
+  "Vila Boa Esperança",
+  "Bom Jesus",
+  "Saudade",
+  "Salinas",
+  "São Sebastião",
+  "Independência",
+  "Campo",
+  "Irmãos Oliveira",
+  "Moinho",
+  "Baixa Fria",
+  "Jacaré I",
+  "Jacaré II",
+  "Sítio Camboa",
+  "Sítio Imbé",
+  "Sítio Açude de Pedra",
+  "Sítio Quatis",
+  "Sítio Arrombados",
+  "Sítio Cai Cai",
+  "Sítio Marrecos",
+  "Sítio Amarelado",
+  "Sítio Angicos",
+];
 
 export const properties: Property[] = Array.from(
-  { length: 996 },
+  { length: 3000 },
   (_, index) => {
     const number = index + 1;
     const block = Math.floor(index / 33) + 1;
@@ -20,18 +45,15 @@ export const properties: Property[] = Array.from(
       id: `property-${number}`,
       number: String(number),
       street: streets[index % streets.length],
-      neighborhood: [
-        "Centro",
-        "Nova Itaenga",
-        "Vila Boa Esperança",
-        "Bom Jesus",
-      ][index % 4],
+      neighborhood: neighborhoods[index % neighborhoods.length],
       sector: `Setor ${String((index % 10) + 1).padStart(2, "0")}`,
       block,
       type: types[index % types.length],
-      // O ciclo atual cobre 12 quarteirões: três quarteirões (~99 imóveis)
-      // para cada ACE. Os demais imóveis permanecem sem atribuição.
-      assignedAceId: block <= 12 ? aceIds[(block - 1) % aceIds.length] : null,
+      // O ciclo atual cobre 60 quarteirões em áreas de tamanhos diferentes.
+      assignedAceId:
+        block <= 60
+          ? aceIds[block <= 12 ? 0 : block <= 27 ? 1 : block <= 44 ? 2 : 3]
+          : null,
     };
   },
 );

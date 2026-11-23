@@ -5,8 +5,15 @@ const configuredBaseUrl = process.env.API_BASE_URL?.replace(/\/$/, "");
 const deploymentBaseUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
   : undefined;
+const configuredIsLocal =
+  configuredBaseUrl?.startsWith("http://localhost") ||
+  configuredBaseUrl?.startsWith("http://127.0.0.1");
 const baseUrl =
-  configuredBaseUrl ?? deploymentBaseUrl ?? "http://localhost:4000";
+  (process.env.VERCEL === "1" && configuredIsLocal
+    ? deploymentBaseUrl
+    : configuredBaseUrl) ??
+  deploymentBaseUrl ??
+  "http://localhost:4000";
 const password = process.env.SENHA_DEMO ?? "vigia-demo-local";
 const tokenCache = new Map<string, { value: string; expiresAt: number }>();
 const pendingTokens = new Map<string, Promise<string>>();
@@ -55,8 +62,12 @@ export async function apiServerFetch<T>(
   // de tempo, autenticação ou rede.
   await connection();
   const method = (options.method ?? "GET").toUpperCase();
+  // Listagens completas de imóveis podem ultrapassar o limite de 2 MB do
+  // Data Cache do Next.js. Elas continuam sendo consultadas pela API, mas
+  // não são persistidas no cache; os demais GETs usam cache curto.
+  const largeCollection = path.startsWith("/v1/imoveis");
   const cacheOptions =
-    method === "GET"
+    method === "GET" && !largeCollection
       ? { next: { revalidate: 20 } }
       : { cache: "no-store" as const };
   const response = await fetch(`${baseUrl}${path}`, {

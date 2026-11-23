@@ -114,8 +114,8 @@ function propertyTypeIcon(type: SectorPropertyMock["tipo"]): LucideIcon {
   return icons[type];
 }
 
-function normalizeSearch(value: string) {
-  return value
+function normalizeSearch(value: string | number | null | undefined) {
+  return String(value ?? "")
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toLocaleLowerCase("pt-BR")
@@ -127,15 +127,11 @@ export function VisitsWorkspace({
   description = "Organize por quarteirão ou rua e acompanhe a situação de cada imóvel no ciclo de dois meses.",
   eyebrow = "Operação de campo · ACE",
   properties: initialProperties = [],
-  currentPage = 1,
-  totalPages = 1,
 }: {
   title?: string;
   description?: string;
   eyebrow?: string;
   properties?: SectorPropertyMock[];
-  currentPage?: number;
-  totalPages?: number;
 } = {}) {
   const cycles = useMemo(() => cycleOptions(), []);
   const properties = initialProperties;
@@ -195,7 +191,19 @@ export function VisitsWorkspace({
 
   return (
     <div>
-      <PageHeading eyebrow={eyebrow} title={title} description={description} />
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <PageHeading
+          eyebrow={eyebrow}
+          title={title}
+          description={description}
+        />
+        <Link
+          href="/visitas/historico"
+          className="border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700"
+        >
+          Meu histórico
+        </Link>
+      </div>
       <section className="border border-slate-200 bg-white p-4 sm:p-5">
         <div className="flex flex-wrap items-end gap-3">
           <label className="min-w-48 flex-1 text-xs font-semibold text-slate-700">
@@ -287,16 +295,14 @@ export function VisitsWorkspace({
                   ].join(" · ")}
             </p>
             <div
-              className={`mt-4 grid grid-cols-4 gap-2 sm:grid-cols-6 ${
-                grouping === "quarteirao" ? "lg:grid-cols-10" : "lg:grid-cols-8"
-              }`}
+              className="mt-4 grid grid-cols-4 gap-2 sm:grid-cols-6 lg:grid-cols-10"
             >
               {items.map((property) => {
                 const state = outcome(property, cycle);
                 const visit = visitInCycle(property, cycle);
-                const deposits = visit
+                const deposits = visit?.formulario?.depositos
                   ? Object.values(visit.formulario.depositos).reduce(
-                      (total, value) => total + value,
+                      (total, value) => total + Number(value ?? 0),
                       0,
                     )
                   : 0;
@@ -350,32 +356,6 @@ export function VisitsWorkspace({
           </p>
         )}
       </div>
-      {totalPages > 1 && (
-        <nav
-          aria-label="Paginação dos imóveis"
-          className="mt-4 flex flex-wrap items-center justify-center gap-3 border border-slate-200 bg-white p-4"
-        >
-          {currentPage > 1 && (
-            <Link
-              href={`/visitas?page=${currentPage - 1}`}
-              className="border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700"
-            >
-              Página anterior
-            </Link>
-          )}
-          <span className="text-sm font-semibold text-slate-700">
-            Página {currentPage} de {totalPages}
-          </span>
-          {currentPage < totalPages && (
-            <Link
-              href={`/visitas?page=${currentPage + 1}`}
-              className="border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700"
-            >
-              Próxima página
-            </Link>
-          )}
-        </nav>
-      )}
       <p className="mt-4 text-xs text-slate-600">
         Dados fictícios fornecidos pela API. O histórico disponível contém a
         última visita de cada imóvel.

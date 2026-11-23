@@ -79,7 +79,9 @@ export function hasPermission(role: Role, permission: Permission) {
 export function canAccessPath(role: Role, pathname: string) {
   const routePermissions: Record<string, Permission> = {
     "/painel": "dashboard:view",
-    "/visitas": "field:routes",
+    // A gestão pode consultar qualquer imóvel e o histórico do ACE; o
+    // permissionamento de escrita continua sendo aplicado pela API.
+    "/visitas": "dashboard:view",
     "/laboratorio": "laboratory:manage",
     "/digitacao-relatorios": "records:transcribe",
     "/territorio-conferencia": "dashboard:view",

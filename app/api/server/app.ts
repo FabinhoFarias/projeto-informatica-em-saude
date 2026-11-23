@@ -75,7 +75,10 @@ export function createApi(
       .safeParse(request.body);
     if (!input.success)
       return response.status(400).json({ error: "Credenciais inválidas" });
-    if (process.env.NODE_ENV === "production") {
+    if (
+      process.env.NODE_ENV === "production" &&
+      process.env.API_DEMO_MODE !== "true"
+    ) {
       return response
         .status(503)
         .json({ error: "Login mockado desabilitado em produção" });
@@ -203,7 +206,7 @@ export function createApi(
     requirePermission("territory:read"),
     (_request, response) =>
       response.json({
-        data: Array.from({ length: 30 }, (_, index) => {
+        data: Array.from({ length: 60 }, (_, index) => {
           const id = `quarteirao-${index + 1}`;
           const assignment = aceMemoryStore
             .assignments()
@@ -345,13 +348,22 @@ export function createApi(
       const cicloId = request.query.cicloId
         ? String(request.query.cicloId)
         : undefined;
+      const data = request.query.data ? String(request.query.data) : undefined;
       const snapshot = await operationalSnapshot(cicloId);
+      const visitas = data
+        ? snapshot.visits.filter((visit) =>
+            String(visit.dataAtividade ?? visit.createdAt).startsWith(data),
+          )
+        : snapshot.visits;
       return response.json({
         data: {
           cicloId: cicloId ?? "ciclo-2026-6",
-          data: "2026-11-22",
-          visitas: snapshot.visits.length,
-          retornos: aceMemoryStore.returns().length,
+          data: data ?? "2026-11-22",
+          visitas: visitas.length,
+          retornos: aceMemoryStore
+            .returns({ cicloId })
+            .filter((item) => !data || String(item.createdAt).startsWith(data))
+            .length,
           amostras: mockApiData.amostras.length,
           origem: "MOCK",
         },
@@ -480,15 +492,19 @@ export function createApi(
               ? String(request.query.aceId)
               : undefined,
       });
+      const hasPagination =
+        request.query.page !== undefined || request.query.limit !== undefined;
       const requestedPage = Number(request.query.page ?? 1);
       const requestedLimit = Number(request.query.limit ?? result.length);
       const page = Number.isFinite(requestedPage)
         ? Math.max(1, Math.floor(requestedPage))
         : 1;
       const limit = Number.isFinite(requestedLimit)
-        ? Math.min(200, Math.max(10, Math.floor(requestedLimit)))
-        : 100;
-      const pageItems = result.slice((page - 1) * limit, page * limit);
+        ? Math.min(2000, Math.max(10, Math.floor(requestedLimit)))
+        : result.length;
+      const pageItems = hasPagination
+        ? result.slice((page - 1) * limit, page * limit)
+        : result;
       response.setHeader("X-Total-Count", String(result.length));
       response.setHeader("X-Page", String(page));
       response.setHeader("X-Page-Size", String(limit));
@@ -504,7 +520,12 @@ export function createApi(
           territorioId: property.neighborhood,
           territorioVersaoId: "mock-v1",
           situacaoCadastral: "ATIVO",
-          zona: "URBANA",
+          zona:
+            mockApiData.territorios.find(
+              (territory) => territory.nome === property.neighborhood,
+            )?.zona === "Rural"
+              ? "RURAL"
+              : "URBANA",
           lado: "NORTE",
           sequenciaPercurso: Number(property.number),
           coordenadas: {
@@ -707,14 +728,67 @@ export function createApi(
     },
   );
   app.get(
+    "/v1/me/historico",
+    requirePermission("visits:read"),
+    async (request, response) => {
+      const aceId = request.user?.id ?? "";
+      const cicloId = request.query.cicloId
+        ? String(request.query.cicloId)
+        : undefined;
+      const data = request.query.data ? String(request.query.data) : undefined;
+      const semana = request.query.semana
+        ? String(request.query.semana)
+        : undefined;
+      const visits = aceMemoryStore.visitsByAce(aceId).filter((visit) => {
+        if (cicloId && String(visit.cicloId ?? "") !== cicloId) return false;
+        const date = String(visit.dataAtividade ?? visit.createdAt ?? "");
+        if (data && !date.startsWith(data)) return false;
+        if (semana && !date.startsWith(semana)) return false;
+        return true;
+      });
+      const properties = await repository.list({ assignedAceId: aceId });
+      return response.json({
+        data: {
+          aceId,
+          visitas: visits,
+          retornos: aceMemoryStore.returns({ aceId, cicloId }),
+          atribuidos: properties.length,
+          visitados: new Set(visits.map((visit) => visit.imovelId)).size,
+        },
+      });
+    },
+  );
+  app.get(
     "/v1/usuarios/aces/:id/imoveis",
     requirePermission("visits:read"),
-    async (request, response) =>
-      response.json({
-        data: await listProperties.execute({
-          assignedAceId: String(request.params.id),
-        }),
-      }),
+    async (request, response) => {
+      const properties = await listProperties.execute({
+        assignedAceId: String(request.params.id),
+      });
+      return response.json({
+        data: properties.map((property) => ({
+          ...property,
+          numero: property.number,
+          tipo: property.type,
+          logradouro: property.street,
+          quarteirao: String(property.block),
+          codigoLocal: property.id,
+          imovelVersaoId: property.id,
+          territorioId: property.neighborhood,
+          situacaoCadastral: "ATIVO",
+          zona: "URBANA",
+          lado: "NORTE",
+          sequenciaPercurso: Number(property.number),
+          coordenadas: {
+            latitude: -7.94,
+            longitude: -35.29,
+            origem: "CADASTRO_DEMO",
+          },
+          pontoMapa: { x: 0, y: 0 },
+          ultimaVisita: normalizeVisit(aceMemoryStore.latestVisit(property.id)),
+        })),
+      });
+    },
   );
   app.post(
     "/v1/sincronizacao",
