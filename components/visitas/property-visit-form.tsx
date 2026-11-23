@@ -4,7 +4,6 @@ import { useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { FieldHelp } from "@/components/plataforma/field-help";
 import type { SectorPropertyMock } from "@/lib/visitas/demo-data";
-import { stockDemo } from "@/lib/gestao/operations-data";
 import {
   PropertyOperationSupport,
   type DemoSyncStatus,
@@ -26,9 +25,6 @@ const propertyTypeLabels: Record<SectorPropertyMock["tipo"], string> = {
   PONTO_ESTRATEGICO: "Ponto estratégico",
   OUTRO: "Outro",
 };
-const larvicideOptions = stockDemo.filter((item) =>
-  ["bti", "diflu"].includes(item.id),
-);
 
 function formatDateBr(isoDate: string) {
   const [year, month, day] = isoDate.split("-");
@@ -108,10 +104,12 @@ function StockProductSelect({
   label,
   name,
   defaultValue,
+  options,
 }: {
   label: string;
   name: string;
   defaultValue?: string;
+  options: Array<{ id: string; name: string; balance: number; unit: string }>;
 }) {
   return (
     <label className="text-xs font-semibold text-slate-700">
@@ -122,7 +120,7 @@ function StockProductSelect({
         className={fieldClass}
       >
         <option value="">Nenhum produto utilizado</option>
-        {larvicideOptions.map((item) => (
+        {options.map((item) => (
           <option key={item.id} value={item.name}>
             {item.name} · saldo {item.balance} {item.unit}
           </option>
@@ -161,11 +159,16 @@ export function PropertyVisitForm({
   property,
   cycle,
   saveVisit,
+  stockItems = [],
 }: {
   property: SectorPropertyMock;
   cycle: string;
   saveVisit?: (payload: Record<string, unknown>) => Promise<unknown>;
+  stockItems?: unknown[];
 }) {
+  const larvicideOptions = (stockItems ?? []).filter((item) =>
+    ["bti", "diflu"].includes(String((item as Record<string, unknown>).id)),
+  );
   const existingVisit =
     property.ultimaVisita &&
     visitMatchesCycle(property.ultimaVisita.dataAtividade, cycle)
@@ -446,6 +449,15 @@ export function PropertyVisitForm({
                 label="Larvicida 1 — tipo"
                 name="larvicida1Tipo"
                 defaultValue={existingForm?.larvicida1Tipo}
+                options={larvicideOptions.map((item) => {
+                  const row = item as Record<string, unknown>;
+                  return {
+                    id: String(row.id),
+                    name: String(row.name ?? row.nome ?? row.id),
+                    balance: Number(row.balance ?? row.saldo ?? 0),
+                    unit: String(row.unit ?? row.unidade ?? "un"),
+                  };
+                })}
               />
               <Field
                 label="Larvicida 1 — quantidade (g)"
@@ -463,6 +475,15 @@ export function PropertyVisitForm({
                 label="Larvicida 2 — tipo"
                 name="larvicida2Tipo"
                 defaultValue={existingForm?.larvicida2Tipo}
+                options={larvicideOptions.map((item) => {
+                  const row = item as Record<string, unknown>;
+                  return {
+                    id: String(row.id),
+                    name: String(row.name ?? row.nome ?? row.id),
+                    balance: Number(row.balance ?? row.saldo ?? 0),
+                    unit: String(row.unit ?? row.unidade ?? "un"),
+                  };
+                })}
               />
               <Field
                 label="Larvicida 2 — quantidade (g)"

@@ -1,10 +1,10 @@
-import { mockSamples } from "@/backend/infrastructure/mock-data/laboratory";
-import { mockStock } from "@/backend/infrastructure/mock-data/stock";
+import { mockSamples } from "./mock-data/laboratory";
+import { mockStock } from "./mock-data/stock";
 import {
   mockCycles,
   mockTerritories,
-} from "@/backend/infrastructure/mock-data/territories";
-import { mockUsers } from "@/backend/infrastructure/mock-data/users";
+} from "./mock-data/territories";
+import { mockUsers } from "./mock-data/users";
 
 /** Agregador de compatibilidade; os mocks ficam separados por domínio. */
 export const mockApiData = {

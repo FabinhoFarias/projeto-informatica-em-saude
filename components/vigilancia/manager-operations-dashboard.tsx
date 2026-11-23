@@ -77,6 +77,16 @@ export interface ManagerDashboardData {
     latest?: { visitas?: number; retornos?: number; amostras?: number };
   };
   fieldSummary: { received: number; pending: number; assigned: number };
+  statusCounts: {
+    realizado: number;
+    recusa: number;
+    fechado: number;
+    semVisita: number;
+    retornos: number;
+  };
+  cycleId: string;
+  cycles: Array<{ id: string; nome: string; status: string }>;
+  aceHistories: Record<string, Record<string, unknown>>;
 }
 
 export function ManagerOperationsDashboard({
@@ -93,16 +103,8 @@ export function ManagerOperationsDashboard({
   const rows = useMemo(() => {
     return apiData.territories.map((territory) => {
       const coverage = territory.cobertura ?? territory.coverage ?? 0;
-      const properties =
-        territory.properties ??
-        Math.max(
-          1,
-          Math.round(
-            apiData.propertiesTotal / Math.max(1, apiData.territories.length),
-          ),
-        );
-      const visited =
-        territory.visited ?? Math.round((properties * coverage) / 100);
+      const properties = territory.properties ?? 0;
+      const visited = territory.visited ?? 0;
       return {
         ...territory,
         name: territory.name,
@@ -117,24 +119,18 @@ export function ManagerOperationsDashboard({
     });
   }, [apiData]);
   const aceRows = useMemo(() => {
-    return apiData.aces.map((user, index) => ({
+    return apiData.aces.map((user) => ({
       id: user.id,
       name: user.nome,
       role: "AGENTE_CAMPO",
-      territory: "Lagoa de Itaenga",
+      territory: apiData.municipality.name,
       status: user.status ?? "ATIVO",
       lastSync: "via API",
-      avatarUrl: `https://randomuser.me/api/portraits/men/${20 + index}.jpg`,
-      assigned:
-        user.assigned ??
-        Math.round(apiData.propertiesTotal / Math.max(1, apiData.aces.length)),
+      avatarUrl:
+        user.avatarUrl ?? "/brandingPrefeioturaLagoaDeItaenga/logoQuadrada.png",
+      assigned: user.assigned ?? 0,
       coverage: user.cobertura ?? 0,
-      visited:
-        user.visited ??
-        Math.round(
-          (apiData.propertiesTotal / Math.max(1, apiData.aces.length)) *
-            ((user.cobertura ?? 0) / 100),
-        ),
+      visited: user.visited ?? 0,
       pending: user.pending ?? 0,
     }));
   }, [apiData]);
@@ -172,9 +168,18 @@ export function ManagerOperationsDashboard({
   const properties = rows.reduce((sum, row) => sum + row.properties, 0);
   const visited = rows.reduce((sum, row) => sum + row.visited, 0);
   const sectors = rows.reduce((sum, row) => sum + row.sectors, 0);
-  const coverage = Math.round((visited / properties) * 100);
+  const coverage = properties ? Math.round((visited / properties) * 100) : 0;
   const completed = rows.filter((row) => row.coverage >= 80).length;
   const selectedAce = aceRows.find((ace) => ace.id === selectedAceId);
+  const selectedHistory = selectedAce
+    ? apiData.aceHistories[selectedAce.id]
+    : undefined;
+  const historyVisits = Array.isArray(selectedHistory?.visitas)
+    ? selectedHistory.visitas
+    : [];
+  const historyReturns = Array.isArray(selectedHistory?.retornos)
+    ? selectedHistory.retornos
+    : [];
 
   return (
     <div>
@@ -183,6 +188,27 @@ export function ManagerOperationsDashboard({
         title="Cobertura de visitas"
         description="Acompanhe o avanço das visitas por bairro e setor, identifique pendências e organize a recuperação dos imóveis."
       />
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-3 border border-slate-200 bg-white p-4">
+        <label className="text-xs font-semibold text-slate-700">
+          Ciclo operacional
+          <select
+            value={apiData.cycleId}
+            onChange={(event) => {
+              window.location.href = `/painel?cicloId=${encodeURIComponent(event.target.value)}`;
+            }}
+            className="mt-1 block min-h-10 min-w-64 border border-slate-300 bg-white px-3 text-sm font-normal"
+          >
+            {apiData.cycles.map((cycle) => (
+              <option key={cycle.id} value={cycle.id}>
+                {cycle.nome} · {cycle.status}
+              </option>
+            ))}
+          </select>
+        </label>
+        <p className="text-xs text-slate-500">
+          Indicadores calculados somente para o ciclo selecionado.
+        </p>
+      </div>
       <section
         aria-label="Indicadores de cobertura"
         className="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4"
@@ -209,6 +235,27 @@ export function ManagerOperationsDashboard({
           detail="Visitas ou retornos necessários"
         />
       </section>
+      <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        {[
+          [
+            "Visitas realizadas",
+            apiData.statusCounts.realizado,
+            "text-emerald-800",
+          ],
+          ["Recusas", apiData.statusCounts.recusa, "text-orange-700"],
+          ["Imóveis fechados", apiData.statusCounts.fechado, "text-amber-700"],
+          ["Sem visita", apiData.statusCounts.semVisita, "text-red-700"],
+          ["Retornos", apiData.statusCounts.retornos, "text-blue-700"],
+        ].map(([label, value, color]) => (
+          <div
+            key={String(label)}
+            className="border border-slate-200 bg-white px-4 py-3"
+          >
+            <p className="text-xs text-slate-500">{label}</p>
+            <p className={`mt-1 text-2xl font-bold ${color}`}>{value}</p>
+          </div>
+        ))}
+      </div>
       <Panel
         title="Acompanhamento dos ACEs"
         description="Usuários de campo vinculados à gestão e cobertura das áreas atribuídas no ciclo atual."
@@ -318,9 +365,9 @@ export function ManagerOperationsDashboard({
                   "Retornos necessários",
                 ],
                 [
-                  "Atividades",
-                  "LI · Tratamento · Retorno",
-                  "Registradas no ciclo",
+                  "Retornos registrados",
+                  String(historyReturns.length),
+                  "No ciclo consultado",
                 ],
               ].map(([label, value, detail]) => (
                 <div
@@ -341,9 +388,35 @@ export function ManagerOperationsDashboard({
               <div className="border border-emerald-100 bg-white p-3 text-sm text-slate-700">
                 <strong>Últimos registros:</strong>
                 <ul className="mt-2 space-y-1 text-xs">
-                  <li>07/10 · Quarteirão 04 · 18 imóveis visitados</li>
-                  <li>06/10 · Quarteirão 02 · 3 retornos agendados</li>
-                  <li>05/10 · Setor atribuído · sincronização concluída</li>
+                  {historyVisits
+                    .slice(-3)
+                    .reverse()
+                    .map((visit, index) => (
+                      <li
+                        key={String(
+                          (visit as Record<string, unknown>).id ?? index,
+                        )}
+                      >
+                        {String(
+                          (visit as Record<string, unknown>).dataAtividade ??
+                            (visit as Record<string, unknown>).createdAt ??
+                            "Data não informada",
+                        )}{" "}
+                        ·{" "}
+                        {String(
+                          (visit as Record<string, unknown>).acesso ??
+                            "REALIZADO",
+                        )}{" "}
+                        · imóvel{" "}
+                        {String(
+                          (visit as Record<string, unknown>).imovelId ??
+                            "não informado",
+                        )}
+                      </li>
+                    ))}
+                  {historyVisits.length === 0 && (
+                    <li>Nenhuma visita registrada no ciclo.</li>
+                  )}
                 </ul>
               </div>
               <div className="border border-emerald-100 bg-white p-3 text-sm text-slate-700">

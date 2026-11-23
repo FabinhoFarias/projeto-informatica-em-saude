@@ -10,9 +10,19 @@ import {
 import { VisitsWorkspace } from "@/components/visitas/visits-workspace";
 import type { SectorPropertyMock } from "@/lib/visitas/demo-data";
 
-export function AceProfile({ ace, history, properties }: {
+export function AceProfile({
+  ace,
+  history,
+  properties,
+}: {
   ace: { id: string; nome: string; status: string; funcao: string } | null;
-  history: { visitados: number; atribuidos: number; pendentes: number; cobertura: number; retornos: unknown[] };
+  history: {
+    visitados: number;
+    atribuidos: number;
+    pendentes: number;
+    cobertura: number;
+    retornos: unknown[];
+  };
   properties: SectorPropertyMock[];
 }) {
   if (!ace)
@@ -21,7 +31,12 @@ export function AceProfile({ ace, history, properties }: {
         ACE não encontrado.
       </div>
     );
-  const stats = { assigned: history.atribuidos, visited: history.visitados, coverage: history.cobertura, pending: history.pendentes };
+  const stats = {
+    assigned: history.atribuidos,
+    visited: history.visitados,
+    coverage: history.cobertura,
+    pending: history.pendentes,
+  };
   const target = 80;
   const coverageBand =
     stats.coverage >= target
@@ -52,9 +67,7 @@ export function AceProfile({ ace, history, properties }: {
       />
       <section className="mb-5 flex flex-wrap items-center gap-4 border border-slate-200 bg-white p-5">
         <Image
-          src={
-            "https://randomuser.me/api/portraits/men/32.jpg"
-          }
+          src={"https://randomuser.me/api/portraits/men/32.jpg"}
           alt={`Foto de ${ace.nome}`}
           width={72}
           height={72}
@@ -66,8 +79,7 @@ export function AceProfile({ ace, history, properties }: {
             Operação de campo · Lagoa de Itaenga
           </p>
           <p className="mt-1 text-xs text-slate-500">
-            Última sincronização: via API · Status:{" "}
-            {ace.status}
+            Última sincronização: via API · Status: {ace.status}
           </p>
         </div>
       </section>

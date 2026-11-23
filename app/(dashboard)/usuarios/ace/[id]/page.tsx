@@ -12,9 +12,10 @@ export default async function AceProfilePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const aces = await apiServerFetch<
-    Array<{ id: string; nome: string; status: string; funcao: string }>
-  >("/v1/usuarios/aces");
+  const aces =
+    await apiServerFetch<
+      Array<{ id: string; nome: string; status: string; funcao: string }>
+    >("/v1/usuarios/aces");
   const history = await apiServerFetch<{
     visitados: number;
     atribuidos: number;
@@ -25,5 +26,11 @@ export default async function AceProfilePage({
   const properties = await apiServerFetch<SectorPropertyMock[]>(
     `/v1/usuarios/aces/${id}/imoveis`,
   );
-  return <AceProfile ace={aces.find((item) => item.id === id) ?? null} history={history} properties={properties} />;
+  return (
+    <AceProfile
+      ace={aces.find((item) => item.id === id) ?? null}
+      history={history}
+      properties={properties}
+    />
+  );
 }

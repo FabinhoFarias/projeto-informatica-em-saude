@@ -19,26 +19,26 @@ Componentes em `components/` não devem executar `fetch`, importar repositórios
 
 ## Status resumido
 
-| Rota/módulo | Leitura pela API | Escrita pela API | Situação |
-|---|---:|---:|---|
-| `/painel` | Sim | Não se aplica | indicadores, territórios, ACEs, imóveis, quarteirões, visitas, sincronizações e relatórios carregados pela API |
-| `/visitas` | Sim | Não se aplica | imóveis paginados pela API |
-| `/visitas/[idImovel]` | Sim | Parcial | imóvel e ficha principal integrados; ocorrências, anexos e retornos pendentes na interface |
-| `/usuarios` | Sim | Não | usuários e territórios carregados pela API; ações administrativas ainda locais |
-| `/usuarios/ace/[id]` | Sim | Não | perfil, histórico e imóveis do ACE integrados |
-| `/territorio-conferencia` | Sim | Não | conferência e atribuições carregadas pela API; alteração ainda não conectada |
-| `/laboratorio` | Parcial | Não | fila inicial integrada; transições e resultado ainda locais |
-| `/planejamento` | Sim | Não | ciclos são carregados pela API; criação/edição ainda local |
-| `/digitacao-relatorios` | Sim | Não | fichas e relatórios são carregados pela API; transcrição ainda local |
-| `/estoque` | Sim | Não | estoque, movimentações e consumo são carregados pela API |
-| `/saneamento` | Sim | Não | ocorrências são carregadas pela API |
-| `/mapas` | Sim | Não | metadados do mapa, hotspots e posições de ACE são carregados pela API |
-| `/hotspots` | Não | Não | redireciona para `/mapas` |
-| `/priorizacao-territorial` | Sim | Não | dados de priorização carregados pela API; decisão ainda local |
-| `/diagnostico` | Sim | Não | indicadores carregados pela API; visualizações complementares locais |
-| `/ingestao` | Sim | Não | status de ingestão carregado pela API; processamento do arquivo ainda no navegador |
-| `/simulacao` | Sim | Não | territórios e cobertura carregados pela API; simulação ainda local |
-| `/configuracao-municipal` | Sim | Não | configuração e permissões carregadas pela API; alterações ainda locais |
+| Rota/módulo                | Leitura pela API | Escrita pela API | Situação                                                                                                       |
+| -------------------------- | ---------------: | ---------------: | -------------------------------------------------------------------------------------------------------------- |
+| `/painel`                  |              Sim |    Não se aplica | indicadores, territórios, ACEs, imóveis, quarteirões, visitas, sincronizações e relatórios carregados pela API |
+| `/visitas`                 |              Sim |    Não se aplica | imóveis paginados pela API                                                                                     |
+| `/visitas/[idImovel]`      |              Sim |          Parcial | imóvel e ficha principal integrados; ocorrências, anexos e retornos pendentes na interface                     |
+| `/usuarios`                |              Sim |              Não | usuários e territórios carregados pela API; ações administrativas ainda locais                                 |
+| `/usuarios/ace/[id]`       |              Sim |              Não | perfil, histórico e imóveis do ACE integrados                                                                  |
+| `/territorio-conferencia`  |              Sim |              Não | conferência e atribuições carregadas pela API; alteração ainda não conectada                                   |
+| `/laboratorio`             |          Parcial |              Não | fila inicial integrada; transições e resultado ainda locais                                                    |
+| `/planejamento`            |              Sim |              Não | ciclos são carregados pela API; criação/edição ainda local                                                     |
+| `/digitacao-relatorios`    |              Sim |              Não | fichas e relatórios são carregados pela API; transcrição ainda local                                           |
+| `/estoque`                 |              Sim |              Não | estoque, movimentações e consumo são carregados pela API                                                       |
+| `/saneamento`              |              Sim |              Não | ocorrências são carregadas pela API                                                                            |
+| `/mapas`                   |              Sim |              Não | metadados do mapa, hotspots e posições de ACE são carregados pela API                                          |
+| `/hotspots`                |              Não |              Não | redireciona para `/mapas`                                                                                      |
+| `/priorizacao-territorial` |              Sim |              Não | dados de priorização carregados pela API; decisão ainda local                                                  |
+| `/diagnostico`             |              Sim |              Não | indicadores carregados pela API; visualizações complementares locais                                           |
+| `/ingestao`                |              Sim |              Não | status de ingestão carregado pela API; processamento do arquivo ainda no navegador                             |
+| `/simulacao`               |              Sim |              Não | territórios e cobertura carregados pela API; simulação ainda local                                             |
+| `/configuracao-municipal`  |              Sim |              Não | configuração e permissões carregadas pela API; alterações ainda locais                                         |
 
 ## 1. `/painel`
 
@@ -74,7 +74,18 @@ GET /v1/cobertura?cicloId=...
 GET /v1/cobertura/aces?cicloId=...
 GET /v1/cobertura/territorios?cicloId=...
 GET /v1/relatorios/diario?cicloId=...
+GET /v1/planejamento/ciclos
+GET /v1/retornos?cicloId=...
+GET /v1/usuarios/aces/:id/historico?cicloId=...
 ```
+
+O seletor de ciclo altera a consulta da página e recalcula os indicadores apenas
+com imóveis atribuídos e visitas daquele ciclo. O painel também exibe, em
+blocos separados, visitas realizadas, recusas, imóveis fechados, imóveis sem
+visita e retornos pendentes. Cada card de ACE possui histórico de visitas e
+retornos obtido pelo endpoint individual do agente. Os indicadores
+epidemiológicos dos territórios são campos persistidos no contrato de
+territórios da API (no ambiente atual, o armazenamento ainda é mock).
 
 ## 2. `/visitas`
 

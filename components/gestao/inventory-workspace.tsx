@@ -5,8 +5,11 @@ import {
   PageHeading,
   Panel,
 } from "@/components/plataforma/dashboard-ui";
-import { stockDemo } from "@/lib/gestao/operations-data";
-export function InventoryWorkspace({ apiData: _apiData }: { apiData?: unknown }) {
+export function InventoryWorkspace({
+  apiData: _apiData,
+}: {
+  apiData?: unknown;
+}) {
   const apiItems = Array.isArray(_apiData) ? _apiData : [];
   const [items, setItems] = useState(
     apiItems.length
@@ -21,7 +24,7 @@ export function InventoryWorkspace({ apiData: _apiData }: { apiData?: unknown })
             consumed: Number(row.consumed ?? row.consumo ?? 0),
           };
         })
-      : stockDemo,
+      : [],
   );
   const low = items.filter((item) => item.balance < item.minimum).length;
   return (

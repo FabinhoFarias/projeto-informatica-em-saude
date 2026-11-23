@@ -4,19 +4,19 @@ import helmet from "helmet";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
 import { z } from "zod";
-import { GetPropertyUseCase } from "@/backend/application/use-cases/get-property";
-import { ListPropertiesUseCase } from "@/backend/application/use-cases/list-properties";
-import type { PropertyRepository } from "@/backend/domain/repositories/property-repository";
-import { MockPropertyRepository } from "@/backend/infrastructure/repositories/mock-property-repository";
-import { mockApiData } from "@/backend/infrastructure/mock-data";
-import { aceMemoryStore } from "@/backend/infrastructure/stores/ace-memory-store";
+import { GetPropertyUseCase } from "../../../backend/application/use-cases/get-property";
+import { ListPropertiesUseCase } from "../../../backend/application/use-cases/list-properties";
+import type { PropertyRepository } from "../../../backend/domain/repositories/property-repository";
+import { MockPropertyRepository } from "../../../backend/infrastructure/repositories/mock-property-repository";
+import { mockApiData } from "../../../backend/infrastructure/mock-data";
+import { aceMemoryStore } from "../../../backend/infrastructure/stores/ace-memory-store";
 import {
   authenticate,
   hasPermission,
   requirePermission,
   signToken,
   type ApiRole,
-} from "@/app/api/server/security";
+} from "./security";
 
 export function createApi(
   repository: PropertyRepository = new MockPropertyRepository(),
@@ -51,7 +51,10 @@ export function createApi(
     }),
   );
   app.use((request, response, next) => {
-    if (process.env.NODE_ENV === "production") {
+    if (
+      process.env.NODE_ENV === "production" &&
+      process.env.API_DEMO_MODE !== "true"
+    ) {
       const protocol =
         request.header("x-forwarded-proto") ??
         (request.secure ? "https" : "http");
@@ -111,12 +114,15 @@ export function createApi(
     response.status(204).send(),
   );
 
-  async function operationalSnapshot() {
+  async function operationalSnapshot(cicloId?: string) {
     const properties = await repository.list();
     const assignedProperties = properties.filter(
       (property) => property.assignedAceId,
     );
-    const visits = aceMemoryStore.allVisits;
+    const visits = aceMemoryStore.allVisits.filter(
+      (visit) =>
+        !cicloId || String(visit.cicloId ?? "ciclo-2026-6") === cicloId,
+    );
     const visitedPropertyIds = new Set(
       visits.map((visit) => String(visit.imovelId ?? "")),
     );
@@ -183,23 +189,12 @@ export function createApi(
     requirePermission("territory:read"),
     (_request, response) =>
       response.json({
-        data: mockApiData.territorios.map((territory, index) => ({
+        data: mockApiData.territorios.map((territory) => ({
           ...territory,
           name: territory.nome,
           city: "Lagoa de Itaenga",
           district: "Área Urbana",
-          population: 2800 + index * 410,
-          suspectedCases: 8 + ((index * 7) % 34),
-          forecastCases: 13 + ((index * 7) % 34),
-          ratePer100k: 74 + ((index * 31) % 290),
-          incidenceProbability: 24 + ((index * 9) % 68),
-          risk: index % 3 === 0 ? "Alto" : index % 2 === 0 ? "Médio" : "Baixo",
-          density: 4200 + index * 350,
-          vectorFoci: 2.1 + (index % 9) * 1.4,
-          apsVisits: 90 + index * 17,
-          apsCases: 12 + (index % 13),
-          apsStatus: index % 3 === 0 ? "Atenção" : "Em observação",
-          trigger: index % 4 === 0,
+          density: territory.population ? territory.population : 0,
         })),
       }),
   );
@@ -251,15 +246,18 @@ export function createApi(
   app.get(
     "/v1/cobertura",
     requirePermission("reports:read"),
-    async (_request, response) => {
-      const snapshot = await operationalSnapshot();
+    async (request, response) => {
+      const cicloId = request.query.cicloId
+        ? String(request.query.cicloId)
+        : undefined;
+      const snapshot = await operationalSnapshot(cicloId);
       const atribuidos = snapshot.assignedProperties.length;
       const visitados = snapshot.assignedProperties.filter((property) =>
         snapshot.visitedPropertyIds.has(property.id),
       ).length;
       return response.json({
         data: {
-          cicloId: "ciclo-2026-6",
+          cicloId: cicloId ?? "ciclo-2026-6",
           atribuidos,
           visitados,
           pendentes: Math.max(0, atribuidos - visitados),
@@ -273,8 +271,11 @@ export function createApi(
   app.get(
     "/v1/cobertura/aces",
     requirePermission("reports:read"),
-    async (_request, response) => {
-      const snapshot = await operationalSnapshot();
+    async (request, response) => {
+      const cicloId = request.query.cicloId
+        ? String(request.query.cicloId)
+        : undefined;
+      const snapshot = await operationalSnapshot(cicloId);
       return response.json({
         data: mockApiData.usuarios.map((user) => {
           const assigned = snapshot.assignedProperties.filter(
@@ -301,8 +302,11 @@ export function createApi(
   app.get(
     "/v1/cobertura/territorios",
     requirePermission("reports:read"),
-    async (_request, response) => {
-      const snapshot = await operationalSnapshot();
+    async (request, response) => {
+      const cicloId = request.query.cicloId
+        ? String(request.query.cicloId)
+        : undefined;
+      const snapshot = await operationalSnapshot(cicloId);
       return response.json({
         data: mockApiData.territorios.map((territory) => {
           const territoryProperties = snapshot.assignedProperties.filter(
@@ -337,10 +341,14 @@ export function createApi(
   app.get(
     "/v1/relatorios/diario",
     requirePermission("reports:read"),
-    async (_request, response) => {
-      const snapshot = await operationalSnapshot();
+    async (request, response) => {
+      const cicloId = request.query.cicloId
+        ? String(request.query.cicloId)
+        : undefined;
+      const snapshot = await operationalSnapshot(cicloId);
       return response.json({
         data: {
+          cicloId: cicloId ?? "ciclo-2026-6",
           data: "2026-11-22",
           visitas: snapshot.visits.length,
           retornos: aceMemoryStore.returns().length,
@@ -353,8 +361,11 @@ export function createApi(
   app.get(
     "/v1/relatorios/semanal",
     requirePermission("reports:read"),
-    async (_request, response) => {
-      const snapshot = await operationalSnapshot();
+    async (request, response) => {
+      const cicloId = request.query.cicloId
+        ? String(request.query.cicloId)
+        : undefined;
+      const snapshot = await operationalSnapshot(cicloId);
       const cobertura = snapshot.assignedProperties.length
         ? Math.round(
             (snapshot.assignedProperties.filter((property) =>
@@ -377,8 +388,11 @@ export function createApi(
   app.get(
     "/v1/relatorios/ciclo",
     requirePermission("reports:read"),
-    async (_request, response) => {
-      const snapshot = await operationalSnapshot();
+    async (request, response) => {
+      const cicloId = request.query.cicloId
+        ? String(request.query.cicloId)
+        : undefined;
+      const snapshot = await operationalSnapshot(cicloId);
       const cobertura = snapshot.assignedProperties.length
         ? Math.round(
             (snapshot.assignedProperties.filter((property) =>
@@ -390,7 +404,7 @@ export function createApi(
         : 0;
       return response.json({
         data: {
-          cicloId: "ciclo-2026-6",
+          cicloId: cicloId ?? "ciclo-2026-6",
           visitas: snapshot.visits.length,
           cobertura,
           origem: "MOCK",
@@ -565,6 +579,12 @@ export function createApi(
               ? String(request.query.imovelId)
               : undefined,
           })
+          .filter(
+            (visit) =>
+              !request.query.cicloId ||
+              String(visit.cicloId ?? "ciclo-2026-6") ===
+                String(request.query.cicloId),
+          )
           .map((visit) => normalizeVisit(visit)),
       }),
   );
@@ -624,6 +644,9 @@ export function createApi(
           propertyId: request.query.imovelId
             ? String(request.query.imovelId)
             : undefined,
+          cicloId: request.query.cicloId
+            ? String(request.query.cicloId)
+            : undefined,
         }),
       }),
   );
@@ -658,7 +681,15 @@ export function createApi(
     requirePermission("reports:read"),
     async (request, response) => {
       const aceId = String(request.params.id);
-      const visits = aceMemoryStore.visitsByAce(aceId);
+      const cicloId = request.query.cicloId
+        ? String(request.query.cicloId)
+        : undefined;
+      const visits = aceMemoryStore
+        .visitsByAce(aceId)
+        .filter(
+          (visit) =>
+            !cicloId || String(visit.cicloId ?? "ciclo-2026-6") === cicloId,
+        );
       const visited = new Set(visits.map((item) => item.imovelId)).size;
       const properties = await repository.list({ assignedAceId: aceId });
       const atribuidos = properties.length;
@@ -670,7 +701,7 @@ export function createApi(
           atribuidos,
           pendentes: Math.max(0, atribuidos - visited),
           cobertura: atribuidos ? Math.round((visited / atribuidos) * 100) : 0,
-          retornos: aceMemoryStore.returns({ aceId }),
+          retornos: aceMemoryStore.returns({ aceId, cicloId }),
         },
       });
     },

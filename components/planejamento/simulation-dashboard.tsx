@@ -28,7 +28,11 @@ function distribute(total: number, weights: number[]) {
   return allocation;
 }
 
-export function SimulationDashboard({ apiData: _apiData }: { apiData?: unknown }) {
+export function SimulationDashboard({
+  apiData: _apiData,
+}: {
+  apiData?: unknown;
+}) {
   const [acs, setAcs] = useState(32);
   const [ace, setAce] = useState(48);
   const [larvicide, setLarvicide] = useState(220);

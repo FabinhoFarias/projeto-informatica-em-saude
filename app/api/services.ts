@@ -30,15 +30,15 @@ export const apiServices = {
   propertyReturns: (id: string) => apiServerFetch(`/v1/imoveis/${id}/retornos`),
   visitOccurrences: (id: string) =>
     apiServerFetch(`/v1/visitas/${id}/ocorrencias`),
-  visitAttachments: (id: string) =>
-    apiServerFetch(`/v1/visitas/${id}/anexos`),
+  visitAttachments: (id: string) => apiServerFetch(`/v1/visitas/${id}/anexos`),
   returns: (query = "") => apiServerFetch(`/v1/retornos${query}`),
   synchronizations: () => apiServerFetch("/v1/sincronizacao"),
-  synchronization: (id: string) =>
-    apiServerFetch(`/v1/sincronizacao/${id}`),
+  synchronization: (id: string) => apiServerFetch(`/v1/sincronizacao/${id}`),
   manualForms: () => apiServerFetch("/v1/fichas-manuais"),
-  aceHistory: (id: string) => apiServerFetch(`/v1/usuarios/aces/${id}/historico`),
-  aceProperties: (id: string) => apiServerFetch(`/v1/usuarios/aces/${id}/imoveis`),
+  aceHistory: (id: string) =>
+    apiServerFetch(`/v1/usuarios/aces/${id}/historico`),
+  aceProperties: (id: string) =>
+    apiServerFetch(`/v1/usuarios/aces/${id}/imoveis`),
   samples: () => apiServerFetch("/v1/amostras"),
   sample: (id: string) => apiServerFetch(`/v1/amostras/${id}`),
   stock: () => apiServerFetch("/v1/estoque"),

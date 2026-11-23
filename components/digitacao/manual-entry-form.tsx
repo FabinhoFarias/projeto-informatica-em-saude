@@ -3,7 +3,6 @@
 import { useState, type FormEvent, type ReactNode } from "react";
 import { Panel } from "@/components/plataforma/dashboard-ui";
 import { FieldHelp } from "@/components/plataforma/field-help";
-import { sectorPropertiesDemo } from "@/lib/visitas/demo-data";
 
 export interface ManualEntry {
   id: string;
@@ -28,8 +27,10 @@ const fieldClass =
 
 export function ManualEntryForm({
   onSave,
+  properties = [],
 }: {
   onSave: (entry: ManualEntry) => void;
+  properties?: unknown[];
 }) {
   const [saved, setSaved] = useState(false);
   const submit = (event: FormEvent<HTMLFormElement>) => {
@@ -97,12 +98,16 @@ export function ManualEntryForm({
         </Field>
         <Field label="Imóvel">
           <select required name="propertyId" className={fieldClass}>
-            {sectorPropertiesDemo.slice(0, 30).map((property) => (
-              <option key={property.id} value={property.id}>
-                Qd. {property.quarteirao} · {property.logradouro},{" "}
-                {property.numero}
-              </option>
-            ))}
+            {properties.slice(0, 30).map((rawProperty) => {
+              const property = rawProperty as Record<string, unknown>;
+              return (
+                <option key={String(property.id)} value={String(property.id)}>
+                  Qd. {String(property.quarteirao ?? "")} ·{" "}
+                  {String(property.logradouro ?? property.endereco ?? "")},{" "}
+                  {String(property.numero ?? "")}
+                </option>
+              );
+            })}
           </select>
         </Field>
         <Field label="Resultado do acesso">

@@ -5,16 +5,17 @@ import {
   PageHeading,
   Panel,
 } from "@/components/plataforma/dashboard-ui";
-import {
-  sanitationDemo,
-  type SanitationStatus,
-} from "@/lib/gestao/operations-data";
+type SanitationStatus = "ABERTO" | "EM_TRATATIVA" | "RESOLVIDO";
 const labels: Record<SanitationStatus, string> = {
   ABERTO: "Aberto",
   EM_TRATATIVA: "Em tratativa",
   RESOLVIDO: "Resolvido",
 };
-export function SanitationWorkspace({ apiData: _apiData }: { apiData?: unknown }) {
+export function SanitationWorkspace({
+  apiData: _apiData,
+}: {
+  apiData?: unknown;
+}) {
   const apiPoints = Array.isArray(_apiData) ? _apiData : [];
   const [points, setPoints] = useState(
     apiPoints.length
@@ -23,15 +24,19 @@ export function SanitationWorkspace({ apiData: _apiData }: { apiData?: unknown }
           return {
             id: String(row.id ?? `api-${index}`),
             type: String(row.type ?? row.tipo ?? "Ocorrência ambiental"),
-            address: String(row.address ?? row.endereco ?? "Endereço não informado"),
+            address: String(
+              row.address ?? row.endereco ?? "Endereço não informado",
+            ),
             neighborhood: String(row.neighborhood ?? row.bairro ?? ""),
-            responsible: String(row.responsible ?? row.responsavel ?? "Não definido"),
+            responsible: String(
+              row.responsible ?? row.responsavel ?? "Não definido",
+            ),
             deadline: String(row.deadline ?? row.prazo ?? "2026-12-31"),
             status: (row.status ?? "ABERTO") as SanitationStatus,
             notes: String(row.notes ?? row.observacoes ?? ""),
           };
         })
-      : sanitationDemo,
+      : [],
   );
   const update = (id: string, status: SanitationStatus) =>
     setPoints((current) =>

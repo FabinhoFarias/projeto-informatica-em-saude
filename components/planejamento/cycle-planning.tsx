@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { PageHeading, Panel } from "@/components/plataforma/dashboard-ui";
-import { municipality, mappedTerritories } from "@/lib/territorios/demo-data";
 
 const options = [
   "Levantamento de índice",
@@ -12,6 +11,12 @@ const options = [
 ];
 
 export function CyclePlanning({ apiData: _apiData }: { apiData?: unknown }) {
+  const apiCycles = Array.isArray(_apiData) ? _apiData : [];
+  const municipalityName = "Lagoa de Itaenga";
+  const mappedTerritories = apiCycles
+    .map((cycle) => (cycle as Record<string, unknown>).territories)
+    .flatMap((territories) => (Array.isArray(territories) ? territories : []))
+    .map((item) => ({ id: String(item), name: String(item) }));
   const [name, setName] = useState("Ciclo operacional 2026.2");
   const [start, setStart] = useState("2026-06-01");
   const [end, setEnd] = useState("2026-07-31");
@@ -51,7 +56,7 @@ export function CyclePlanning({ apiData: _apiData }: { apiData?: unknown }) {
   return (
     <div>
       <PageHeading
-        eyebrow={`${municipality.name} · gestão operacional`}
+        eyebrow={`${municipalityName} · gestão operacional`}
         title="Planejamento por ciclo"
         description="Organize um único ciclo com várias atividades, territórios e ACEs antes da publicação do trabalho de campo."
       />

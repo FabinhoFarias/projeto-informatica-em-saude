@@ -1,13 +1,40 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { demoTerritories } from "@/lib/priorizacao/demo-data";
-import { evaluateDemoTerritory } from "@/lib/priorizacao/rules";
-import type { ReviewStatus } from "@/lib/priorizacao/types";
 import { TerritoryHousesPanel } from "@/components/territorios/territory-houses-panel";
 
-export function TerritorialPrioritization({ apiData: _apiData }: { apiData?: unknown }) {
-  const [selectedId, setSelectedId] = useState(demoTerritories[0].id);
+type ReviewStatus =
+  | "Aguardando análise"
+  | "Encaminhado à coordenação"
+  | "Sem prioridade"
+  | "Mantido em observação";
+type Territory = {
+  id: string;
+  nome: string;
+  distrito?: string;
+  notificacoesRecentes?: number;
+  notificacoesAnteriores?: number;
+  focosInformados?: number;
+  imoveisPendentes?: number;
+};
+function evaluateTerritory(item: Territory) {
+  const score =
+    Number(item.notificacoesRecentes ?? 0) + Number(item.focosInformados ?? 0);
+  return {
+    nivel: score >= 10 ? "Revisão prioritária" : "Acompanhar",
+    motivos: ["Indicadores territoriais recebidos pela API."],
+    sugestao: "Validar com a equipe municipal.",
+  };
+}
+export function TerritorialPrioritization({
+  apiData: _apiData,
+}: {
+  apiData?: unknown;
+}) {
+  const demoTerritories = (
+    Array.isArray(_apiData) ? _apiData : []
+  ) as Territory[];
+  const [selectedId, setSelectedId] = useState(demoTerritories[0]?.id ?? "");
   const [decisions, setDecisions] = useState<Record<string, ReviewStatus>>({});
   const selected = useMemo(
     () =>
@@ -15,12 +42,20 @@ export function TerritorialPrioritization({ apiData: _apiData }: { apiData?: unk
       demoTerritories[0],
     [selectedId],
   );
-  const result = evaluateDemoTerritory(selected);
+  const result = selected
+    ? evaluateTerritory(selected)
+    : { nivel: "Acompanhar", motivos: [], sugestao: "" };
   const status = decisions[selected.id] ?? "Aguardando análise";
   const priorityCount = demoTerritories.filter(
-    (item) => evaluateDemoTerritory(item).nivel === "Revisão prioritária",
+    (item) => evaluateTerritory(item).nivel === "Revisão prioritária",
   ).length;
 
+  if (!selected)
+    return (
+      <p className="text-sm text-slate-600">
+        Nenhum território retornado pela API.
+      </p>
+    );
   return (
     <div className="space-y-6">
       <header className="border-b border-slate-200 pb-6">
@@ -74,7 +109,7 @@ export function TerritorialPrioritization({ apiData: _apiData }: { apiData?: unk
           </p>
           <div className="mt-4 space-y-2">
             {demoTerritories.map((item) => {
-              const evaluation = evaluateDemoTerritory(item);
+              const evaluation = evaluateTerritory(item);
               return (
                 <button
                   key={item.id}
@@ -128,14 +163,20 @@ export function TerritorialPrioritization({ apiData: _apiData }: { apiData?: unk
           <dl className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
             <Fact
               label="Notificações atuais"
-              value={selected.notificacoesRecentes}
+              value={selected.notificacoesRecentes ?? 0}
             />
             <Fact
               label="Período anterior"
-              value={selected.notificacoesAnteriores}
+              value={selected.notificacoesAnteriores ?? 0}
             />
-            <Fact label="Focos informados" value={selected.focosInformados} />
-            <Fact label="Imóveis pendentes" value={selected.imoveisPendentes} />
+            <Fact
+              label="Focos informados"
+              value={selected.focosInformados ?? 0}
+            />
+            <Fact
+              label="Imóveis pendentes"
+              value={selected.imoveisPendentes ?? 0}
+            />
           </dl>
           <div className="mt-5 border-l-4 border-blue-600 bg-blue-50 p-4">
             <h3 className="text-sm font-bold text-blue-950">

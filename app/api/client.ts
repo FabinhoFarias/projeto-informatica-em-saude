@@ -2,7 +2,11 @@ import "server-only";
 import { connection } from "next/server";
 
 const configuredBaseUrl = process.env.API_BASE_URL?.replace(/\/$/, "");
-const baseUrl = configuredBaseUrl ?? "http://localhost:4000";
+const deploymentBaseUrl = process.env.VERCEL_URL
+  ? `https://${process.env.VERCEL_URL}`
+  : undefined;
+const baseUrl =
+  configuredBaseUrl ?? deploymentBaseUrl ?? "http://localhost:4000";
 const password = process.env.SENHA_DEMO ?? "vigia-demo-local";
 const tokenCache = new Map<string, { value: string; expiresAt: number }>();
 const pendingTokens = new Map<string, Promise<string>>();
@@ -47,15 +51,6 @@ export async function apiServerFetch<T>(
   options: RequestInit = {},
   role = "GESTOR",
 ): Promise<T> {
-  if (
-    process.env.NODE_ENV === "production" &&
-    process.env.VERCEL === "1" &&
-    !configuredBaseUrl
-  ) {
-    throw new Error(
-      "API_BASE_URL não foi configurada no ambiente de produção.",
-    );
-  }
   // cacheComponents exige uma marcação explícita antes de dados dependentes
   // de tempo, autenticação ou rede.
   await connection();

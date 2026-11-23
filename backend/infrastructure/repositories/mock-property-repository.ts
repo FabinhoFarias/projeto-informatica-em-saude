@@ -1,5 +1,5 @@
-import type { PropertyRepository } from "@/backend/domain/repositories/property-repository";
-import { properties } from "@/backend/infrastructure/mock-data/properties";
+import type { PropertyRepository } from "../../domain/repositories/property-repository";
+import { properties } from "../mock-data/properties";
 
 export class MockPropertyRepository implements PropertyRepository {
   async list(

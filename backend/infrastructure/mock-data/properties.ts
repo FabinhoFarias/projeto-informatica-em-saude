@@ -1,4 +1,4 @@
-import type { Property } from "@/backend/domain/entities/property";
+import type { Property } from "../../domain/entities/property";
 
 const streets = ["Rua das Palmeiras", "Travessa do Sol", "Rua do Açude"];
 const types: Property["type"][] = [

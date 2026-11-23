@@ -292,8 +292,7 @@ export function VisitsWorkspace({
               }`}
             >
               {items.map((property) => {
-                const state =
-                  outcome(property, cycle);
+                const state = outcome(property, cycle);
                 const visit = visitInCycle(property, cycle);
                 const deposits = visit
                   ? Object.values(visit.formulario.depositos).reduce(

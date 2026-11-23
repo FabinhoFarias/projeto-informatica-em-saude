@@ -8,7 +8,17 @@ import {
 } from "@/components/digitacao/manual-entry-form";
 import { PageHeading, Panel } from "@/components/plataforma/dashboard-ui";
 
-export function DigitizationWorkspace({ apiData: _apiData }: { apiData?: unknown }) {
+export function DigitizationWorkspace({
+  apiData: _apiData,
+}: {
+  apiData?: unknown;
+}) {
+  const properties =
+    _apiData && typeof _apiData === "object" && "properties" in _apiData
+      ? Array.isArray((_apiData as { properties?: unknown }).properties)
+        ? (_apiData as { properties: unknown[] }).properties
+        : []
+      : [];
   const [entries, setEntries] = useState<ManualEntry[]>([]);
   return (
     <div className="min-w-0">
@@ -19,6 +29,7 @@ export function DigitizationWorkspace({ apiData: _apiData }: { apiData?: unknown
       />
       <div className="space-y-5">
         <ManualEntryForm
+          properties={properties}
           onSave={(entry) => setEntries((current) => [entry, ...current])}
         />
         {entries.length > 0 && (

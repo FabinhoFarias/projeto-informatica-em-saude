@@ -23,7 +23,8 @@ export function LaboratoryWorkspace({
 }: {
   initialSamples?: LaboratorySampleMock[];
 }) {
-  const [samples, setSamples] = useState<LaboratorySampleMock[]>(initialSamples);
+  const [samples, setSamples] =
+    useState<LaboratorySampleMock[]>(initialSamples);
   const [selectedId, setSelectedId] = useState(samples[0]?.id ?? "");
   const [filter, setFilter] = useState<SampleFilter>("PENDENTES");
   const selected =

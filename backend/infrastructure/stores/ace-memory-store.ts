@@ -11,7 +11,8 @@ const visits: StoredRecord[] = Array.from(
     imovelId: `property-${index + 1}`,
     aceId: demoAceIds[index % demoAceIds.length],
     cicloId: "ciclo-2026-6",
-    acesso: index % 17 === 0 ? "FECHADO" : "REALIZADO",
+    acesso:
+      index % 19 === 0 ? "RECUSA" : index % 17 === 0 ? "FECHADO" : "REALIZADO",
     statusConteudo: "CONCLUIDO",
     status: "SINCRONIZADO",
     origem: "MOCK_SEED",
@@ -20,7 +21,17 @@ const visits: StoredRecord[] = Array.from(
 );
 const occurrences: StoredRecord[] = [];
 const attachments: StoredRecord[] = [];
-const returns: StoredRecord[] = [];
+const returns: StoredRecord[] = visits
+  .filter((visit) => visit.acesso === "RECUSA" || visit.acesso === "FECHADO")
+  .map((visit, index) => ({
+    id: `retorno-seed-${index + 1}`,
+    imovelId: visit.imovelId,
+    aceId: visit.aceId,
+    cicloId: visit.cicloId,
+    motivo: visit.acesso === "RECUSA" ? "RECUSA" : "FECHADO",
+    status: "PENDENTE",
+    createdAt: visit.createdAt,
+  }));
 const assignments: StoredRecord[] = Array.from({ length: 12 }, (_, index) => ({
   id: `atribuicao-${index + 1}`,
   quarteiraoId: `quarteirao-${index + 1}`,
@@ -113,11 +124,14 @@ export const aceMemoryStore = {
     returns.push(item);
     return item;
   },
-  returns(filters: { aceId?: string; propertyId?: string } = {}) {
+  returns(
+    filters: { aceId?: string; propertyId?: string; cicloId?: string } = {},
+  ) {
     return returns.filter(
       (item) =>
         (!filters.aceId || item.aceId === filters.aceId) &&
-        (!filters.propertyId || item.imovelId === filters.propertyId),
+        (!filters.propertyId || item.imovelId === filters.propertyId) &&
+        (!filters.cicloId || item.cicloId === filters.cicloId),
     );
   },
   upsertAssignment(payload: Record<string, unknown>) {

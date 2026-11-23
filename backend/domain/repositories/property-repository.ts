@@ -1,4 +1,4 @@
-import type { Property } from "@/backend/domain/entities/property";
+import type { Property } from "../entities/property";
 
 export interface PropertyRepository {
   list(filters?: {

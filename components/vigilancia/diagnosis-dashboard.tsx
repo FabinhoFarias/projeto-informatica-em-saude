@@ -8,9 +8,25 @@ import {
 } from "@/components/plataforma/dashboard-ui";
 import { RiskBadge } from "@/components/territorios/risk-badge";
 import { PermissionGate } from "@/components/identidade/permission-gate";
-import { municipality, neighborhoods } from "@/lib/territorios/demo-data";
 import { formatNumber } from "@/lib/plataforma/format";
-import type { MunicipalityConfiguration } from "@/lib/territorios/types";
+
+type DiagnosisNeighborhood = {
+  id: string;
+  name: string;
+  district: string;
+  city: string;
+  population: number;
+  suspectedCases: number;
+  ratePer100k: number;
+  risk: "Baixo" | "Médio" | "Alto" | "Crítico";
+  density: number;
+  vectorFoci: number;
+  apsVisits: number;
+  apsCases: number;
+  trigger: boolean;
+  [key: string]: string | number | boolean;
+};
+type MunicipalityConfiguration = { name: string; state: string };
 
 const weekLabels = [
   "SE 31",
@@ -43,11 +59,19 @@ function pointsFor(values: number[]) {
     .join(" ");
 }
 
-export function DiagnosisDashboard({ apiData: _apiData }: { apiData?: unknown }) {
+export function DiagnosisDashboard({
+  apiData: _apiData,
+}: {
+  apiData?: unknown;
+}) {
   const [sortKey, setSortKey] = useState<SortKey>("vectorFoci");
   const [ascending, setAscending] = useState(false);
   const [sensitivity, setSensitivity] = useState(60);
-  const activeNeighborhoods = neighborhoods;
+  const activeNeighborhoods = useMemo(
+    () => (Array.isArray(_apiData) ? _apiData : []) as DiagnosisNeighborhood[],
+    [_apiData],
+  );
+  const municipality = { name: "Lagoa de Itaenga", state: "PE" };
 
   const sortedNeighborhoods = useMemo(
     () =>
@@ -448,7 +472,7 @@ export function DiagnosisDashboard({ apiData: _apiData }: { apiData?: unknown })
 }
 
 function downloadTerritorialData(
-  rows: typeof neighborhoods,
+  rows: DiagnosisNeighborhood[],
   municipality: MunicipalityConfiguration,
 ) {
   const headers = [

@@ -1,4 +1,4 @@
-import type { PropertyRepository } from "@/backend/domain/repositories/property-repository";
+import type { PropertyRepository } from "../../domain/repositories/property-repository";
 
 export class ListPropertiesUseCase {
   constructor(private readonly properties: PropertyRepository) {}

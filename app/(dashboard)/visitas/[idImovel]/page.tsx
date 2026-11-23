@@ -14,10 +14,16 @@ export default async function PropertyVisitPage({
   params: Promise<{ idImovel: string }>;
   searchParams: Promise<{ ciclo?: string }>;
 }) {
-  const [{ idImovel }, query] = await Promise.all([params, searchParams]);
+  const [{ idImovel }, query, stock] = await Promise.all([
+    params,
+    searchParams,
+    apiServerFetch<unknown[]>("/v1/estoque"),
+  ]);
   let property: SectorPropertyMock;
   try {
-    property = await apiServerFetch<SectorPropertyMock>(`/v1/imoveis/${idImovel}`);
+    property = await apiServerFetch<SectorPropertyMock>(
+      `/v1/imoveis/${idImovel}`,
+    );
   } catch {
     notFound();
   }
@@ -25,5 +31,12 @@ export default async function PropertyVisitPage({
     query.ciclo ??
     `${new Date().getFullYear()}-${Math.floor(new Date().getMonth() / 2) + 1}`;
   const saveVisit = saveVisitThroughApi.bind(null, idImovel, cycle);
-  return <PropertyVisitForm property={property} cycle={cycle} saveVisit={saveVisit} />;
+  return (
+    <PropertyVisitForm
+      property={property}
+      cycle={cycle}
+      saveVisit={saveVisit}
+      stockItems={stock}
+    />
+  );
 }

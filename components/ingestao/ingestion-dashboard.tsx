@@ -3,12 +3,14 @@
 import { useRef, useState } from "react";
 import { readSheet } from "read-excel-file/browser";
 import { PageHeading, Panel } from "@/components/plataforma/dashboard-ui";
-import { municipality } from "@/lib/territorios/demo-data";
-import { demoHeaders, demoRows } from "@/lib/ingestao/demo-data";
 import { parseCsv, resolveNeighborhood } from "@/lib/ingestao/processor";
 import type { ImportResult } from "@/lib/ingestao/types";
 
-export function IngestionDashboard({ apiData: _apiData }: { apiData?: unknown }) {
+export function IngestionDashboard({
+  apiData: _apiData,
+}: {
+  apiData?: unknown;
+}) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [source, setSource] = useState("e-SUS PEC");
   const [file, setFile] = useState<File | null>(null);
@@ -126,13 +128,13 @@ export function IngestionDashboard({ apiData: _apiData }: { apiData?: unknown })
     }
   };
 
-  const previewHeaders = result?.headers ?? demoHeaders;
-  const previewRows = result?.rows ?? demoRows;
+  const previewHeaders = result?.headers ?? [];
+  const previewRows = result?.rows ?? [];
 
   return (
     <div>
       <PageHeading
-        eyebrow={`${municipality.prefeitura} · Entrada de dados`}
+        eyebrow="Prefeitura de Lagoa de Itaenga · Entrada de dados"
         title="Ingestão de dados"
         description="Importe planilhas de e-SUS APS, SINAN ou SIM e confira o esquema e a qualidade dos registros antes da consolidação."
       />

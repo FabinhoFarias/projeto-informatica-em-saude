@@ -5,16 +5,33 @@ import { HotspotWorkspace } from "@/components/operacao/hotspot-workspace";
 import { GoogleMapViewport } from "@/components/operacao/google-map-viewport";
 import { MapViewport } from "@/components/operacao/map-viewport";
 import { PageHeading } from "@/components/plataforma/dashboard-ui";
-import { sectorPropertiesDemo } from "@/lib/visitas/demo-data";
 
 const hasGoogleMapsKey = Boolean(process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY);
 
 export function MapsWorkspace({ apiData: _apiData }: { apiData?: unknown }) {
+  const apiProperties = Array.isArray(
+    (_apiData as { properties?: unknown[] } | undefined)?.properties,
+  )
+    ? (_apiData as { properties: unknown[] }).properties
+    : [];
+  const properties = apiProperties.map((raw, index) => {
+    const row = raw as Record<string, unknown>;
+    return {
+      id: String(row.id ?? `property-${index}`),
+      codigoLocal: String(row.codigoLocal ?? row.id ?? index + 1),
+      logradouro: String(row.logradouro ?? row.endereco ?? ""),
+      numero: String(row.numero ?? ""),
+      quarteirao: String(row.quarteirao ?? ""),
+      sequenciaPercurso: Number(row.sequenciaPercurso ?? index + 1),
+      pontoMapa: (row.pontoMapa as { x: number; y: number } | undefined) ?? {
+        x: 10 + ((index * 17) % 80),
+        y: 15 + ((index * 29) % 70),
+      },
+    };
+  });
   const [layer, setLayer] = useState<"imoveis" | "hotspots">("imoveis");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const selected = sectorPropertiesDemo.find(
-    (property) => property.id === selectedId,
-  );
+  const selected = properties.find((property) => property.id === selectedId);
 
   return (
     <div className="min-w-0">
@@ -75,7 +92,7 @@ export function MapsWorkspace({ apiData: _apiData }: { apiData?: unknown }) {
               />
             </svg>
             {!hasGoogleMapsKey &&
-              sectorPropertiesDemo.map((property) => (
+              properties.map((property) => (
                 <button
                   key={property.id}
                   type="button"
