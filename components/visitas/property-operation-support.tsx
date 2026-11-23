@@ -22,7 +22,7 @@ export function PropertyOperationSupport({
   readOnly?: boolean;
 }) {
   return (
-    <div className="mb-4 space-y-4">
+    <div className="flex flex-col gap-4">
       <fieldset disabled={readOnly} className="contents">
         <div className="grid items-start gap-4 xl:grid-cols-2">
           {property.ultimaVisita && <TimelinePanel property={property} />}

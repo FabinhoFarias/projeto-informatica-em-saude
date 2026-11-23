@@ -8,55 +8,166 @@ import {
   PageHeading,
   Panel,
 } from "@/components/plataforma/dashboard-ui";
-import { municipality, neighborhoods } from "@/lib/territorios/demo-data";
-import { municipalClientsDemo } from "@/lib/administracao/demo-data";
-import { sectorPropertiesDemo } from "@/lib/visitas/demo-data";
-import { initialUsers } from "@/lib/identidade/demo-users";
+// O componente recebe todos os dados pela API através de ManagerDashboardData.
 
-function getCoverageRows() {
-  return neighborhoods.map((neighborhood, index) => {
-    const properties = Math.max(18, 28 + ((index * 13) % 64));
-    const coverage = Math.min(100, 42 + ((index * 11) % 54));
-    const visited = Math.round((properties * coverage) / 100);
-    return {
-      ...neighborhood,
-      properties,
-      coverage,
-      visited,
-      pending: properties - visited,
-      sectors: 1 + (index % 4),
-    };
-  });
+function coverageColor(coverage: number) {
+  if (coverage >= 80) return "#047857";
+  if (coverage >= 60) return "#f59e0b";
+  return "#ef4444";
 }
 
-function getAceCoverageRows() {
-  return initialUsers
-    .filter((user) => user.role === "AGENTE_CAMPO")
-    .map((user, index) => ({
-      ...user,
-      avatarUrl:
-        user.avatarUrl ??
-        `https://randomuser.me/api/portraits/men/${20 + index}.jpg`,
-      assigned: 78 + index * 16,
-      visited: 54 + index * 19,
-      coverage: 62 + index * 11,
-      pending: 24 - index * 3,
-    }));
+export interface ManagerDashboardData {
+  coverage: {
+    atribuidos: number;
+    visitados: number;
+    pendentes: number;
+    percentual: number;
+  };
+  territories: Array<{
+    id: string;
+    name: string;
+    district?: string;
+    cobertura?: number;
+    status?: string;
+    coverage?: number;
+    properties?: number;
+    visited?: number;
+  }>;
+  aces: Array<{
+    id: string;
+    nome: string;
+    status?: string;
+    cobertura?: number;
+    assigned?: number;
+    visited?: number;
+    pending?: number;
+    avatarUrl?: string;
+    lastSync?: string;
+  }>;
+  blocks: Array<{
+    id: string;
+    numero: number;
+    bairro: string;
+    aceId?: string | null;
+  }>;
+  propertiesTotal: number;
+  municipality: { name: string; state: string; prefeitura: string };
+  neighborhoods: Array<{
+    id: string;
+    name: string;
+    district: string;
+    population: number;
+    suspectedCases: number;
+    forecastCases: number;
+    ratePer100k: number;
+    incidenceProbability: number;
+    risk: "Baixo" | "Médio" | "Alto" | "Crítico";
+    vectorFoci: number;
+    apsCases: number;
+    apsStatus: string;
+  }>;
+  properties: Array<{
+    id: string;
+    neighborhood: string;
+    quarteirao?: number | string;
+    lastVisitStatus?: string;
+  }>;
+  dailyReport: {
+    dates: string[];
+    latest?: { visitas?: number; retornos?: number; amostras?: number };
+  };
+  fieldSummary: { received: number; pending: number; assigned: number };
 }
 
-export function ManagerOperationsDashboard() {
-  const institutionPrimary =
-    municipalClientsDemo.find((client) => client.id === "lagoa-de-itaenga")
-      ?.branding.primaryColor ?? "#006b4f";
+export function ManagerOperationsDashboard({
+  apiData,
+}: {
+  apiData: ManagerDashboardData;
+}) {
+  const institutionPrimary = "#006b4f";
   const [search, setSearch] = useState("");
-  const [mode, setMode] = useState<"BAIRROS" | "SETORES">("BAIRROS");
+  const [mode, setMode] = useState<"BAIRROS" | "SETORES" | "QUARTEIROES">(
+    "BAIRROS",
+  );
   const [selectedAceId, setSelectedAceId] = useState<string | null>(null);
-  const rows = useMemo(() => getCoverageRows(), []);
-  const aceRows = useMemo(() => getAceCoverageRows(), []);
+  const rows = useMemo(() => {
+    return apiData.territories.map((territory) => {
+      const coverage = territory.cobertura ?? territory.coverage ?? 0;
+      const properties =
+        territory.properties ??
+        Math.max(
+          1,
+          Math.round(
+            apiData.propertiesTotal / Math.max(1, apiData.territories.length),
+          ),
+        );
+      const visited =
+        territory.visited ?? Math.round((properties * coverage) / 100);
+      return {
+        ...territory,
+        name: territory.name,
+        properties,
+        coverage,
+        visited,
+        pending: properties - visited,
+        sectors: apiData.blocks.filter(
+          (block) => block.bairro === territory.name && Boolean(block.aceId),
+        ).length,
+      };
+    });
+  }, [apiData]);
+  const aceRows = useMemo(() => {
+    return apiData.aces.map((user, index) => ({
+      id: user.id,
+      name: user.nome,
+      role: "AGENTE_CAMPO",
+      territory: "Lagoa de Itaenga",
+      status: user.status ?? "ATIVO",
+      lastSync: "via API",
+      avatarUrl: `https://randomuser.me/api/portraits/men/${20 + index}.jpg`,
+      assigned:
+        user.assigned ??
+        Math.round(apiData.propertiesTotal / Math.max(1, apiData.aces.length)),
+      coverage: user.cobertura ?? 0,
+      visited:
+        user.visited ??
+        Math.round(
+          (apiData.propertiesTotal / Math.max(1, apiData.aces.length)) *
+            ((user.cobertura ?? 0) / 100),
+        ),
+      pending: user.pending ?? 0,
+    }));
+  }, [apiData]);
   const filtered = rows.filter((row) =>
-    row.name
+    String(row.name ?? "")
       .toLocaleLowerCase("pt-BR")
       .includes(search.toLocaleLowerCase("pt-BR")),
+  );
+  const blockRows = useMemo(
+    () =>
+      apiData.blocks.map((block) => {
+        const properties = apiData.properties.filter(
+          (property) => Number(property.quarteirao) === block.numero,
+        ).length;
+        const visited = apiData.properties.filter(
+          (property) =>
+            Number(property.quarteirao) === block.numero &&
+            property.lastVisitStatus,
+        ).length;
+        const coverage = properties
+          ? Math.round((visited / properties) * 100)
+          : 0;
+        return {
+          number: block.numero,
+          properties,
+          coverage,
+          visited,
+        };
+      }),
+    [apiData],
+  );
+  const filteredBlocks = blockRows.filter((block) =>
+    String(block.number).includes(search.trim()),
   );
   const properties = rows.reduce((sum, row) => sum + row.properties, 0);
   const visited = rows.reduce((sum, row) => sum + row.visited, 0);
@@ -68,7 +179,7 @@ export function ManagerOperationsDashboard() {
   return (
     <div>
       <PageHeading
-        eyebrow={`${municipality.prefeitura} · Operação de endemias`}
+        eyebrow={`${apiData.municipality.prefeitura} · Operação de endemias`}
         title="Cobertura de visitas"
         description="Acompanhe o avanço das visitas por bairro e setor, identifique pendências e organize a recuperação dos imóveis."
       />
@@ -253,7 +364,7 @@ export function ManagerOperationsDashboard() {
       >
         <div className="mb-5 grid gap-3 border border-slate-200 bg-slate-50 p-4 md:grid-cols-[1fr_auto]">
           <label className="text-xs font-semibold text-slate-700">
-            Buscar bairro ou setor
+            Buscar bairro, setor ou quarteirão
             <input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
@@ -262,7 +373,7 @@ export function ManagerOperationsDashboard() {
             />
           </label>
           <div className="flex items-end border border-slate-300 bg-white p-1">
-            {(["BAIRROS", "SETORES"] as const).map((item) => (
+            {(["BAIRROS", "SETORES", "QUARTEIROES"] as const).map((item) => (
               <button
                 key={item}
                 type="button"
@@ -274,64 +385,102 @@ export function ManagerOperationsDashboard() {
                 }
                 className={`min-h-9 px-4 text-xs font-semibold ${mode === item ? "text-white hover:brightness-90" : "text-slate-600 hover:bg-slate-100"}`}
               >
-                {item === "BAIRROS" ? "Bairros" : "Setores"}
+                {item === "BAIRROS"
+                  ? "Bairros"
+                  : item === "SETORES"
+                    ? "Setores"
+                    : "Quarteirões"}
               </button>
             ))}
           </div>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[760px] text-left text-sm">
-            <thead className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
-              <tr>
-                <th className="px-3 py-3">
-                  {mode === "BAIRROS" ? "Bairro" : "Setor"}
-                </th>
-                <th className="px-3 py-3">Área</th>
-                <th className="px-3 py-3 text-right">Setores</th>
-                <th className="px-3 py-3 text-right">Imóveis</th>
-                <th className="px-3 py-3">Cobertura</th>
-                <th className="px-3 py-3 text-right">Pendentes</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((row) => (
-                <tr
-                  key={row.id}
-                  className="border-b border-slate-100 last:border-0"
+        {mode === "QUARTEIROES" ? (
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6">
+            {filteredBlocks.map((block) => (
+              <article
+                key={block.number}
+                className="flex flex-col items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 text-center shadow-sm"
+              >
+                <div
+                  className="grid h-28 w-28 place-items-center rounded-full p-2"
+                  style={{
+                    background: `conic-gradient(${coverageColor(block.coverage)} ${block.coverage}%, #e2e8f0 ${block.coverage}% 100%)`,
+                  }}
+                  role="img"
+                  aria-label={`Quarteirão ${block.number}, ${block.coverage}% de cobertura`}
                 >
-                  <td className="px-3 py-3 font-semibold text-slate-900">
-                    {mode === "BAIRROS" ? row.name : `Setores de ${row.name}`}
-                  </td>
-                  <td className="px-3 py-3 text-slate-600">
-                    {row.district.replace("Área ", "")}
-                  </td>
-                  <td className="px-3 py-3 text-right text-slate-600">
-                    {row.sectors}
-                  </td>
-                  <td className="px-3 py-3 text-right text-slate-600">
-                    {row.visited}/{row.properties}
-                  </td>
-                  <td className="px-3 py-3">
-                    <div className="flex items-center gap-3">
-                      <div className="h-2 min-w-28 overflow-hidden rounded-full bg-slate-200">
-                        <div
-                          className={`h-full ${row.coverage >= 80 ? "bg-emerald-700" : row.coverage >= 60 ? "bg-amber-500" : "bg-red-500"}`}
-                          style={{ width: `${row.coverage}%` }}
-                        />
-                      </div>
-                      <span className="text-xs font-bold text-slate-700">
-                        {row.coverage}%
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-3 py-3 text-right font-semibold text-slate-700">
-                    {row.pending}
-                  </td>
+                  <div className="grid h-full w-full place-items-center rounded-full bg-white">
+                    <p className="text-3xl font-bold text-slate-950">
+                      {block.number}
+                    </p>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900">
+                    Quarteirão {block.number}
+                  </h3>
+                  <p className="mt-1 text-xs text-slate-600">
+                    {block.visited}/{block.properties} imóveis visitados
+                  </p>
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[760px] text-left text-sm">
+              <thead className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
+                <tr>
+                  <th className="px-3 py-3">
+                    {mode === "BAIRROS" ? "Bairro" : "Setor"}
+                  </th>
+                  <th className="px-3 py-3">Área</th>
+                  <th className="px-3 py-3 text-right">Setores</th>
+                  <th className="px-3 py-3 text-right">Imóveis</th>
+                  <th className="px-3 py-3">Cobertura</th>
+                  <th className="px-3 py-3 text-right">Pendentes</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {filtered.map((row) => (
+                  <tr
+                    key={row.id}
+                    className="border-b border-slate-100 last:border-0"
+                  >
+                    <td className="px-3 py-3 font-semibold text-slate-900">
+                      {mode === "BAIRROS" ? row.name : `Setores de ${row.name}`}
+                    </td>
+                    <td className="px-3 py-3 text-slate-600">
+                      {(row.district ?? "Urbana").replace("Área ", "")}
+                    </td>
+                    <td className="px-3 py-3 text-right text-slate-600">
+                      {row.sectors}
+                    </td>
+                    <td className="px-3 py-3 text-right text-slate-600">
+                      {row.visited}/{row.properties}
+                    </td>
+                    <td className="px-3 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="h-2 min-w-28 overflow-hidden rounded-full bg-slate-200">
+                          <div
+                            className={`h-full ${row.coverage >= 80 ? "bg-emerald-700" : row.coverage >= 60 ? "bg-amber-500" : "bg-red-500"}`}
+                            style={{ width: `${row.coverage}%` }}
+                          />
+                        </div>
+                        <span className="text-xs font-bold text-slate-700">
+                          {row.coverage}%
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-3 py-3 text-right font-semibold text-slate-700">
+                      {row.pending}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </Panel>
       <div className="mt-4 grid gap-4 lg:grid-cols-2">
         <Panel
@@ -353,15 +502,14 @@ export function ManagerOperationsDashboard() {
         </Panel>
         <Panel
           title="Origem dos indicadores"
-          description="Cobertura baseada no fluxo mockado da vigilância ambiental"
+          description="Cobertura baseada nos registros retornados pela API da vigilância ambiental"
         >
           <p className="text-sm leading-6 text-slate-600">
-            Os números representam visitas e imóveis cadastrados no ciclo. A
-            integração futura poderá substituir os mocks por dados do
-            aplicativo, relatórios de campo e sincronização dos ACEs.
+            Os números representam visitas e imóveis cadastrados no ciclo,
+            calculados a partir das atribuições e sincronizações da API.
           </p>
           <p className="mt-4 text-xs text-slate-500">
-            Imóveis de referência no protótipo: {sectorPropertiesDemo.length}
+            Imóveis retornados pela API: {apiData.propertiesTotal}
           </p>
         </Panel>
       </div>

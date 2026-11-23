@@ -6,44 +6,45 @@ import {
   Panel,
 } from "@/components/plataforma/dashboard-ui";
 import {
-  territoryReviewDemo,
+  type TerritoryReviewItem,
   type TerritoryReviewStatus,
 } from "@/lib/gestao/operations-data";
-import { initialUsers } from "@/lib/identidade/demo-users";
-import { mappedTerritories } from "@/lib/territorios/demo-data";
+
+export interface TerritoryReviewAce {
+  id: string;
+  name: string;
+  lastSync?: string;
+}
+
+export interface TerritoryReviewBlock {
+  id: string;
+  number: number;
+  neighborhood: string;
+  territoryId: string;
+  zone: string;
+  properties: number;
+}
 
 const labels: Record<TerritoryReviewStatus, string> = {
   VALIDADO: "Validado",
   DIVERGENCIA: "Divergência",
   CONFERIR: "Conferir",
 };
-export function TerritoryReview() {
-  const [items, setItems] = useState(territoryReviewDemo);
+export function TerritoryReview({
+  initialItems,
+  aces,
+  blocks,
+  initialAssignments,
+}: {
+  initialItems: TerritoryReviewItem[];
+  aces: TerritoryReviewAce[];
+  blocks: TerritoryReviewBlock[];
+  initialAssignments: Record<string, string>;
+}) {
+  const [items, setItems] = useState(initialItems);
   const [search, setSearch] = useState("");
-  const aces = initialUsers.filter((user) => user.role === "AGENTE_CAMPO");
-  const blocks = useMemo(
-    () =>
-      Array.from({ length: 30 }, (_, index) => {
-        const territory = mappedTerritories[index % mappedTerritories.length];
-        return {
-          id: `quarteirao-${index + 1}`,
-          number: index + 1,
-          neighborhood: territory.name,
-          territoryId: territory.id,
-          zone: territory.zone,
-          properties: 42 + ((index * 13) % 56),
-        };
-      }),
-    [],
-  );
-  const [assignments, setAssignments] = useState<Record<string, string>>(() =>
-    Array.from({ length: 30 }, (_, index) => index + 1).reduce<
-      Record<string, string>
-    >((result, number, index) => {
-      result[`quarteirao-${number}`] = aces[index % aces.length]?.id ?? "";
-      return result;
-    }, {}),
-  );
+  const [assignments, setAssignments] =
+    useState<Record<string, string>>(initialAssignments);
   const [blockSearch, setBlockSearch] = useState("");
   const [savingBlockId, setSavingBlockId] = useState<string | null>(null);
   const [syncLabels, setSyncLabels] = useState<Record<string, string>>({});

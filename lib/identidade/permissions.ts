@@ -10,6 +10,21 @@ export const roles = [
 
 export type Role = (typeof roles)[number];
 
+/** Rota inicial apresentada quando o usuário troca de perfil. */
+export const roleHomeRoutes: Record<Role, string> = {
+  ADMIN: "/painel",
+  GESTOR: "/painel",
+  EPIDEMIOLOGISTA: "/painel",
+  AGENTE_CAMPO: "/visitas",
+  LABORATORISTA: "/laboratorio",
+  DIGITADOR: "/digitacao-relatorios",
+  PROFISSIONAL_APS: "/painel",
+};
+
+export function getRoleHomeRoute(role: Role) {
+  return roleHomeRoutes[role];
+}
+
 export const roleLabels: Record<Role, string> = {
   ADMIN: "Administrador do Sistema",
   GESTOR: "Gestor de Saúde Municipal",

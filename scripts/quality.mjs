@@ -5,12 +5,13 @@ import { join } from "node:path";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const lock = join(root, ".quality.lock");
-const source = ["app", "components", "lib", "scripts"];
+const source = ["app", "components", "lib", "scripts", "tests"];
 const formatFiles = [
   "app/**/*.{ts,tsx,css}",
   "components/**/*.{ts,tsx}",
   "lib/**/*.{ts,tsx}",
   "scripts/*.{mjs,js,ts}",
+  "tests/*.{mjs,js,ts}",
   "*.{json,md,mjs,ts}",
 ];
 const commands = {
@@ -28,12 +29,13 @@ const commands = {
     ...formatFiles,
   ],
   test: [
-    "--experimental-strip-types",
+    "node_modules/tsx/dist/cli.mjs",
     "--test",
     "--test-concurrency=1",
-    "scripts/hotspots.test.mjs",
-    "scripts/marco-dois-rules.test.mjs",
-    "scripts/update-progress.test.js",
+    "tests/api.test.ts",
+    "tests/hotspots.test.mjs",
+    "tests/marco-dois-rules.test.mjs",
+    "tests/update-progress.test.js",
   ],
 };
 const requested = process.argv[2] ?? "all";
@@ -58,9 +60,12 @@ try {
 try {
   for (const step of steps) {
     const disk = statfsSync(root);
-    if (disk.bavail * disk.bsize < 10 * 1024 ** 3) {
+    // Testes unitários e de contrato usam um servidor efêmero e não precisam
+    // do mesmo espaço reservado para build/formatação em massa.
+    const minimumFreeGiB = step === "test" || step === "typecheck" ? 1 : 10;
+    if (disk.bavail * disk.bsize < minimumFreeGiB * 1024 ** 3) {
       throw new Error(
-        "Verificação cancelada: são necessários 10 GiB livres no volume do projeto.",
+        `Verificação cancelada: são necessários ${minimumFreeGiB} GiB livres no volume do projeto.`,
       );
     }
     console.log(

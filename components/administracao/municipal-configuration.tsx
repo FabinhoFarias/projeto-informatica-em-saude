@@ -23,7 +23,7 @@ import {
 const fieldClass =
   "mt-1 h-10 w-full border border-slate-300 bg-white px-3 text-sm outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100";
 
-export function MunicipalConfiguration() {
+export function MunicipalConfiguration({ apiData: _apiData }: { apiData?: unknown }) {
   const [clients, setClients] = useState<MunicipalClientMock[]>(() =>
     structuredClone(municipalClientsDemo),
   );

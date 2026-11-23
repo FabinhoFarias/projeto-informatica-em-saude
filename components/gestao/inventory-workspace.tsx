@@ -6,8 +6,23 @@ import {
   Panel,
 } from "@/components/plataforma/dashboard-ui";
 import { stockDemo } from "@/lib/gestao/operations-data";
-export function InventoryWorkspace() {
-  const [items, setItems] = useState(stockDemo);
+export function InventoryWorkspace({ apiData: _apiData }: { apiData?: unknown }) {
+  const apiItems = Array.isArray(_apiData) ? _apiData : [];
+  const [items, setItems] = useState(
+    apiItems.length
+      ? apiItems.map((item, index) => {
+          const row = item as Record<string, unknown>;
+          return {
+            id: String(row.id ?? `api-${index}`),
+            name: String(row.name ?? row.nome ?? "Item de estoque"),
+            unit: String(row.unit ?? row.unidade ?? "unidade"),
+            balance: Number(row.balance ?? row.saldo ?? 0),
+            minimum: Number(row.minimum ?? row.minimo ?? 0),
+            consumed: Number(row.consumed ?? row.consumo ?? 0),
+          };
+        })
+      : stockDemo,
+  );
   const low = items.filter((item) => item.balance < item.minimum).length;
   return (
     <div>

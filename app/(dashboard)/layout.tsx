@@ -1,6 +1,9 @@
 import { Suspense, type ReactNode } from "react";
 import { DashboardShell } from "@/components/plataforma/dashboard-shell";
 
+// O painel depende da API em tempo de requisição e não deve ser pré-renderizado.
+export const instant = false;
+
 function DashboardLoading() {
   return (
     <div

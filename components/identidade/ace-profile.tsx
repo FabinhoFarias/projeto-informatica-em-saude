@@ -7,20 +7,21 @@ import {
   Panel,
   MetricCard,
 } from "@/components/plataforma/dashboard-ui";
-import { initialUsers } from "@/lib/identidade/demo-users";
 import { VisitsWorkspace } from "@/components/visitas/visits-workspace";
+import type { SectorPropertyMock } from "@/lib/visitas/demo-data";
 
-export function AceProfile({ id }: { id: string }) {
-  const ace = initialUsers.find(
-    (user) => user.id === id && user.role === "AGENTE_CAMPO",
-  );
+export function AceProfile({ ace, history, properties }: {
+  ace: { id: string; nome: string; status: string; funcao: string } | null;
+  history: { visitados: number; atribuidos: number; pendentes: number; cobertura: number; retornos: unknown[] };
+  properties: SectorPropertyMock[];
+}) {
   if (!ace)
     return (
       <div className="border border-red-200 bg-red-50 p-5 text-sm text-red-800">
         ACE não encontrado.
       </div>
     );
-  const stats = { assigned: 126, visited: 91, coverage: 72, pending: 35 };
+  const stats = { assigned: history.atribuidos, visited: history.visitados, coverage: history.cobertura, pending: history.pendentes };
   const target = 80;
   const coverageBand =
     stats.coverage >= target
@@ -38,7 +39,7 @@ export function AceProfile({ id }: { id: string }) {
     <div>
       <PageHeading
         eyebrow="Gestão de campo · perfil do ACE"
-        title={ace.name}
+        title={ace.nome}
         description="Histórico operacional, cobertura territorial e registros do ciclo selecionado."
         action={
           <Link
@@ -52,20 +53,20 @@ export function AceProfile({ id }: { id: string }) {
       <section className="mb-5 flex flex-wrap items-center gap-4 border border-slate-200 bg-white p-5">
         <Image
           src={
-            ace.avatarUrl ?? "https://randomuser.me/api/portraits/men/32.jpg"
+            "https://randomuser.me/api/portraits/men/32.jpg"
           }
-          alt={`Foto de ${ace.name}`}
+          alt={`Foto de ${ace.nome}`}
           width={72}
           height={72}
           className="h-[72px] w-[72px] rounded-full object-cover"
         />
         <div>
-          <h2 className="text-xl font-bold text-slate-950">{ace.name}</h2>
+          <h2 className="text-xl font-bold text-slate-950">{ace.nome}</h2>
           <p className="text-sm text-slate-600">
-            {ace.territory} · {ace.municipality}
+            Operação de campo · Lagoa de Itaenga
           </p>
           <p className="mt-1 text-xs text-slate-500">
-            Última sincronização: {ace.lastSync ?? "sem registro"} · Status:{" "}
+            Última sincronização: via API · Status:{" "}
             {ace.status}
           </p>
         </div>
@@ -140,9 +141,10 @@ export function AceProfile({ id }: { id: string }) {
       </Panel>
       <section className="mb-5 border-t border-slate-300 pt-5">
         <VisitsWorkspace
-          eyebrow={`Operação acompanhada · ${ace.name}`}
+          eyebrow={`Operação acompanhada · ${ace.nome}`}
           title="Imóveis e visitas do ACE"
           description="A mesma visão operacional usada pelo ACE: ciclo, quarteirão, rua, situação da visita e acesso à ficha do imóvel."
+          properties={properties}
         />
       </section>
       <div className="max-w-2xl">
@@ -153,7 +155,7 @@ export function AceProfile({ id }: { id: string }) {
         >
           <div className="w-full overflow-x-auto overscroll-x-contain">
             <div className="min-w-[280px] space-y-2">
-              {(ace.operationalFunctions ?? ["CAMPO"]).map((item) => (
+              {[ace.funcao || "CAMPO"].map((item) => (
                 <div
                   key={item}
                   className="break-words border border-slate-200 bg-slate-50 p-3 text-sm font-medium text-slate-700"

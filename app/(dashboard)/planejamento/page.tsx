@@ -1,5 +1,9 @@
 import { CyclePlanning } from "@/components/planejamento/cycle-planning";
+import { apiServices } from "@/app/api/services";
 
-export default function PlanejamentoPage() {
-  return <CyclePlanning />;
+export const instant = false;
+
+export default async function PlanejamentoPage() {
+  const cycles = await apiServices.cycles();
+  return <CyclePlanning apiData={cycles} />;
 }

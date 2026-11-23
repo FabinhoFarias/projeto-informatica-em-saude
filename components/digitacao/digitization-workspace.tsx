@@ -8,7 +8,7 @@ import {
 } from "@/components/digitacao/manual-entry-form";
 import { PageHeading, Panel } from "@/components/plataforma/dashboard-ui";
 
-export function DigitizationWorkspace() {
+export function DigitizationWorkspace({ apiData: _apiData }: { apiData?: unknown }) {
   const [entries, setEntries] = useState<ManualEntry[]>([]);
   return (
     <div className="min-w-0">

@@ -1,38 +1,5 @@
-import type { Property } from "@/backend/domain/entities/property";
 import type { PropertyRepository } from "@/backend/domain/repositories/property-repository";
-
-const properties: Property[] = [
-  {
-    id: "property-1",
-    number: "10",
-    street: "Rua das Palmeiras",
-    neighborhood: "Centro",
-    sector: "Setor 02",
-    block: 1,
-    type: "RESIDENCIAL",
-    assignedAceId: "u-4",
-  },
-  {
-    id: "property-2",
-    number: "38",
-    street: "Rua das Palmeiras",
-    neighborhood: "Centro",
-    sector: "Setor 02",
-    block: 1,
-    type: "COMERCIAL",
-    assignedAceId: "u-5",
-  },
-  {
-    id: "property-3",
-    number: "10",
-    street: "Rua do Açude",
-    neighborhood: "Nova Itaenga",
-    sector: "Setor 04",
-    block: 10,
-    type: "PREDIO",
-    assignedAceId: "u-10",
-  },
-];
+import { properties } from "@/backend/infrastructure/mock-data/properties";
 
 export class MockPropertyRepository implements PropertyRepository {
   async list(

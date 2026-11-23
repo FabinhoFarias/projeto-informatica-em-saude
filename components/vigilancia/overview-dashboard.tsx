@@ -7,20 +7,12 @@ import {
   PageHeading,
   Panel,
 } from "@/components/plataforma/dashboard-ui";
-import { RiskBadge } from "@/components/territorios/risk-badge";
 import { PermissionGate } from "@/components/identidade/permission-gate";
 import { useRole } from "@/components/identidade/rbac-context";
-import { municipality, neighborhoods } from "@/lib/territorios/demo-data";
-import { formatNumber } from "@/lib/plataforma/format";
-import { recommendationsFor } from "@/lib/priorizacao/recommendations";
-import { riskColors } from "@/lib/territorios/risk";
-import type { Neighborhood } from "@/lib/territorios/types";
-import { ManagerOperationsDashboard } from "@/components/vigilancia/manager-operations-dashboard";
-import { sectorPropertiesDemo } from "@/lib/visitas/demo-data";
 import {
-  availableDailyReportDates,
-  defaultDailyReportDate,
-} from "@/lib/visitas/daily-report";
+  ManagerOperationsDashboard,
+  type ManagerDashboardData,
+} from "@/components/vigilancia/manager-operations-dashboard";
 
 type SortKey = "incidenceProbability" | "forecastCases" | "name" | "vectorFoci";
 
@@ -38,7 +30,7 @@ const sortOptions: { value: SortKey; label: string }[] = [
 ];
 
 function projectedCasesFor(
-  neighborhood: Neighborhood,
+  neighborhood: DashboardNeighborhood,
   weeks: number,
   condition: string,
 ) {
@@ -55,6 +47,55 @@ function projectedCasesFor(
   );
 }
 
+type DashboardNeighborhood = ManagerDashboardData["neighborhoods"][number];
+
+function formatNumber(value: number) {
+  return new Intl.NumberFormat("pt-BR").format(value);
+}
+
+function dashboardRiskColor(risk: DashboardNeighborhood["risk"]) {
+  return {
+    foreground:
+      risk === "Crítico" || risk === "Alto"
+        ? "#b91c1c"
+        : risk === "Médio"
+          ? "#b45309"
+          : "#047857",
+    background:
+      risk === "Crítico" || risk === "Alto"
+        ? "#fee2e2"
+        : risk === "Médio"
+          ? "#fef3c7"
+          : "#d1fae5",
+  };
+}
+
+function DashboardRiskBadge({ risk }: { risk: DashboardNeighborhood["risk"] }) {
+  const colors = dashboardRiskColor(risk);
+  return (
+    <span
+      className="inline-flex items-center gap-2 px-2.5 py-1 text-xs font-semibold"
+      style={{ color: colors.foreground, backgroundColor: colors.background }}
+    >
+      <span
+        className="h-1.5 w-1.5 rounded-full"
+        style={{ backgroundColor: colors.foreground }}
+      />
+      {risk}
+    </span>
+  );
+}
+
+function recommendationsFor(neighborhood: DashboardNeighborhood) {
+  return neighborhood.risk === "Crítico" || neighborhood.risk === "Alto"
+    ? [
+        "Priorizar visitas de campo",
+        "Revisar focos e imóveis pendentes",
+        "Validar dados com a vigilância municipal",
+      ]
+    : ["Manter monitoramento territorial", "Reforçar orientação preventiva"];
+}
+
 function normalizeSearchText(value: string) {
   return value
     .normalize("NFD")
@@ -62,15 +103,20 @@ function normalizeSearchText(value: string) {
     .toLocaleLowerCase("pt-BR");
 }
 
-export function OverviewDashboard() {
+export function OverviewDashboard({
+  managerData,
+}: {
+  managerData: ManagerDashboardData;
+}) {
   const role = useRole();
+  const { municipality, neighborhoods, properties } = managerData;
   const [period, setPeriod] = useState(4);
   const [condition, setCondition] = useState("Todos");
   const [sortKey, setSortKey] = useState<SortKey>("incidenceProbability");
   const [neighborhoodSearch, setNeighborhoodSearch] = useState("");
   const [view, setView] = useState<"grid" | "table">("grid");
   const [selectedNeighborhood, setSelectedNeighborhood] =
-    useState<Neighborhood | null>(null);
+    useState<DashboardNeighborhood | null>(null);
 
   const normalizedSearch = normalizeSearchText(neighborhoodSearch.trim());
   const sortedNeighborhoods = useMemo(
@@ -98,9 +144,11 @@ export function OverviewDashboard() {
     (item) => item.risk === "Crítico",
   ).length;
 
-  if (role === "AGENTE_CAMPO") return <FieldPortal />;
-  if (role === "PROFISSIONAL_APS") return <ApsPortal />;
-  if (role === "GESTOR") return <ManagerOperationsDashboard />;
+  if (role === "AGENTE_CAMPO") return <FieldPortal data={managerData} />;
+  if (role === "PROFISSIONAL_APS")
+    return <ApsPortal neighborhoods={neighborhoods} />;
+  if (role === "GESTOR")
+    return <ManagerOperationsDashboard apiData={managerData} />;
 
   return (
     <div>
@@ -315,7 +363,7 @@ export function OverviewDashboard() {
                     </td>
                     <td className="py-3.5 pr-4">
                       <div className="flex items-center gap-2">
-                        <RiskBadge risk={item.risk} />
+                        <DashboardRiskBadge risk={item.risk} />
                         <span className="text-xs text-slate-600">
                           {item.incidenceProbability}%
                         </span>
@@ -366,13 +414,13 @@ function NeighborhoodCard({
   rank,
   onDetails,
 }: {
-  neighborhood: Neighborhood;
+  neighborhood: DashboardNeighborhood;
   weeks: number;
   condition: string;
   rank: number;
   onDetails: () => void;
 }) {
-  const riskColor = riskColors[neighborhood.risk];
+  const colors = dashboardRiskColor(neighborhood.risk);
   const cases = projectedCasesFor(neighborhood, weeks, condition);
 
   return (
@@ -391,7 +439,7 @@ function NeighborhoodCard({
             </p>
           </div>
         </div>
-        <RiskBadge risk={neighborhood.risk} />
+        <DashboardRiskBadge risk={neighborhood.risk} />
       </div>
 
       <div className="mt-4 grid grid-cols-3 gap-2 border-y border-slate-100 py-3">
@@ -434,7 +482,7 @@ function NeighborhoodCard({
             className="h-full"
             style={{
               width: `${neighborhood.incidenceProbability}%`,
-              backgroundColor: riskColor.foreground,
+              backgroundColor: colors.foreground,
             }}
           />
         </div>
@@ -456,7 +504,7 @@ function RecommendationsDrawer({
   condition,
   onClose,
 }: {
-  neighborhood: Neighborhood;
+  neighborhood: DashboardNeighborhood;
   weeks: number;
   condition: string;
   onClose: () => void;
@@ -489,8 +537,7 @@ function RecommendationsDrawer({
               {neighborhood.name}
             </h2>
             <p className="mt-1 text-sm text-slate-500">
-              {neighborhood.district} · {municipality.name},{" "}
-              {municipality.state}
+              {neighborhood.district}
             </p>
           </div>
           <button
@@ -506,7 +553,7 @@ function RecommendationsDrawer({
           <div>
             <p className="text-xs text-slate-500">Nível de risco</p>
             <div className="mt-1">
-              <RiskBadge risk={neighborhood.risk} />
+              <DashboardRiskBadge risk={neighborhood.risk} />
             </div>
           </div>
           <div className="text-right">
@@ -585,25 +632,16 @@ function RecommendationsDrawer({
   );
 }
 
-function FieldPortal() {
+function FieldPortal({ data }: { data: ManagerDashboardData }) {
   const [routeStarted, setRouteStarted] = useState(false);
-  const reportDates = useMemo(() => availableDailyReportDates(), []);
-  const [reportDate, setReportDate] = useState(
-    reportDates.includes(defaultDailyReportDate)
-      ? defaultDailyReportDate
-      : (reportDates[0] ?? defaultDailyReportDate),
-  );
+  const reportDates = data.dailyReport.dates;
+  const fallbackDate = reportDates[0] ?? new Date().toISOString().slice(0, 10);
+  const [reportDate, setReportDate] = useState(fallbackDate);
   const dailyReportUrl = `/relatorios/resumo-diario-servico-antivetorial.html?data=${reportDate}`;
   const fieldSummaryUrl = `/relatorios/resumo-trabalho-campo-laboratorio.html?data=${reportDate}`;
-  const assignedNeighborhood = neighborhoods.find(
-    (neighborhood) => neighborhood.id === "centro",
-  )!;
-  const sent = sectorPropertiesDemo.filter(
-    (property) => property.ultimaVisita?.operacaoSync.status === "RECEBIDA",
-  ).length;
-  const pending = sectorPropertiesDemo.filter(
-    (property) => property.ultimaVisita?.operacaoSync.status === "PENDENTE",
-  ).length;
+  const assignedNeighborhood = data.neighborhoods[0];
+  const sent = data.fieldSummary.received;
+  const pending = data.fieldSummary.pending;
 
   return (
     <div>
@@ -618,7 +656,7 @@ function FieldPortal() {
       >
         <Panel title="Imóveis atribuídos" description="Percurso demonstrativo">
           <p className="text-3xl font-bold text-slate-950">
-            {sectorPropertiesDemo.length}
+            {data.fieldSummary.assigned}
           </p>
         </Panel>
         <Panel title="Visitas recebidas" description="Registros sincronizados">
@@ -727,7 +765,7 @@ function FieldPortal() {
           title="Alerta da microárea"
           description="Vigilância municipal · projeção para SE 42–45"
         >
-          <RiskBadge risk={assignedNeighborhood.risk} />
+          <DashboardRiskBadge risk={assignedNeighborhood.risk} />
           <p className="mt-4 text-sm font-semibold text-slate-900">
             Aumento de notificações suspeitas no Centro
           </p>
@@ -741,7 +779,11 @@ function FieldPortal() {
   );
 }
 
-function ApsPortal() {
+function ApsPortal({
+  neighborhoods,
+}: {
+  neighborhoods: ManagerDashboardData["neighborhoods"];
+}) {
   const priorityNeighborhoods = neighborhoods.filter(
     (item) => item.risk === "Alto" || item.risk === "Crítico",
   );
@@ -795,7 +837,7 @@ function ApsPortal() {
                     {neighborhood.ratePer100k}/100 mil hab.
                   </span>
                 </span>
-                <RiskBadge risk={neighborhood.risk} />
+                <DashboardRiskBadge risk={neighborhood.risk} />
               </li>
             ))}
           </ul>

@@ -3,9 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "api:dev": "tsx app/api/server/main.ts",
-    "api:start": "tsx app/api/server/main.ts",
+    "dev": "node scripts/dev.mjs",
+    "web:dev": "next dev",
+    "api:dev": "dotenv -e .env -- tsx app/api/server/main.ts",
+    "api:start": "dotenv -e .env -- tsx app/api/server/main.ts",
     "build": "next build && node scripts/update-progress.js",
     "start": "next start",
     "lint": "node scripts/quality.mjs lint",

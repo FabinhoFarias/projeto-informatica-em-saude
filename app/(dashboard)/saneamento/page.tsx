@@ -1,4 +1,8 @@
 import { SanitationWorkspace } from "@/components/gestao/sanitation-workspace";
-export default function SanitationPage() {
-  return <SanitationWorkspace />;
+import { apiServices } from "@/app/api/services";
+
+export const instant = false;
+export default async function SanitationPage() {
+  const data = await apiServices.sanitation();
+  return <SanitationWorkspace apiData={data} />;
 }

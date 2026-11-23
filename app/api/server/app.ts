@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import express, { type Request, type Response } from "express";
 import helmet from "helmet";
 import cors from "cors";
@@ -8,6 +9,7 @@ import { ListPropertiesUseCase } from "@/backend/application/use-cases/list-prop
 import type { PropertyRepository } from "@/backend/domain/repositories/property-repository";
 import { MockPropertyRepository } from "@/backend/infrastructure/repositories/mock-property-repository";
 import { mockApiData } from "@/backend/infrastructure/mock-data";
+import { aceMemoryStore } from "@/backend/infrastructure/stores/ace-memory-store";
 import {
   authenticate,
   hasPermission,
@@ -108,6 +110,33 @@ export function createApi(
   app.post("/v1/auth/logout", (_request, response) =>
     response.status(204).send(),
   );
+
+  async function operationalSnapshot() {
+    const properties = await repository.list();
+    const assignedProperties = properties.filter(
+      (property) => property.assignedAceId,
+    );
+    const visits = aceMemoryStore.allVisits;
+    const visitedPropertyIds = new Set(
+      visits.map((visit) => String(visit.imovelId ?? "")),
+    );
+    return { properties, assignedProperties, visits, visitedPropertyIds };
+  }
+
+  function normalizeVisit(visit: Record<string, unknown> | null) {
+    if (!visit) return null;
+    const createdAt = String(visit.createdAt ?? new Date().toISOString());
+    return {
+      ...visit,
+      dataAtividade: String(visit.dataAtividade ?? createdAt.slice(0, 10)),
+      formulario: (visit.formulario ?? {}) as Record<string, unknown>,
+      operacaoSync: visit.operacaoSync ?? {
+        operationUuid: String(visit.id),
+        status: visit.status === "SINCRONIZADO" ? "RECEBIDA" : "PENDENTE",
+        recebidaEm: visit.status === "SINCRONIZADO" ? createdAt : null,
+      },
+    };
+  }
   app.get(
     "/v1/usuarios",
     requirePermission("users:read"),
@@ -117,6 +146,17 @@ export function createApi(
     "/v1/usuarios/aces",
     requirePermission("users:read"),
     (_request, response) => response.json({ data: mockApiData.usuarios }),
+  );
+  app.get(
+    "/v1/usuarios/:id",
+    requirePermission("users:read"),
+    (request, response) =>
+      response.json({
+        data:
+          mockApiData.usuarios.find(
+            (user) => user.id === String(request.params.id),
+          ) ?? null,
+      }),
   );
   app.get(
     "/v1/permissoes",
@@ -141,26 +181,67 @@ export function createApi(
   app.get(
     "/v1/territorios",
     requirePermission("territory:read"),
-    (_request, response) => response.json({ data: mockApiData.territorios }),
+    (_request, response) =>
+      response.json({
+        data: mockApiData.territorios.map((territory, index) => ({
+          ...territory,
+          name: territory.nome,
+          city: "Lagoa de Itaenga",
+          district: "Área Urbana",
+          population: 2800 + index * 410,
+          suspectedCases: 8 + ((index * 7) % 34),
+          forecastCases: 13 + ((index * 7) % 34),
+          ratePer100k: 74 + ((index * 31) % 290),
+          incidenceProbability: 24 + ((index * 9) % 68),
+          risk: index % 3 === 0 ? "Alto" : index % 2 === 0 ? "Médio" : "Baixo",
+          density: 4200 + index * 350,
+          vectorFoci: 2.1 + (index % 9) * 1.4,
+          apsVisits: 90 + index * 17,
+          apsCases: 12 + (index % 13),
+          apsStatus: index % 3 === 0 ? "Atenção" : "Em observação",
+          trigger: index % 4 === 0,
+        })),
+      }),
   );
   app.get(
     "/v1/quarteiroes",
     requirePermission("territory:read"),
     (_request, response) =>
       response.json({
-        data: Array.from({ length: 30 }, (_, index) => ({
-          id: `quarteirao-${index + 1}`,
-          numero: index + 1,
-          bairro:
-            mockApiData.territorios[index % mockApiData.territorios.length]
-              .nome,
-        })),
+        data: Array.from({ length: 30 }, (_, index) => {
+          const id = `quarteirao-${index + 1}`;
+          const assignment = aceMemoryStore
+            .assignments()
+            .find((item) => item.quarteiraoId === id);
+          return {
+            id,
+            numero: index + 1,
+            bairro:
+              mockApiData.territorios[index % mockApiData.territorios.length]
+                .nome,
+            aceId: assignment?.aceId ?? null,
+            cicloId: assignment?.cicloId ?? null,
+          };
+        }),
       }),
   );
   app.get(
     "/v1/atribuicoes",
     requirePermission("territory:read"),
-    (_request, response) => response.json({ data: [] }),
+    (request, response) =>
+      response.json({
+        data: aceMemoryStore.assignments(
+          request.query.aceId ? String(request.query.aceId) : undefined,
+        ),
+      }),
+  );
+  app.post(
+    "/v1/atribuicoes",
+    requirePermission("territory:manage"),
+    (request, response) =>
+      response
+        .status(201)
+        .json({ data: aceMemoryStore.upsertAssignment(request.body) }),
   );
   app.get(
     "/v1/ciclos",
@@ -170,29 +251,78 @@ export function createApi(
   app.get(
     "/v1/cobertura",
     requirePermission("reports:read"),
-    (_request, response) => response.json({ data: mockApiData.cobertura }),
+    async (_request, response) => {
+      const snapshot = await operationalSnapshot();
+      const atribuidos = snapshot.assignedProperties.length;
+      const visitados = snapshot.assignedProperties.filter((property) =>
+        snapshot.visitedPropertyIds.has(property.id),
+      ).length;
+      return response.json({
+        data: {
+          cicloId: "ciclo-2026-6",
+          atribuidos,
+          visitados,
+          pendentes: Math.max(0, atribuidos - visitados),
+          percentual: atribuidos
+            ? Math.round((visitados / atribuidos) * 100)
+            : 0,
+        },
+      });
+    },
   );
   app.get(
     "/v1/cobertura/aces",
     requirePermission("reports:read"),
-    (_request, response) =>
-      response.json({
-        data: mockApiData.usuarios.map((user, index) => ({
-          ...user,
-          cobertura: 54 + index * 9,
-        })),
-      }),
+    async (_request, response) => {
+      const snapshot = await operationalSnapshot();
+      return response.json({
+        data: mockApiData.usuarios.map((user) => {
+          const assigned = snapshot.assignedProperties.filter(
+            (property) => property.assignedAceId === user.id,
+          );
+          const visited = new Set(
+            snapshot.visits
+              .filter((visit) => visit.aceId === user.id)
+              .map((visit) => String(visit.imovelId)),
+          ).size;
+          return {
+            ...user,
+            atribuidos: assigned.length,
+            visitados: visited,
+            pendentes: Math.max(0, assigned.length - visited),
+            cobertura: assigned.length
+              ? Math.round((visited / assigned.length) * 100)
+              : 0,
+          };
+        }),
+      });
+    },
   );
   app.get(
     "/v1/cobertura/territorios",
     requirePermission("reports:read"),
-    (_request, response) =>
-      response.json({
-        data: mockApiData.territorios.map((territory, index) => ({
-          ...territory,
-          cobertura: 48 + index * 11,
-        })),
-      }),
+    async (_request, response) => {
+      const snapshot = await operationalSnapshot();
+      return response.json({
+        data: mockApiData.territorios.map((territory) => {
+          const territoryProperties = snapshot.assignedProperties.filter(
+            (property) => property.neighborhood === territory.nome,
+          );
+          const visited = territoryProperties.filter((property) =>
+            snapshot.visitedPropertyIds.has(property.id),
+          ).length;
+          return {
+            ...territory,
+            atribuidos: territoryProperties.length,
+            visitados: visited,
+            pendentes: territoryProperties.length - visited,
+            cobertura: territoryProperties.length
+              ? Math.round((visited / territoryProperties.length) * 100)
+              : 0,
+          };
+        }),
+      });
+    },
   );
   app.get(
     "/v1/amostras",
@@ -207,47 +337,72 @@ export function createApi(
   app.get(
     "/v1/relatorios/diario",
     requirePermission("reports:read"),
-    (_request, response) =>
-      response.json({
+    async (_request, response) => {
+      const snapshot = await operationalSnapshot();
+      return response.json({
         data: {
           data: "2026-11-22",
-          visitas: 582,
-          retornos: 92,
-          amostras: 2,
+          visitas: snapshot.visits.length,
+          retornos: aceMemoryStore.returns().length,
+          amostras: mockApiData.amostras.length,
           origem: "MOCK",
         },
-      }),
+      });
+    },
   );
   app.get(
     "/v1/relatorios/semanal",
     requirePermission("reports:read"),
-    (_request, response) =>
-      response.json({
+    async (_request, response) => {
+      const snapshot = await operationalSnapshot();
+      const cobertura = snapshot.assignedProperties.length
+        ? Math.round(
+            (snapshot.assignedProperties.filter((property) =>
+              snapshot.visitedPropertyIds.has(property.id),
+            ).length /
+              snapshot.assignedProperties.length) *
+              100,
+          )
+        : 0;
+      return response.json({
         data: {
           periodo: "semana-47-2026",
-          visitas: 582,
-          cobertura: 58,
+          visitas: snapshot.visits.length,
+          cobertura,
           origem: "MOCK",
         },
-      }),
+      });
+    },
   );
   app.get(
     "/v1/relatorios/ciclo",
     requirePermission("reports:read"),
-    (_request, response) =>
-      response.json({
+    async (_request, response) => {
+      const snapshot = await operationalSnapshot();
+      const cobertura = snapshot.assignedProperties.length
+        ? Math.round(
+            (snapshot.assignedProperties.filter((property) =>
+              snapshot.visitedPropertyIds.has(property.id),
+            ).length /
+              snapshot.assignedProperties.length) *
+              100,
+          )
+        : 0;
+      return response.json({
         data: {
           cicloId: "ciclo-2026-6",
-          visitas: 582,
-          cobertura: 58,
+          visitas: snapshot.visits.length,
+          cobertura,
           origem: "MOCK",
         },
-      }),
+      });
+    },
   );
   app.get(
     "/v1/ocorrencias",
     requirePermission("visits:read"),
-    (_request, response) => response.json({ data: [] }),
+    (_request, response) =>
+      response.json({ data: aceMemoryStore.occurrences() }),
   );
   app.get(
     "/v1/saneamento",
@@ -311,7 +466,42 @@ export function createApi(
               ? String(request.query.aceId)
               : undefined,
       });
-      return response.json({ data: result });
+      const requestedPage = Number(request.query.page ?? 1);
+      const requestedLimit = Number(request.query.limit ?? result.length);
+      const page = Number.isFinite(requestedPage)
+        ? Math.max(1, Math.floor(requestedPage))
+        : 1;
+      const limit = Number.isFinite(requestedLimit)
+        ? Math.min(200, Math.max(10, Math.floor(requestedLimit)))
+        : 100;
+      const pageItems = result.slice((page - 1) * limit, page * limit);
+      response.setHeader("X-Total-Count", String(result.length));
+      response.setHeader("X-Page", String(page));
+      response.setHeader("X-Page-Size", String(limit));
+      return response.json({
+        data: pageItems.map((property) => ({
+          ...property,
+          numero: property.number,
+          tipo: property.type,
+          logradouro: property.street,
+          quarteirao: String(property.block),
+          codigoLocal: property.id,
+          imovelVersaoId: property.id,
+          territorioId: property.neighborhood,
+          territorioVersaoId: "mock-v1",
+          situacaoCadastral: "ATIVO",
+          zona: "URBANA",
+          lado: "NORTE",
+          sequenciaPercurso: Number(property.number),
+          coordenadas: {
+            latitude: -7.94,
+            longitude: -35.29,
+            origem: "CADASTRO_DEMO",
+          },
+          pontoMapa: { x: 0, y: 0 },
+          ultimaVisita: normalizeVisit(aceMemoryStore.latestVisit(property.id)),
+        })),
+      });
     },
   );
   app.get(
@@ -327,7 +517,30 @@ export function createApi(
       ) {
         return response.status(404).json({ error: "Imóvel não encontrado" });
       }
-      return response.json({ data: property });
+      return response.json({
+        data: {
+          ...property,
+          numero: property.number,
+          tipo: property.type,
+          logradouro: property.street,
+          quarteirao: String(property.block),
+          codigoLocal: property.id,
+          imovelVersaoId: property.id,
+          territorioId: property.neighborhood,
+          territorioVersaoId: "mock-v1",
+          situacaoCadastral: "ATIVO",
+          zona: "URBANA",
+          lado: "NORTE",
+          sequenciaPercurso: Number(property.number),
+          coordenadas: {
+            latitude: -7.94,
+            longitude: -35.29,
+            origem: "CADASTRO_DEMO",
+          },
+          pontoMapa: { x: 0, y: 0 },
+          ultimaVisita: normalizeVisit(aceMemoryStore.latestVisit(property.id)),
+        },
+      });
     },
   );
   app.post(
@@ -335,12 +548,24 @@ export function createApi(
     requirePermission("visits:write"),
     (request, response) =>
       response.status(201).json({
-        data: {
-          id: `visita-mock-${Date.now()}`,
-          ...request.body,
-          status: "PENDENTE_SINCRONIZACAO",
-          origem: "MOCK",
-        },
+        data: aceMemoryStore.createVisit(request.body, request.user!.id),
+      }),
+  );
+  app.get(
+    "/v1/visitas",
+    requirePermission("visits:read"),
+    (request, response) =>
+      response.json({
+        data: aceMemoryStore
+          .visits({
+            aceId: request.query.aceId
+              ? String(request.query.aceId)
+              : undefined,
+            propertyId: request.query.imovelId
+              ? String(request.query.imovelId)
+              : undefined,
+          })
+          .map((visit) => normalizeVisit(visit)),
       }),
   );
   app.get(
@@ -348,42 +573,192 @@ export function createApi(
     requirePermission("visits:read"),
     (request, response) =>
       response.json({
-        data: { id: request.params.id, status: "MOCK", origem: "MOCK" },
+        data: normalizeVisit(aceMemoryStore.visit(String(request.params.id))),
       }),
   );
   app.get(
     "/v1/visitas/:id/ocorrencias",
     requirePermission("visits:read"),
-    (_request, response) => response.json({ data: [] }),
+    (request, response) =>
+      response.json({
+        data: aceMemoryStore.occurrences(String(request.params.id)),
+      }),
   );
   app.post(
     "/v1/visitas/:id/ocorrencias",
     requirePermission("visits:write"),
     (request, response) =>
       response.status(201).json({
-        data: {
-          id: `ocorrencia-mock-${Date.now()}`,
-          ...request.body,
-          origem: "MOCK",
-        },
+        data: aceMemoryStore.createOccurrence(
+          String(request.params.id),
+          request.body,
+        ),
       }),
   );
   app.post(
     "/v1/visitas/:id/anexos",
     requirePermission("visits:write"),
-    (_request, response) =>
+    (request, response) =>
       response.status(201).json({
-        data: {
-          id: `anexo-mock-${Date.now()}`,
-          status: "PENDENTE_SINCRONIZACAO",
-          origem: "MOCK",
-        },
+        data: aceMemoryStore.createAttachment(
+          String(request.params.id),
+          request.body,
+        ),
+      }),
+  );
+  app.get(
+    "/v1/visitas/:id/anexos",
+    requirePermission("visits:read"),
+    (request, response) =>
+      response.json({
+        data: aceMemoryStore.attachments(String(request.params.id)),
       }),
   );
   app.get(
     "/v1/retornos",
     requirePermission("visits:read"),
-    (_request, response) => response.json({ data: [] }),
+    (request, response) =>
+      response.json({
+        data: aceMemoryStore.returns({
+          aceId: request.query.aceId ? String(request.query.aceId) : undefined,
+          propertyId: request.query.imovelId
+            ? String(request.query.imovelId)
+            : undefined,
+        }),
+      }),
+  );
+  app.post(
+    "/v1/retornos",
+    requirePermission("visits:write"),
+    (request, response) =>
+      response.status(201).json({
+        data: aceMemoryStore.createReturn(request.body, request.user!.id),
+      }),
+  );
+  app.get(
+    "/v1/imoveis/:id/visitas",
+    requirePermission("visits:read"),
+    (request, response) =>
+      response.json({
+        data: aceMemoryStore
+          .visitsByProperty(String(request.params.id))
+          .map((visit) => normalizeVisit(visit)),
+      }),
+  );
+  app.get(
+    "/v1/imoveis/:id/retornos",
+    requirePermission("visits:read"),
+    (request, response) =>
+      response.json({
+        data: aceMemoryStore.returns({ propertyId: String(request.params.id) }),
+      }),
+  );
+  app.get(
+    "/v1/usuarios/aces/:id/historico",
+    requirePermission("reports:read"),
+    async (request, response) => {
+      const aceId = String(request.params.id);
+      const visits = aceMemoryStore.visitsByAce(aceId);
+      const visited = new Set(visits.map((item) => item.imovelId)).size;
+      const properties = await repository.list({ assignedAceId: aceId });
+      const atribuidos = properties.length;
+      return response.json({
+        data: {
+          aceId,
+          visitas: visits,
+          visitados: visited,
+          atribuidos,
+          pendentes: Math.max(0, atribuidos - visited),
+          cobertura: atribuidos ? Math.round((visited / atribuidos) * 100) : 0,
+          retornos: aceMemoryStore.returns({ aceId }),
+        },
+      });
+    },
+  );
+  app.get(
+    "/v1/usuarios/aces/:id/imoveis",
+    requirePermission("visits:read"),
+    async (request, response) =>
+      response.json({
+        data: await listProperties.execute({
+          assignedAceId: String(request.params.id),
+        }),
+      }),
+  );
+  app.post(
+    "/v1/sincronizacao",
+    requirePermission("visits:write"),
+    (request, response) => {
+      const operationUuid = String(
+        request.body.operationUuid ?? crypto.randomUUID(),
+      );
+      return response.status(201).json({
+        data: aceMemoryStore.synchronize(operationUuid, request.body),
+      });
+    },
+  );
+  app.get(
+    "/v1/sincronizacao/:operationUuid",
+    requirePermission("visits:read"),
+    (request, response) =>
+      response.json({
+        data: aceMemoryStore.synchronization(
+          String(request.params.operationUuid),
+        ),
+      }),
+  );
+  app.get(
+    "/v1/sincronizacao",
+    requirePermission("visits:read"),
+    (_request, response) =>
+      response.json({ data: aceMemoryStore.synchronizations() }),
+  );
+  app.get(
+    "/v1/fichas-manuais",
+    requirePermission("visits:read"),
+    (_request, response) =>
+      response.json({
+        data: aceMemoryStore.allVisits.filter(
+          (visit) => visit.origemRegistro === "PAPEL",
+        ),
+      }),
+  );
+  app.get(
+    "/v1/estoque/consumo",
+    requirePermission("stock:read"),
+    (_request, response) =>
+      response.json({
+        data: aceMemoryStore.allVisits
+          .filter(
+            (visit) =>
+              Number(visit.larvicida1Quantidade ?? 0) > 0 ||
+              Number(visit.larvicida2Quantidade ?? 0) > 0,
+          )
+          .map((visit) => ({
+            visitaId: visit.id,
+            imovelId: visit.imovelId,
+            aceId: visit.aceId,
+            larvicida1Tipo: visit.larvicida1Tipo ?? "",
+            larvicida1Quantidade: Number(visit.larvicida1Quantidade ?? 0),
+            larvicida2Tipo: visit.larvicida2Tipo ?? "",
+            larvicida2Quantidade: Number(visit.larvicida2Quantidade ?? 0),
+          })),
+      }),
+  );
+  app.get(
+    "/v1/mapas/aces",
+    requirePermission("maps:read"),
+    (_request, response) =>
+      response.json({
+        data: mockApiData.usuarios.map((user, index) => ({
+          aceId: user.id,
+          nome: user.nome,
+          latitude: -7.94 + index * 0.002,
+          longitude: -35.29 + index * 0.002,
+          atualizadoEm: "2026-11-22T09:00:00-03:00",
+          origem: "MOCK",
+        })),
+      }),
   );
   app.get(
     "/v1/amostras/:id",

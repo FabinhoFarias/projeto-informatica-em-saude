@@ -11,7 +11,7 @@ const options = [
   "Ponto estratégico",
 ];
 
-export function CyclePlanning() {
+export function CyclePlanning({ apiData: _apiData }: { apiData?: unknown }) {
   const [name, setName] = useState("Ciclo operacional 2026.2");
   const [start, setStart] = useState("2026-06-01");
   const [end, setEnd] = useState("2026-07-31");

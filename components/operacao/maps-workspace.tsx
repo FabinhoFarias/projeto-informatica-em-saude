@@ -9,7 +9,7 @@ import { sectorPropertiesDemo } from "@/lib/visitas/demo-data";
 
 const hasGoogleMapsKey = Boolean(process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY);
 
-export function MapsWorkspace() {
+export function MapsWorkspace({ apiData: _apiData }: { apiData?: unknown }) {
   const [layer, setLayer] = useState<"imoveis" | "hotspots">("imoveis");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const selected = sectorPropertiesDemo.find(

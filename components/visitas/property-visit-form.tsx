@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { FieldHelp } from "@/components/plataforma/field-help";
 import type { SectorPropertyMock } from "@/lib/visitas/demo-data";
@@ -68,8 +68,10 @@ function currentTimeInRecife() {
   }).format(new Date());
 }
 
-function visitMatchesCycle(date: string, cycle: string) {
+function visitMatchesCycle(date: string | undefined, cycle: string) {
+  if (!date) return false;
   const [year, month] = date.split("-").map(Number);
+  if (!Number.isFinite(year) || !Number.isFinite(month)) return false;
   return `${year}-${Math.floor((month - 1) / 2) + 1}` === cycle;
 }
 
@@ -158,9 +160,11 @@ function Section({
 export function PropertyVisitForm({
   property,
   cycle,
+  saveVisit,
 }: {
   property: SectorPropertyMock;
   cycle: string;
+  saveVisit?: (payload: Record<string, unknown>) => Promise<unknown>;
 }) {
   const existingVisit =
     property.ultimaVisita &&
@@ -178,45 +182,12 @@ export function PropertyVisitForm({
       ? "SINCRONIZADO"
       : "PENDENTE",
   );
-  const [liInspected, setLiInspected] = useState(() => {
-    if (typeof window === "undefined") return true;
-    const raw = sessionStorage.getItem(`vigia:visita:${property.id}:${cycle}`);
-    if (!raw) return existingForm?.imovelInspecionado ?? true;
-    try {
-      const saved = JSON.parse(raw);
-      if (saved.versaoFormulario !== "2")
-        return existingForm?.imovelInspecionado ?? true;
-      return saved.imovelInspecionado !== "N";
-    } catch {
-      return true;
-    }
-  });
+  const [liInspected, setLiInspected] = useState(
+    existingForm?.imovelInspecionado ?? true,
+  );
   const formRef = useRef<HTMLFormElement>(null);
 
-  useEffect(() => {
-    const raw = sessionStorage.getItem(`vigia:visita:${property.id}:${cycle}`);
-    if (!raw || !formRef.current) return;
-    try {
-      const saved = JSON.parse(raw) as Record<string, string>;
-      if (saved.versaoFormulario !== "2") {
-        sessionStorage.removeItem(`vigia:visita:${property.id}:${cycle}`);
-        return;
-      }
-      for (const [name, value] of Object.entries(saved)) {
-        const field = formRef.current.elements.namedItem(name);
-        if (
-          field instanceof HTMLInputElement ||
-          field instanceof HTMLSelectElement ||
-          field instanceof HTMLTextAreaElement
-        )
-          field.value = value;
-      }
-    } catch {
-      sessionStorage.removeItem(`vigia:visita:${property.id}:${cycle}`);
-    }
-  }, [cycle, property.id]);
-
-  function save(event: FormEvent<HTMLFormElement>) {
+  async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
     const formData = new FormData(form);
@@ -229,19 +200,14 @@ export function PropertyVisitForm({
     formData.set("dataAtividade", dateIso);
     formData.set("versaoFormulario", "2");
     const data = Object.fromEntries(formData);
-    sessionStorage.setItem(
-      `vigia:visita:${property.id}:${cycle}`,
-      JSON.stringify(data),
-    );
+    if (saveVisit) await saveVisit(data);
     setSyncStatus("PENDENTE");
-    setMessage(
-      "Ficha registrada nesta demonstração e mantida nesta sessão do navegador.",
-    );
+    setMessage("Ficha enviada para a API e registrada para sincronização.");
   }
 
   return (
-    <div>
-      <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <Link
             href="/visitas"
@@ -262,15 +228,10 @@ export function PropertyVisitForm({
           </p>
         </div>
       </div>
-      <form
-        id="property-visit-form"
-        ref={formRef}
-        onSubmit={save}
-        className="space-y-0"
-      >
+      <form id="property-visit-form" ref={formRef} onSubmit={save}>
         <fieldset
           disabled={!isCurrentCycle}
-          className="block space-y-4 border-0 p-0"
+          className="flex flex-col gap-4 border-0 p-0"
         >
           <Section
             title="Atividade e situação da visita"
@@ -541,14 +502,16 @@ export function PropertyVisitForm({
           </Section>
         </fieldset>
       </form>
-      <section className="mt-6 border-t border-slate-300 pt-6">
-        <h2 className="mb-3 text-lg font-bold text-slate-950">
-          Registros complementares da operação
-        </h2>
-        <p className="mb-4 text-sm text-slate-600">
-          Depois de salvar a ficha, complemente o registro com histórico,
-          sincronização, ocorrências e anexos.
-        </p>
+      <section className="flex flex-col gap-4 border-t border-slate-300 pt-4">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-lg font-bold text-slate-950">
+            Registros complementares da operação
+          </h2>
+          <p className="text-sm text-slate-600">
+            Depois de salvar a ficha, complemente o registro com histórico,
+            sincronização, ocorrências e anexos.
+          </p>
+        </div>
         <PropertyOperationSupport
           property={property}
           syncStatus={syncStatus}
@@ -556,7 +519,7 @@ export function PropertyVisitForm({
           readOnly={!isCurrentCycle}
         />
       </section>
-      <div className="mt-6 flex flex-col items-center justify-center gap-3 border border-slate-200 bg-white p-4 text-center shadow-sm">
+      <div className="flex flex-col items-center justify-center gap-3 border border-slate-200 bg-white p-4 text-center shadow-sm">
         <p role="status" className="text-sm font-semibold text-emerald-800">
           {message}
         </p>

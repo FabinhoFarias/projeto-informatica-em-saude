@@ -5,7 +5,7 @@ const {
   calculateProgress,
   updateDocument,
   formatProgress,
-} = require("./update-progress");
+} = require("../scripts/update-progress");
 /* eslint-enable @typescript-eslint/no-require-imports */
 
 function requirement(id, status = "⏳ **Futuro**") {

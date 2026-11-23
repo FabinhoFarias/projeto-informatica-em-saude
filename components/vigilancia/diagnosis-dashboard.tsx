@@ -43,7 +43,7 @@ function pointsFor(values: number[]) {
     .join(" ");
 }
 
-export function DiagnosisDashboard() {
+export function DiagnosisDashboard({ apiData: _apiData }: { apiData?: unknown }) {
   const [sortKey, setSortKey] = useState<SortKey>("vectorFoci");
   const [ascending, setAscending] = useState(false);
   const [sensitivity, setSensitivity] = useState(60);

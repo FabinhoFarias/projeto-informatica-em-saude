@@ -14,8 +14,25 @@ const labels: Record<SanitationStatus, string> = {
   EM_TRATATIVA: "Em tratativa",
   RESOLVIDO: "Resolvido",
 };
-export function SanitationWorkspace() {
-  const [points, setPoints] = useState(sanitationDemo);
+export function SanitationWorkspace({ apiData: _apiData }: { apiData?: unknown }) {
+  const apiPoints = Array.isArray(_apiData) ? _apiData : [];
+  const [points, setPoints] = useState(
+    apiPoints.length
+      ? apiPoints.map((item, index) => {
+          const row = item as Record<string, unknown>;
+          return {
+            id: String(row.id ?? `api-${index}`),
+            type: String(row.type ?? row.tipo ?? "Ocorrência ambiental"),
+            address: String(row.address ?? row.endereco ?? "Endereço não informado"),
+            neighborhood: String(row.neighborhood ?? row.bairro ?? ""),
+            responsible: String(row.responsible ?? row.responsavel ?? "Não definido"),
+            deadline: String(row.deadline ?? row.prazo ?? "2026-12-31"),
+            status: (row.status ?? "ABERTO") as SanitationStatus,
+            notes: String(row.notes ?? row.observacoes ?? ""),
+          };
+        })
+      : sanitationDemo,
+  );
   const update = (id: string, status: SanitationStatus) =>
     setPoints((current) =>
       current.map((point) => (point.id === id ? { ...point, status } : point)),

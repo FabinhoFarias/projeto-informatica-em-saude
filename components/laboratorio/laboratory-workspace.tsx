@@ -10,7 +10,6 @@ import { SampleSummary } from "@/components/laboratorio/sample-summary";
 import { SampleTimeline } from "@/components/laboratorio/sample-timeline";
 import { MetricCard, PageHeading } from "@/components/plataforma/dashboard-ui";
 import {
-  laboratorySamplesDemo,
   type LaboratoryPhase,
   type LaboratorySampleMock,
   type LaboratorySpecies,
@@ -19,10 +18,12 @@ import {
 const LABORATORY_USER = "João Silva · ACE Laboratorista";
 const finishedStatuses = ["CONCLUIDA", "INCONCLUSIVA"];
 
-export function LaboratoryWorkspace() {
-  const [samples, setSamples] = useState<LaboratorySampleMock[]>(() =>
-    structuredClone(laboratorySamplesDemo),
-  );
+export function LaboratoryWorkspace({
+  initialSamples = [],
+}: {
+  initialSamples?: LaboratorySampleMock[];
+}) {
+  const [samples, setSamples] = useState<LaboratorySampleMock[]>(initialSamples);
   const [selectedId, setSelectedId] = useState(samples[0]?.id ?? "");
   const [filter, setFilter] = useState<SampleFilter>("PENDENTES");
   const selected =

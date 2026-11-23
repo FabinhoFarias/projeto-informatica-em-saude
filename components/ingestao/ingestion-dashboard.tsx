@@ -8,7 +8,7 @@ import { demoHeaders, demoRows } from "@/lib/ingestao/demo-data";
 import { parseCsv, resolveNeighborhood } from "@/lib/ingestao/processor";
 import type { ImportResult } from "@/lib/ingestao/types";
 
-export function IngestionDashboard() {
+export function IngestionDashboard({ apiData: _apiData }: { apiData?: unknown }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [source, setSource] = useState("e-SUS PEC");
   const [file, setFile] = useState<File | null>(null);

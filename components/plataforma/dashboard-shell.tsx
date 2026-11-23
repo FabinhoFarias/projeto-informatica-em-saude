@@ -1,13 +1,17 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { DashboardHeader } from "@/components/dashboard-header";
 import { RoleProvider } from "@/components/identidade/rbac-context";
 import { RouteAccess } from "@/components/identidade/route-access";
 import { DashboardSidebar } from "@/components/dashboard-sidebar";
-import { canAccessPath, type Role } from "@/lib/identidade/permissions";
+import {
+  canAccessPath,
+  getRoleHomeRoute,
+  type Role,
+} from "@/lib/identidade/permissions";
 import { navigationItems } from "@/lib/plataforma/navigation";
 
 const INITIAL_ROLE: Role = "GESTOR";
@@ -37,6 +41,7 @@ function LoggedOutState({ onResume }: { onResume: () => void }) {
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const [role, setRole] = useState<Role>(INITIAL_ROLE);
   const [loggedOut, setLoggedOut] = useState(false);
@@ -47,6 +52,15 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
   const handleLogout = () => setLoggedOut(true);
   const handleResume = () => setLoggedOut(false);
+  const handleRoleChange = (nextRole: Role) => {
+    setRole(nextRole);
+    setLoggedOut(false);
+
+    // Cada perfil começa em uma tela compatível com suas permissões.
+    // Isso evita deixar a demonstração em uma rota que geraria o aviso de acesso restrito.
+    const home = getRoleHomeRoute(nextRole);
+    if (pathname !== home) router.replace(home);
+  };
   const expandSidebar = () => setSidebarExpanded(true);
   const collapseSidebar = () => setSidebarExpanded(false);
 
@@ -63,7 +77,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       <div className="min-w-0 flex-1">
         <DashboardHeader
           role={role}
-          onRoleChange={setRole}
+          onRoleChange={handleRoleChange}
           onLogout={handleLogout}
         />
 

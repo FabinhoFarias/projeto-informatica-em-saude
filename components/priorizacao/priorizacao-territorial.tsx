@@ -6,7 +6,7 @@ import { evaluateDemoTerritory } from "@/lib/priorizacao/rules";
 import type { ReviewStatus } from "@/lib/priorizacao/types";
 import { TerritoryHousesPanel } from "@/components/territorios/territory-houses-panel";
 
-export function TerritorialPrioritization() {
+export function TerritorialPrioritization({ apiData: _apiData }: { apiData?: unknown }) {
   const [selectedId, setSelectedId] = useState(demoTerritories[0].id);
   const [decisions, setDecisions] = useState<Record<string, ReviewStatus>>({});
   const selected = useMemo(

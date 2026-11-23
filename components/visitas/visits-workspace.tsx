@@ -17,10 +17,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { PageHeading } from "@/components/plataforma/dashboard-ui";
-import {
-  sectorPropertiesDemo,
-  type SectorPropertyMock,
-} from "@/lib/visitas/demo-data";
+import type { SectorPropertyMock } from "@/lib/visitas/demo-data";
 
 type Outcome = "VISITADO" | "RECUSA" | "FECHADO" | "NAO_VISITADO";
 type Grouping = "quarteirao" | "rua";
@@ -125,48 +122,30 @@ function normalizeSearch(value: string) {
     .trim();
 }
 
-function loadSessionOutcomes(cycle: string) {
-  const loaded: Record<string, Outcome> = {};
-  if (typeof window === "undefined") return loaded;
-  for (const property of sectorPropertiesDemo) {
-    const key = `vigia:visita:${property.id}:${cycle}`;
-    const raw = sessionStorage.getItem(key);
-    if (!raw) continue;
-    try {
-      const access = JSON.parse(raw).acesso;
-      loaded[property.id] =
-        access === "REALIZADO"
-          ? "VISITADO"
-          : access === "RECUSA"
-            ? "RECUSA"
-            : "FECHADO";
-    } catch {
-      sessionStorage.removeItem(key);
-    }
-  }
-  return loaded;
-}
-
 export function VisitsWorkspace({
   title = "Imóveis do meu setor",
   description = "Organize por quarteirão ou rua e acompanhe a situação de cada imóvel no ciclo de dois meses.",
   eyebrow = "Operação de campo · ACE",
+  properties: initialProperties = [],
+  currentPage = 1,
+  totalPages = 1,
 }: {
   title?: string;
   description?: string;
   eyebrow?: string;
+  properties?: SectorPropertyMock[];
+  currentPage?: number;
+  totalPages?: number;
 } = {}) {
   const cycles = useMemo(() => cycleOptions(), []);
+  const properties = initialProperties;
   const [cycle, setCycle] = useState(cycles[0].key);
   const [grouping, setGrouping] = useState<Grouping>("quarteirao");
   const [search, setSearch] = useState("");
-  const [sessionOutcomes, setSessionOutcomes] = useState<
-    Record<string, Outcome>
-  >(() => loadSessionOutcomes(cycles[0].key));
 
   const filtered = useMemo(() => {
     const term = normalizeSearch(search);
-    return sectorPropertiesDemo
+    return properties
       .filter((property) => {
         const propertyNumber = normalizeSearch(property.numero);
         const street = normalizeSearch(property.logradouro);
@@ -184,7 +163,7 @@ export function VisitsWorkspace({
         return street.includes(term) || block.includes(term);
       })
       .sort((a, b) => a.sequenciaPercurso - b.sequenciaPercurso);
-  }, [search]);
+  }, [properties, search]);
 
   const groups = useMemo(() => {
     const grouped = new Map<string, SectorPropertyMock[]>();
@@ -195,8 +174,8 @@ export function VisitsWorkspace({
     }
     for (const properties of grouped.values()) {
       properties.sort((a, b) => {
-        const stateA = sessionOutcomes[a.id] ?? outcome(a, cycle);
-        const stateB = sessionOutcomes[b.id] ?? outcome(b, cycle);
+        const stateA = outcome(a, cycle);
+        const stateB = outcome(b, cycle);
         return (
           outcomePriority[stateA] - outcomePriority[stateB] ||
           a.sequenciaPercurso - b.sequenciaPercurso
@@ -204,11 +183,11 @@ export function VisitsWorkspace({
       });
     }
     return [...grouped];
-  }, [cycle, filtered, grouping, sessionOutcomes]);
+  }, [cycle, filtered, grouping]);
 
-  const counts = sectorPropertiesDemo.reduce<Record<Outcome, number>>(
+  const counts = properties.reduce<Record<Outcome, number>>(
     (result, property) => {
-      result[sessionOutcomes[property.id] ?? outcome(property, cycle)]++;
+      result[outcome(property, cycle)]++;
       return result;
     },
     { VISITADO: 0, RECUSA: 0, FECHADO: 0, NAO_VISITADO: 0 },
@@ -226,7 +205,6 @@ export function VisitsWorkspace({
               onChange={(event) => {
                 const nextCycle = event.target.value;
                 setCycle(nextCycle);
-                setSessionOutcomes(loadSessionOutcomes(nextCycle));
               }}
               className="mt-1 h-11 w-full border border-slate-300 bg-white px-3 text-sm font-normal"
             >
@@ -315,7 +293,7 @@ export function VisitsWorkspace({
             >
               {items.map((property) => {
                 const state =
-                  sessionOutcomes[property.id] ?? outcome(property, cycle);
+                  outcome(property, cycle);
                 const visit = visitInCycle(property, cycle);
                 const deposits = visit
                   ? Object.values(visit.formulario.depositos).reduce(
@@ -373,9 +351,35 @@ export function VisitsWorkspace({
           </p>
         )}
       </div>
+      {totalPages > 1 && (
+        <nav
+          aria-label="Paginação dos imóveis"
+          className="mt-4 flex flex-wrap items-center justify-center gap-3 border border-slate-200 bg-white p-4"
+        >
+          {currentPage > 1 && (
+            <Link
+              href={`/visitas?page=${currentPage - 1}`}
+              className="border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700"
+            >
+              Página anterior
+            </Link>
+          )}
+          <span className="text-sm font-semibold text-slate-700">
+            Página {currentPage} de {totalPages}
+          </span>
+          {currentPage < totalPages && (
+            <Link
+              href={`/visitas?page=${currentPage + 1}`}
+              className="border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700"
+            >
+              Próxima página
+            </Link>
+          )}
+        </nav>
+      )}
       <p className="mt-4 text-xs text-slate-600">
-        Dados fictícios. As alterações ficam apenas nesta sessão; o histórico
-        disponível contém a última visita de cada imóvel.
+        Dados fictícios fornecidos pela API. O histórico disponível contém a
+        última visita de cada imóvel.
       </p>
     </div>
   );

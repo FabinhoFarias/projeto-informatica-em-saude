@@ -6,9 +6,7 @@ import {
   PageHeading,
   Panel,
 } from "@/components/plataforma/dashboard-ui";
-import { mappedTerritories, municipality } from "@/lib/territorios/demo-data";
 import { roleLabels, roles, type Role } from "@/lib/identidade/permissions";
-import { initialUsers } from "@/lib/identidade/demo-users";
 import type {
   AccountStatus,
   UserAccount,
@@ -27,14 +25,9 @@ const functionLabels: Record<OperationalFunction, string> = {
   PONTO_ESTRATEGICO: "Pontos estratégicos",
 };
 
-const territoryOptions = [
+const baseTerritoryOptions = [
   "Secretaria Municipal de Saúde",
   "Vigilância Epidemiológica",
-  ...mappedTerritories.map((territory) => territory.name),
-  ...mappedTerritories
-    .slice(0, 3)
-    .map((territory) => `${territory.name} · Microárea 01`),
-  ...mappedTerritories.slice(0, 3).map((territory) => `UBS ${territory.name}`),
 ];
 
 const blankForm: UserForm = {
@@ -108,7 +101,20 @@ function formatLastSync(lastSync?: string) {
   };
 }
 
-export function UsersDashboard() {
+export function UsersDashboard({
+  initialUsers,
+  territoryNames = [],
+}: {
+  initialUsers: UserAccount[];
+  territoryNames?: string[];
+}) {
+  const municipality = { name: "Lagoa de Itaenga", state: "PE" };
+  const territoryOptions = [
+    ...baseTerritoryOptions,
+    ...territoryNames,
+    ...territoryNames.slice(0, 3).map((name) => `${name} · Microárea 01`),
+    ...territoryNames.slice(0, 3).map((name) => `UBS ${name}`),
+  ];
   const [users, setUsers] = useState(initialUsers);
   const [query, setQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState("Todos os perfis");
