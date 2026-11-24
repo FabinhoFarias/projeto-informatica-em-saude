@@ -1,5 +1,6 @@
 import "server-only";
 import { connection } from "next/server";
+import { cookies } from "next/headers";
 
 const configuredBaseUrl = process.env.API_BASE_URL?.replace(/\/$/, "");
 const deploymentBaseUrl = process.env.VERCEL_URL
@@ -19,6 +20,8 @@ const tokenCache = new Map<string, { value: string; expiresAt: number }>();
 const pendingTokens = new Map<string, Promise<string>>();
 
 async function token(role = "GESTOR") {
+  const cookieToken = (await cookies()).get("vigia_access_token")?.value;
+  if (cookieToken) return cookieToken;
   const cached = tokenCache.get(role);
   if (cached && cached.expiresAt > Date.now() + 60_000) return cached.value;
   const pending = pendingTokens.get(role);

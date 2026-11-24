@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 type Visit = {
   id: string;
@@ -16,14 +16,7 @@ export function AceVisitHistory({
   visits: Visit[];
   cycles: Array<{ id: string; nome: string }>;
 }) {
-  const router = useRouter();
   const params = useSearchParams();
-  const update = (key: string, value: string) => {
-    const next = new URLSearchParams(params.toString());
-    if (value) next.set(key, value);
-    else next.delete(key);
-    router.push(`/visitas/historico?${next.toString()}`);
-  };
   return (
     <section className="border border-slate-200 bg-white p-5">
       <h2 className="text-lg font-bold text-slate-950">
@@ -32,13 +25,17 @@ export function AceVisitHistory({
       <p className="mb-4 text-sm text-slate-600">
         Consulte seus registros por data, semana ou ciclo.
       </p>
-      <div className="grid gap-3 md:grid-cols-3">
+      <form
+        action="/visitas/historico"
+        method="get"
+        className="grid gap-3 md:grid-cols-3"
+      >
         <label className="text-sm font-semibold text-slate-700">
           Data
           <input
             type="date"
             defaultValue={params.get("data") ?? ""}
-            onChange={(event) => update("data", event.target.value)}
+            name="data"
             className="mt-1 block w-full border border-slate-300 px-3 py-2"
           />
         </label>
@@ -47,7 +44,7 @@ export function AceVisitHistory({
           <input
             type="week"
             defaultValue={params.get("semana") ?? ""}
-            onChange={(event) => update("semana", event.target.value)}
+            name="semana"
             className="mt-1 block w-full border border-slate-300 px-3 py-2"
           />
         </label>
@@ -55,7 +52,7 @@ export function AceVisitHistory({
           Ciclo
           <select
             defaultValue={params.get("cicloId") ?? ""}
-            onChange={(event) => update("cicloId", event.target.value)}
+            name="cicloId"
             className="mt-1 block w-full border border-slate-300 px-3 py-2"
           >
             <option value="">Todos os ciclos</option>
@@ -66,7 +63,13 @@ export function AceVisitHistory({
             ))}
           </select>
         </label>
-      </div>
+        <button
+          type="submit"
+          className="w-fit bg-emerald-800 px-4 py-2 text-sm font-semibold text-white md:col-span-3"
+        >
+          Filtrar registros
+        </button>
+      </form>
       <div className="mt-5 overflow-x-auto">
         <table className="w-full min-w-[620px] text-left text-sm">
           <thead>

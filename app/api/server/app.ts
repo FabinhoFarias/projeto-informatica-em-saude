@@ -9,6 +9,7 @@ import { ListPropertiesUseCase } from "../../../backend/application/use-cases/li
 import type { PropertyRepository } from "../../../backend/domain/repositories/property-repository";
 import { MockPropertyRepository } from "../../../backend/infrastructure/repositories/mock-property-repository";
 import { mockApiData } from "../../../backend/infrastructure/mock-data";
+import { mockSanitation } from "../../../backend/infrastructure/mock-data/sanitation";
 import { aceMemoryStore } from "../../../backend/infrastructure/stores/ace-memory-store";
 import {
   authenticate,
@@ -105,6 +106,13 @@ export function createApi(
       role,
       municipalityId: "lagoa-de-itaenga",
     };
+    response.cookie("vigia_access_token", signToken(user), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 30 * 60 * 1000,
+      path: "/",
+    });
     return response.json({
       data: { user, accessToken: signToken(user), expiresIn: 1800 },
     });
@@ -113,9 +121,10 @@ export function createApi(
   app.get("/v1/auth/me", (request, response) =>
     response.json({ data: request.user }),
   );
-  app.post("/v1/auth/logout", (_request, response) =>
-    response.status(204).send(),
-  );
+  app.post("/v1/auth/logout", (_request, response) => {
+    response.clearCookie("vigia_access_token", { path: "/" });
+    return response.status(204).send();
+  });
 
   async function operationalSnapshot(cicloId?: string) {
     const properties = await repository.list();
@@ -349,12 +358,27 @@ export function createApi(
         ? String(request.query.cicloId)
         : undefined;
       const data = request.query.data ? String(request.query.data) : undefined;
+      const aceId = request.query.aceId
+        ? String(request.query.aceId)
+        : undefined;
       const snapshot = await operationalSnapshot(cicloId);
+      const aceVisits = aceId
+        ? snapshot.visits.filter((visit) => String(visit.aceId ?? "") === aceId)
+        : snapshot.visits;
+      const datasDisponiveis = [
+        ...new Set(
+          aceVisits
+            .map((visit) =>
+              String(visit.dataAtividade ?? visit.createdAt ?? "").slice(0, 10),
+            )
+            .filter(Boolean),
+        ),
+      ].sort();
       const visitas = data
-        ? snapshot.visits.filter((visit) =>
+        ? aceVisits.filter((visit) =>
             String(visit.dataAtividade ?? visit.createdAt).startsWith(data),
           )
-        : snapshot.visits;
+        : aceVisits;
       return response.json({
         data: {
           cicloId: cicloId ?? "ciclo-2026-6",
@@ -365,6 +389,8 @@ export function createApi(
             .filter((item) => !data || String(item.createdAt).startsWith(data))
             .length,
           amostras: mockApiData.amostras.length,
+          datasDisponiveis,
+          aceId: aceId ?? null,
           origem: "MOCK",
         },
       });
@@ -433,7 +459,7 @@ export function createApi(
   app.get(
     "/v1/saneamento",
     requirePermission("territory:read"),
-    (_request, response) => response.json({ data: [] }),
+    (_request, response) => response.json({ data: mockSanitation }),
   );
   app.get(
     "/v1/estoque/movimentacoes",
@@ -739,11 +765,22 @@ export function createApi(
       const semana = request.query.semana
         ? String(request.query.semana)
         : undefined;
+      const isoWeek = (value: string) => {
+        const date = new Date(`${value.slice(0, 10)}T12:00:00Z`);
+        if (Number.isNaN(date.getTime())) return "";
+        const thursday = new Date(date);
+        thursday.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay() || 7));
+        const yearStart = new Date(Date.UTC(thursday.getUTCFullYear(), 0, 1));
+        const week = Math.ceil(
+          ((thursday.getTime() - yearStart.getTime()) / 86400000 + 1) / 7,
+        );
+        return `${thursday.getUTCFullYear()}-W${String(week).padStart(2, "0")}`;
+      };
       const visits = aceMemoryStore.visitsByAce(aceId).filter((visit) => {
         if (cicloId && String(visit.cicloId ?? "") !== cicloId) return false;
         const date = String(visit.dataAtividade ?? visit.createdAt ?? "");
         if (data && !date.startsWith(data)) return false;
-        if (semana && !date.startsWith(semana)) return false;
+        if (semana && isoWeek(date) !== semana) return false;
         return true;
       });
       const properties = await repository.list({ assignedAceId: aceId });

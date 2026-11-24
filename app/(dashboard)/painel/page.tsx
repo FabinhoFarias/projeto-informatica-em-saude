@@ -11,60 +11,47 @@ export default async function OverviewPage({
 }) {
   const query = await searchParams;
   const cicloId = query.cicloId ?? "ciclo-2026-6";
-  const [
-    coverage,
-    territories,
-    aces,
-    blocks,
-    properties,
-    neighborhoods,
-    dailyReport,
-    visits,
-    synchronizations,
-    assignments,
-    cycles,
-    returns,
-  ] = await Promise.all([
-    apiServerFetch<ManagerDashboardData["coverage"]>(
-      `/v1/cobertura?cicloId=${cicloId}`,
-    ),
-    apiServerFetch<ManagerDashboardData["territories"]>(
-      `/v1/cobertura/territorios?cicloId=${cicloId}`,
-    ),
-    apiServerFetch<ManagerDashboardData["aces"]>(
-      `/v1/cobertura/aces?cicloId=${cicloId}`,
-    ),
-    apiServerFetch<ManagerDashboardData["blocks"]>("/v1/quarteiroes"),
-    // O ciclo atual usa os primeiros 60 quarteirões (até 1.980 imóveis).
-    // Limitar esta leitura evita transferir imóveis ainda não atribuídos ao painel.
-    apiServerFetch<Array<Record<string, unknown>>>("/v1/imoveis?limit=2000"),
-    apiServerFetch<ManagerDashboardData["neighborhoods"]>("/v1/territorios"),
-    apiServerFetch<Record<string, unknown>>(
-      `/v1/relatorios/diario?cicloId=${cicloId}`,
-    ),
-    apiServerFetch<Array<Record<string, unknown>>>(
-      `/v1/visitas?cicloId=${cicloId}`,
-    ),
-    apiServerFetch<Array<Record<string, unknown>>>("/v1/sincronizacao"),
-    apiServerFetch<Array<Record<string, unknown>>>("/v1/atribuicoes"),
-    apiServerFetch<Array<Record<string, unknown>>>("/v1/planejamento/ciclos"),
-    apiServerFetch<Array<Record<string, unknown>>>(
-      `/v1/retornos?cicloId=${cicloId}`,
-    ),
-  ]);
-  const aceHistories = Object.fromEntries(
-    await Promise.all(
-      aces.map(
-        async (ace) =>
-          [
-            ace.id,
-            await apiServerFetch<Record<string, unknown>>(
-              `/v1/usuarios/aces/${ace.id}/historico?cicloId=${cicloId}`,
-            ),
-          ] as const,
-      ),
-    ),
+  // Em desenvolvimento, consultas sequenciais evitam picos de CPU/memória no Mac.
+  const coverage = await apiServerFetch<ManagerDashboardData["coverage"]>(
+    `/v1/cobertura?cicloId=${cicloId}`,
   );
+  const territories = await apiServerFetch<ManagerDashboardData["territories"]>(
+    `/v1/cobertura/territorios?cicloId=${cicloId}`,
+  );
+  const aces = await apiServerFetch<ManagerDashboardData["aces"]>(
+    `/v1/cobertura/aces?cicloId=${cicloId}`,
+  );
+  const blocks =
+    await apiServerFetch<ManagerDashboardData["blocks"]>("/v1/quarteiroes");
+  const properties = await apiServerFetch<Array<Record<string, unknown>>>(
+    "/v1/imoveis?limit=2000",
+  );
+  const neighborhoods =
+    await apiServerFetch<ManagerDashboardData["neighborhoods"]>(
+      "/v1/territorios",
+    );
+  const dailyReport = await apiServerFetch<Record<string, unknown>>(
+    `/v1/relatorios/diario?cicloId=${cicloId}`,
+  );
+  const visits = await apiServerFetch<Array<Record<string, unknown>>>(
+    `/v1/visitas?cicloId=${cicloId}`,
+  );
+  const synchronizations =
+    await apiServerFetch<Array<Record<string, unknown>>>("/v1/sincronizacao");
+  const assignments =
+    await apiServerFetch<Array<Record<string, unknown>>>("/v1/atribuicoes");
+  const cycles = await apiServerFetch<Array<Record<string, unknown>>>(
+    "/v1/planejamento/ciclos",
+  );
+  const returns = await apiServerFetch<Array<Record<string, unknown>>>(
+    `/v1/retornos?cicloId=${cicloId}`,
+  );
+  const aceHistories: Record<string, Record<string, unknown>> = {};
+  for (const ace of aces) {
+    aceHistories[ace.id] = await apiServerFetch<Record<string, unknown>>(
+      `/v1/usuarios/aces/${ace.id}/historico?cicloId=${cicloId}`,
+    );
+  }
   const normalizedProperties = properties
     .filter((property) => property.assignedAceId)
     .map((property) => ({
@@ -163,7 +150,11 @@ export default async function OverviewPage({
     neighborhoods,
     properties: normalizedProperties,
     dailyReport: {
-      dates: dailyReport.data ? [String(dailyReport.data)] : [],
+      dates: Array.isArray(dailyReport.datasDisponiveis)
+        ? dailyReport.datasDisponiveis.map(String)
+        : dailyReport.data
+          ? [String(dailyReport.data)]
+          : [],
       latest: {
         visitas: Number(dailyReport.visitas ?? 0),
         retornos: Number(dailyReport.retornos ?? 0),

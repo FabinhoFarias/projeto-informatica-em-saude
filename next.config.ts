@@ -13,6 +13,12 @@ const nextConfig: NextConfig = {
   },
   cacheComponents: true,
   partialPrefetching: true,
+  async rewrites() {
+    if (process.env.NODE_ENV !== "development") return [];
+    return [
+      { source: "/v1/:path*", destination: "http://localhost:4000/v1/:path*" },
+    ];
+  },
   turbopack: {
     rules: {
       "*.css": {

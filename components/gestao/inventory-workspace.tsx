@@ -6,11 +6,17 @@ import {
   Panel,
 } from "@/components/plataforma/dashboard-ui";
 export function InventoryWorkspace({
-  apiData: _apiData,
+  apiData,
 }: {
-  apiData?: unknown;
+  apiData?:
+    | { stock?: unknown; movements?: unknown; consumption?: unknown }
+    | unknown[];
 }) {
-  const apiItems = Array.isArray(_apiData) ? _apiData : [];
+  const apiItems = Array.isArray(apiData)
+    ? apiData
+    : Array.isArray((apiData as { stock?: unknown[] } | undefined)?.stock)
+      ? (apiData as { stock: unknown[] }).stock
+      : [];
   const [items, setItems] = useState(
     apiItems.length
       ? apiItems.map((item, index) => {
@@ -19,6 +25,7 @@ export function InventoryWorkspace({
             id: String(row.id ?? `api-${index}`),
             name: String(row.name ?? row.nome ?? "Item de estoque"),
             unit: String(row.unit ?? row.unidade ?? "unidade"),
+            category: String(row.category ?? row.categoria ?? "APOIO"),
             balance: Number(row.balance ?? row.saldo ?? 0),
             minimum: Number(row.minimum ?? row.minimo ?? 0),
             consumed: Number(row.consumed ?? row.consumo ?? 0),
@@ -61,6 +68,7 @@ export function InventoryWorkspace({
               <tr>
                 <th className="p-3">Produto</th>
                 <th className="p-3">Unidade</th>
+                <th className="p-3">Categoria</th>
                 <th className="p-3 text-right">Saldo</th>
                 <th className="p-3 text-right">Mínimo</th>
                 <th className="p-3 text-right">Consumo</th>
@@ -72,6 +80,7 @@ export function InventoryWorkspace({
                 <tr key={item.id} className="border-b border-slate-100">
                   <td className="p-3 font-semibold">{item.name}</td>
                   <td className="p-3 text-slate-600">{item.unit}</td>
+                  <td className="p-3 text-slate-600">{item.category}</td>
                   <td className="p-3 text-right">
                     <input
                       aria-label={`Saldo de ${item.name}`}

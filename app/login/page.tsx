@@ -31,7 +31,10 @@ export default function LoginPage() {
         throw new Error(body.error ?? "Não foi possível entrar na plataforma.");
       }
       localStorage.setItem("vigia.accessToken", body.data.accessToken);
-      router.push("/painel");
+      const redirect = new URLSearchParams(window.location.search).get(
+        "redirect",
+      );
+      router.push(redirect || "/painel");
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Falha ao entrar.");
     } finally {
