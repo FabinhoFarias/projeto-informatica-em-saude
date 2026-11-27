@@ -358,9 +358,15 @@ export function createApi(
         ? String(request.query.cicloId)
         : undefined;
       const data = request.query.data ? String(request.query.data) : undefined;
-      const aceId = request.query.aceId
+      const requestedAceId = request.query.aceId
         ? String(request.query.aceId)
         : undefined;
+      // ACEs consultam somente o próprio relatório; gestores podem informar
+      // um ACE específico ou consultar o consolidado municipal.
+      const aceId =
+        request.user?.role === "AGENTE_CAMPO"
+          ? request.user.id
+          : requestedAceId;
       const snapshot = await operationalSnapshot(cicloId);
       const aceVisits = aceId
         ? snapshot.visits.filter((visit) => String(visit.aceId ?? "") === aceId)
@@ -379,6 +385,95 @@ export function createApi(
             String(visit.dataAtividade ?? visit.createdAt).startsWith(data),
           )
         : aceVisits;
+      const propertiesById = new Map(
+        snapshot.properties.map((property) => [String(property.id), property]),
+      );
+      const shortPropertyType = (type: unknown) => {
+        switch (String(type ?? "").toUpperCase()) {
+          case "RESIDENCIAL":
+            return "RES";
+          case "PREDIO":
+            return "PRD";
+          case "COMERCIAL":
+            return "COM";
+          case "TERRENO":
+            return "TB";
+          case "ESCOLA":
+            return "ESC";
+          case "UBS":
+            return "UBS";
+          case "IGREJA":
+            return "IGR";
+          case "INDUSTRIAL":
+            return "IND";
+          case "PONTO_ESTRATEGICO":
+            return "PE";
+          default:
+            return "OUT";
+        }
+      };
+      const rows = visitas.map((visit) => {
+        const property = propertiesById.get(String(visit.imovelId));
+        const form = (visit.formulario ?? {}) as Record<string, unknown>;
+        const deposits = (form.depositos ?? {}) as Record<string, unknown>;
+        return [
+          property?.block ?? "",
+          "",
+          "",
+          property?.street ?? "",
+          property?.number ?? "",
+          "",
+          "",
+          shortPropertyType(property?.type),
+          String(visit.dataAtividade ?? visit.createdAt ?? "").slice(11, 16),
+          visit.acesso === "REALIZADO" ? "N" : "R",
+          visit.acesso === "RECUSA"
+            ? "R"
+            : visit.acesso === "FECHADO"
+              ? "F"
+              : "",
+          ...["A1", "A2", "B", "C", "D1", "D2", "E"].map((key) =>
+            Number(deposits[key] ?? 0),
+          ),
+          form.imovelInspecionado ? "S" : "N",
+          form.amostraInicial ?? 0,
+          form.amostraFinal ?? 0,
+          form.quantidadeTubitos ?? 0,
+          form.depositosEliminados ?? 0,
+          form.imovelTratado ? "S" : "N",
+          form.larvicida1Tipo ?? "",
+          form.larvicida1Quantidade ?? 0,
+          form.larvicida1Depositos ?? 0,
+          form.larvicida2Tipo ?? "",
+          form.larvicida2Quantidade ?? 0,
+          form.perifocalTipo ?? "",
+          form.perifocalCargas ?? 0,
+        ];
+      });
+      const inspectedDeposits = visitas.reduce((total, visit) => {
+        const deposits = ((visit.formulario ?? {}) as Record<string, unknown>)
+          .depositos as Record<string, unknown> | undefined;
+        const values = Object.values(deposits ?? {}).map((value) =>
+          Number(value ?? 0),
+        );
+        return (
+          total + values.reduce((sum: number, value: number) => sum + value, 0)
+        );
+      }, 0);
+      const samples = visitas.reduce(
+        (total, visit) =>
+          total +
+          Number(
+            ((visit.formulario ?? {}) as Record<string, unknown>)
+              .quantidadeTubitos ?? 0,
+          ),
+        0,
+      );
+      const treated = visitas.filter((visit) =>
+        Boolean(
+          ((visit.formulario ?? {}) as Record<string, unknown>).imovelTratado,
+        ),
+      ).length;
       return response.json({
         data: {
           cicloId: cicloId ?? "ciclo-2026-6",
@@ -392,6 +487,45 @@ export function createApi(
           datasDisponiveis,
           aceId: aceId ?? null,
           origem: "MOCK",
+          metadata: {
+            municipio: "Lagoa de Itaenga",
+            localidade: "Lagoa de Itaenga",
+            categoria: "1–sede",
+            zona: "Urbana",
+            tipo: "1–sede",
+            concluida: visitas.length ? "S–sim" : "N–não",
+            dataAtividade: data ?? "",
+            cicloAno: `${cicloId ?? "ciclo-2026-6"}/2026`,
+            agente: aceId ?? "",
+            supervisor: "Gestor ACE",
+          },
+          totals: {
+            properties: visitas.length,
+            inspectedDeposits,
+            samples,
+            treated,
+          },
+          rows,
+          fieldSummary: {
+            propertiesByType: [],
+            properties: [],
+            samples: [],
+            pending: [],
+            depositsInspected: [],
+            depositsTreated: [],
+            adulticide: [],
+            workedBlocks: [
+              ...new Set(
+                visitas
+                  .map(
+                    (visit) =>
+                      propertiesById.get(String(visit.imovelId))?.block,
+                  )
+                  .filter(Boolean),
+              ),
+            ].join(", "),
+            completedBlocks: "—",
+          },
         },
       });
     },

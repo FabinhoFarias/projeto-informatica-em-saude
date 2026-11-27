@@ -72,7 +72,14 @@ const permissions: Record<ApiRole, ApiPermission[]> = {
     "prioritization:read",
     "diagnosis:read",
   ],
-  AGENTE_CAMPO: ["territory:read", "visits:read", "visits:write", "maps:read"],
+  AGENTE_CAMPO: [
+    "territory:read",
+    "visits:read",
+    "visits:write",
+    "reports:read",
+    "planning:read",
+    "maps:read",
+  ],
   LABORATORISTA: [
     "territory:read",
     "laboratory:read",

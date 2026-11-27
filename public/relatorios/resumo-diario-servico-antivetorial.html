@@ -230,34 +230,54 @@
        * A API devolve metadados, 31 valores por imóvel e os totais do dia.
        * Os IDs do HTML acima são usados pela função fill().
        */
-      const body = document.getElementById("imoveis");
+      // Quantidade de linhas por folha do formulário oficial. Ajuste este
+      // valor quando o espaço útil da versão impressa for recalibrado.
+      const ROWS_PER_SHEET = 24;
+      const firstSheet = document.querySelector(".sheet");
 
       function createRows(rows = []) {
-        // Limpa a tabela antes de trocar a data ou exibir uma nova resposta.
-        body.replaceChildren();
-        // O formulário oficial reserva 24 linhas, mesmo quando algumas ficam vazias.
-        for (let row = 0; row < 24; row++) {
-          const values = rows[row] ?? [];
-          const tr = document.createElement("tr");
-          for (let column = 0; column < 31; column++) {
-            const td = document.createElement("td");
-            td.contentEditable = "true";
-            td.textContent = values[column] ?? "";
-            const normalizedValue = String(values[column] ?? "").trim();
-            if (/^-?\d+(?:[.,]\d+)?$/.test(normalizedValue)) {
-              td.classList.add("numeric-value");
-              const digitCount = normalizedValue.replace(/\D/g, "").length;
-              if (digitCount > 3) td.classList.add("long-numeric-value");
-            }
-            tr.appendChild(td);
+        // Remove páginas adicionais de uma seleção anterior.
+        document.querySelectorAll(".report-page").forEach((page) => {
+          if (page !== firstSheet) page.remove();
+        });
+        firstSheet.classList.add("report-page");
+        const pageCount = Math.max(1, Math.ceil(rows.length / ROWS_PER_SHEET));
+        for (let pageIndex = 0; pageIndex < pageCount; pageIndex++) {
+          const page = pageIndex === 0 ? firstSheet : firstSheet.cloneNode(true);
+          if (pageIndex > 0) {
+            page.classList.add("report-page");
+            firstSheet.parentElement.appendChild(page);
           }
-          body.appendChild(tr);
+          const pageBody = page.querySelector("#imoveis");
+          pageBody.replaceChildren();
+          const pageRows = rows.slice(
+            pageIndex * ROWS_PER_SHEET,
+            (pageIndex + 1) * ROWS_PER_SHEET,
+          );
+          pageRows.forEach((values) => {
+            const tr = document.createElement("tr");
+            for (let column = 0; column < 31; column++) {
+              const td = document.createElement("td");
+              td.contentEditable = "true";
+              td.textContent = values[column] ?? "";
+              const normalizedValue = String(values[column] ?? "").trim();
+              if (/^-?\d+(?:[.,]\d+)?$/.test(normalizedValue)) {
+                td.classList.add("numeric-value");
+                const digitCount = normalizedValue.replace(/\D/g, "").length;
+                if (digitCount > 3) td.classList.add("long-numeric-value");
+              }
+              tr.appendChild(td);
+            }
+            pageBody.appendChild(tr);
+          });
         }
       }
 
       function fill(id, value) {
         // Preenche um campo único do cabeçalho, total ou rodapé pelo seu ID.
-        document.getElementById(id).textContent = value ?? "";
+        document.querySelectorAll(`[id="${id}"]`).forEach((element) => {
+          element.textContent = value ?? "";
+        });
       }
 
       async function loadDailyReport() {
@@ -274,7 +294,11 @@
           const response = await fetch(endpoint, { cache: "no-store" });
           if (!response.ok) throw new Error("Relatório indisponível");
           const report = await response.json();
-          const metadata = report.metadata;
+          const metadata = report.metadata || {};
+          const totals = report.totals || {};
+          // Renderiza as linhas primeiro: mesmo que algum campo opcional do
+          // cabeçalho esteja ausente, os registros do dia continuam visíveis.
+          createRows(Array.isArray(report.rows) ? report.rows : []);
           // Cabeçalho e assinaturas.
           fill("municipio", metadata.municipio);
           fill("localidade", metadata.localidade);
@@ -289,16 +313,14 @@
           // Totais posicionados logo abaixo da tabela de imóveis.
           fill(
             "total-imoveis",
-            `Imóveis registrados: ${report.totals.properties}`,
+            `Imóveis registrados: ${totals.properties ?? 0}`,
           );
           fill(
             "total-depositos",
-            `Depósitos inspecionados: ${report.totals.inspectedDeposits}`,
+            `Depósitos inspecionados: ${totals.inspectedDeposits ?? 0}`,
           );
-          fill("total-amostras", `Tubitos: ${report.totals.samples}`);
-          fill("total-tratados", `Imóveis tratados: ${report.totals.treated}`);
-          // Uma matriz com 31 valores alimenta cada linha de imóvel.
-          createRows(report.rows);
+          fill("total-amostras", `Tubitos: ${totals.samples ?? 0}`);
+          fill("total-tratados", `Imóveis tratados: ${totals.treated ?? 0}`);
         } catch (error) {
           // Mantém a folha editável e informa a falha sem quebrar o template.
           createRows();

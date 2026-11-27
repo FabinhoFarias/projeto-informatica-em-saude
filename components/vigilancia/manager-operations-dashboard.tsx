@@ -435,17 +435,17 @@ export function ManagerOperationsDashboard({
         title="Cobertura territorial"
         description="A leitura operacional usa registros de visitas, sem projeção de casos ou probabilidade de surto."
       >
-        <div className="mb-5 grid gap-3 border border-slate-200 bg-slate-50 p-4 md:grid-cols-[1fr_auto]">
-          <label className="text-xs font-semibold text-slate-700">
+        <div className="mb-5 grid min-w-0 gap-3 border border-slate-200 bg-slate-50 p-4 md:grid-cols-[minmax(0,1fr)_minmax(0,20rem)] md:items-end">
+          <label className="flex flex-col text-xs font-semibold text-slate-700">
             Buscar bairro, setor ou quarteirão
             <input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Digite o nome do território"
-              className="mt-1 min-h-10 w-full border border-slate-300 bg-white px-3 text-sm font-normal outline-none focus:border-emerald-700"
+              className="mt-1 min-h-10 w-full flex-1 border border-slate-300 bg-white px-3 text-sm font-normal outline-none focus:border-emerald-700"
             />
           </label>
-          <div className="flex items-end border border-slate-300 bg-white p-1">
+          <div className="flex w-full border border-slate-300 bg-white p-1">
             {(["BAIRROS", "SETORES", "QUARTEIROES"] as const).map((item) => (
               <button
                 key={item}
@@ -456,7 +456,7 @@ export function ManagerOperationsDashboard({
                     ? { backgroundColor: institutionPrimary }
                     : undefined
                 }
-                className={`min-h-9 px-4 text-xs font-semibold ${mode === item ? "text-white hover:brightness-90" : "text-slate-600 hover:bg-slate-100"}`}
+                className={`min-h-9 flex-1 px-4 text-sm font-semibold ${mode === item ? "text-white hover:brightness-90" : "bg-white text-slate-700 hover:bg-slate-100"}`}
               >
                 {item === "BAIRROS"
                   ? "Bairros"
@@ -468,7 +468,7 @@ export function ManagerOperationsDashboard({
           </div>
         </div>
         {mode === "QUARTEIROES" ? (
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-10">
             {filteredBlocks.map((block) => (
               <article
                 key={block.number}

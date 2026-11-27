@@ -21,9 +21,20 @@ import type { SectorPropertyMock } from "@/lib/visitas/demo-data";
 
 type Outcome = "VISITADO" | "RECUSA" | "FECHADO" | "NAO_VISITADO";
 type Grouping = "quarteirao" | "rua";
+type VisitFilter = "TODOS" | "NAO_VISITADOS" | "PENDENCIAS";
 
 function cycleKey(date: Date) {
   return `${date.getFullYear()}-${Math.floor(date.getMonth() / 2) + 1}`;
+}
+
+function isLastWeekOfCycle(cycle: string) {
+  const [year, cycleNumber] = cycle.split("-").map(Number);
+  if (!year || !cycleNumber) return false;
+  const end = new Date(year, cycleNumber * 2, 0, 23, 59, 59, 999);
+  const now = new Date();
+  return (
+    cycleKey(now) === cycle && end.getTime() - now.getTime() <= 7 * 86400000
+  );
 }
 
 function cycleOptions() {
@@ -138,11 +149,20 @@ export function VisitsWorkspace({
   const [cycle, setCycle] = useState(cycles[0].key);
   const [grouping, setGrouping] = useState<Grouping>("quarteirao");
   const [search, setSearch] = useState("");
+  const [visitFilter, setVisitFilter] = useState<VisitFilter>("TODOS");
 
   const filtered = useMemo(() => {
     const term = normalizeSearch(search);
     return properties
       .filter((property) => {
+        const state = outcome(property, cycle);
+        if (visitFilter === "NAO_VISITADOS" && state !== "NAO_VISITADO")
+          return false;
+        if (
+          visitFilter === "PENDENCIAS" &&
+          !["RECUSA", "FECHADO"].includes(state)
+        )
+          return false;
         const propertyNumber = normalizeSearch(property.numero);
         const street = normalizeSearch(property.logradouro);
         const block = normalizeSearch(property.quarteirao);
@@ -159,7 +179,7 @@ export function VisitsWorkspace({
         return street.includes(term) || block.includes(term);
       })
       .sort((a, b) => a.sequenciaPercurso - b.sequenciaPercurso);
-  }, [properties, search]);
+  }, [cycle, properties, search, visitFilter]);
 
   const groups = useMemo(() => {
     const grouped = new Map<string, SectorPropertyMock[]>();
@@ -181,14 +201,6 @@ export function VisitsWorkspace({
     return [...grouped];
   }, [cycle, filtered, grouping]);
 
-  const counts = properties.reduce<Record<Outcome, number>>(
-    (result, property) => {
-      result[outcome(property, cycle)]++;
-      return result;
-    },
-    { VISITADO: 0, RECUSA: 0, FECHADO: 0, NAO_VISITADO: 0 },
-  );
-
   return (
     <div>
       <div className="flex flex-wrap items-end justify-between gap-3">
@@ -205,8 +217,24 @@ export function VisitsWorkspace({
         </Link>
       </div>
       <section className="border border-slate-200 bg-white p-4 sm:p-5">
-        <div className="flex flex-wrap items-end gap-3">
-          <label className="min-w-48 flex-1 text-xs font-semibold text-slate-700">
+        <label className="w-full text-sm font-semibold text-slate-800">
+          <span className="mb-1 block">Buscar imóvel</span>
+          <span className="relative block">
+            <Search
+              className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500"
+              aria-hidden="true"
+            />
+            <input
+              type="search"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Buscar rua, número ou quarteirão"
+              className="h-11 w-full border border-slate-300 bg-white pl-10 pr-3 text-sm font-normal"
+            />
+          </span>
+        </label>
+        <div className="mt-3 grid w-full grid-cols-1 items-end gap-3 sm:grid-cols-3">
+          <label className="w-full min-w-0 text-left text-xs font-semibold text-slate-700">
             Ciclo bimestral
             <select
               value={cycle}
@@ -223,14 +251,14 @@ export function VisitsWorkspace({
               ))}
             </select>
           </label>
-          <fieldset className="text-xs font-semibold text-slate-700">
+          <fieldset className="w-full min-w-0 text-left text-xs font-semibold text-slate-700">
             <legend className="mb-1">Organizar por</legend>
-            <div className="flex border border-slate-300 p-1">
+            <div className="flex w-full border border-slate-300 p-1">
               <button
                 type="button"
                 aria-pressed={grouping === "quarteirao"}
                 onClick={() => setGrouping("quarteirao")}
-                className={`min-h-9 px-3 text-sm ${grouping === "quarteirao" ? "bg-emerald-800 text-white" : "text-slate-700"}`}
+                className={`min-h-9 flex-1 px-3 text-sm ${grouping === "quarteirao" ? "bg-emerald-800 text-white" : "text-slate-700"}`}
               >
                 Quarteirão
               </button>
@@ -238,41 +266,34 @@ export function VisitsWorkspace({
                 type="button"
                 aria-pressed={grouping === "rua"}
                 onClick={() => setGrouping("rua")}
-                className={`min-h-9 px-3 text-sm ${grouping === "rua" ? "bg-emerald-800 text-white" : "text-slate-700"}`}
+                className={`min-h-9 flex-1 px-3 text-sm ${grouping === "rua" ? "bg-emerald-800 text-white" : "text-slate-700"}`}
               >
                 Rua
               </button>
             </div>
           </fieldset>
-          <label className="relative min-w-56 flex-[2]">
-            <span className="sr-only">Buscar imóvel</span>
-            <Search
-              className="absolute left-3 top-3.5 h-4 w-4 text-slate-500"
-              aria-hidden="true"
-            />
-            <input
-              type="search"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Buscar rua, número ou quarteirão"
-              className="h-11 w-full border border-slate-300 bg-white pl-9 pr-3 text-sm"
-            />
-          </label>
-        </div>
-        <div
-          aria-label="Legenda e totais do ciclo"
-          className="mt-4 flex flex-wrap gap-x-5 gap-y-2 border-t border-slate-200 pt-4 text-sm"
-        >
-          <span className="text-emerald-900">
-            ● Visitados: {counts.VISITADO}
-          </span>
-          <span className="text-orange-800">● Recusas: {counts.RECUSA}</span>
-          <span className="text-amber-800">
-            ● Ninguém em casa/fechados: {counts.FECHADO}
-          </span>
-          <span className="text-red-800">
-            ● Não visitados: {counts.NAO_VISITADO}
-          </span>
+          <fieldset className="w-full min-w-0 text-xs font-semibold text-slate-700">
+            <legend className="mb-1 text-left">Filtros</legend>
+            <div className="flex w-full flex-col border border-slate-300 p-1 sm:flex-row">
+              {(["TODOS", "NAO_VISITADOS", "PENDENCIAS"] as VisitFilter[]).map(
+                (filter) => (
+                  <button
+                    key={filter}
+                    type="button"
+                    aria-pressed={visitFilter === filter}
+                    onClick={() => setVisitFilter(filter)}
+                    className={`min-h-9 min-w-32 flex-1 px-4 text-sm font-semibold ${visitFilter === filter ? "bg-emerald-800 text-white" : "bg-white text-slate-700"}`}
+                  >
+                    {filter === "TODOS"
+                      ? "Todos"
+                      : filter === "NAO_VISITADOS"
+                        ? "Não visitados"
+                        : "Pendências"}
+                  </button>
+                ),
+              )}
+            </div>
+          </fieldset>
         </div>
       </section>
       <div className="mt-4 space-y-4">
@@ -294,12 +315,13 @@ export function VisitsWorkspace({
                     ...new Set(items.map((property) => property.quarteirao)),
                   ].join(" · ")}
             </p>
-            <div
-              className="mt-4 grid grid-cols-4 gap-2 sm:grid-cols-6 lg:grid-cols-10"
-            >
+            <div className="mt-4 grid grid-cols-4 gap-2 sm:grid-cols-6 lg:grid-cols-10">
               {items.map((property) => {
                 const state = outcome(property, cycle);
                 const visit = visitInCycle(property, cycle);
+                const showAlert =
+                  property.alertaBairro === true ||
+                  (state === "NAO_VISITADO" && isLastWeekOfCycle(cycle));
                 const deposits = visit?.formulario?.depositos
                   ? Object.values(visit.formulario.depositos).reduce(
                       (total, value) => total + Number(value ?? 0),
@@ -325,7 +347,7 @@ export function VisitsWorkspace({
                           {propertyType(property.tipo)}
                         </span>
                       </span>
-                      {state === "NAO_VISITADO" ? (
+                      {showAlert ? (
                         <span
                           className="mt-0.5 h-2.5 w-2.5 shrink-0 rounded-full bg-red-500 shadow-sm ring-1 ring-white md:ring-2"
                           aria-hidden="true"

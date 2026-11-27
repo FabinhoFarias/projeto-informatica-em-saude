@@ -25,17 +25,34 @@ const seededVisitProperties = territoryNames.flatMap(
 );
 const visits: StoredRecord[] = seededVisitProperties.map((property, index) => {
   const aceId = property.assignedAceId ?? demoAceIds[index % demoAceIds.length];
+  const dataAtividade = `2026-11-${String(17 + (index % 6)).padStart(2, "0")}`;
+  const concluida = index % 19 !== 0 && index % 17 !== 0;
   return {
     id: `visita-seed-${index + 1}`,
     imovelId: property.id,
     aceId,
     cicloId: "ciclo-2026-6",
-    acesso:
-      index % 19 === 0 ? "RECUSA" : index % 17 === 0 ? "FECHADO" : "REALIZADO",
+    acesso: index % 19 === 0 ? "RECUSA" : index % 17 === 0 ? "FECHADO" : "REALIZADO",
+    dataAtividade,
+    formulario: {
+      depositos: {
+        A1: concluida ? index % 3 : 0,
+        A2: concluida ? index % 2 : 0,
+        B: concluida ? (index + 1) % 4 : 0,
+        C: concluida ? index % 2 : 0,
+        D1: concluida ? index % 3 : 0,
+        D2: concluida ? (index + 1) % 3 : 0,
+        E: concluida ? index % 2 : 0,
+      },
+      imovelInspecionado: concluida,
+      quantidadeTubitos: concluida && index % 5 === 0 ? 2 : 0,
+      depositosEliminados: concluida ? index % 3 : 0,
+      imovelTratado: concluida && index % 4 === 0,
+    },
     statusConteudo: "CONCLUIDO",
     status: "SINCRONIZADO",
     origem: "MOCK_SEED",
-    createdAt: `2026-11-${String((index % 22) + 1).padStart(2, "0")}T08:00:00-03:00`,
+    createdAt: `${dataAtividade}T08:00:00-03:00`,
   };
 });
 const occurrences: StoredRecord[] = [];

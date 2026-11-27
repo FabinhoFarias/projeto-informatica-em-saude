@@ -77,6 +77,10 @@ export interface SectorPropertyMock {
   territorioVersaoId: string;
   setor: string;
   quarteirao: string;
+  /** Bairro de referência para alertas definidos pela gestão. */
+  bairro?: string;
+  /** Alerta municipal definido pelo gestor para este bairro. */
+  alertaBairro?: boolean;
   lado: "NORTE" | "SUL";
   sequenciaPercurso: number;
   coordenadas: {
@@ -252,6 +256,15 @@ export const sectorPropertiesDemo: SectorPropertyMock[] =
         territorioVersaoId: sectorVersionId,
         setor: "Setor 02 · Centro",
         quarteirao,
+        bairro: [
+          "Centro",
+          "Nova Itaenga",
+          "São Sebastião",
+          "Salinas",
+          "Sítio Camboa",
+        ][blockIndex % 5],
+        // Mock de atenção definida pelo gestor para alguns bairros.
+        alertaBairro: blockIndex % 7 === 0,
         lado: propertyIndex < Math.ceil(count / 2) ? "NORTE" : "SUL",
         sequenciaPercurso: sequence,
         coordenadas: {
